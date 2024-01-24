@@ -1,2 +1,4 @@
 # Environments
-movieappserver/
+movieAppServer/
+ __pycache__/
+routes/__pycache__/
