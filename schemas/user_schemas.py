@@ -8,6 +8,13 @@ class UserBase(BaseModel):
     user_type: str
 
 
+class UserUpdate(BaseModel):
+    username: str
+    email: str
+    user_type: str
+    password: str
+
+
 class UserDisplay(BaseModel):
     username: str
     email: str
