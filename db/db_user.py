@@ -7,8 +7,7 @@ from db.hash import Hash
 def create_user(db: Session, request: UserBase):
     new_user = DbUser(
         username=request.username,
-        email=request.email,
-        user_type=request.user_type,  # Maybe we should just add a value here!
+        email=request.email,  # Maybe we should just add a value here!
         password=Hash.bcrypt(request.password),
     )
     db.add(new_user)
@@ -29,7 +28,9 @@ def get_user(db: Session, id: int = None, email: str = None):
     else:
         return None
 
-
+# Maybe we should create 2 types of update.
+# One for the user to update his email/password and,
+# another for Admins to update the role!
 def update_user(db: Session, id: int, request: UserUpdate):
     user = db.query(DbUser).filter(DbUser.id == id).first()
     if user is None:

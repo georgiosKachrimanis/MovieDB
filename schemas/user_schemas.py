@@ -5,7 +5,6 @@ class UserBase(BaseModel):
     username: str
     email: str
     password: str
-    user_type: str
 
 
 class UserUpdate(BaseModel):
