@@ -1,8 +1,6 @@
 from enum import Enum
 from typing import Optional
-
 from fastapi import APIRouter, Depends, Response, status
-
 from schemas import MovieCategory, MovieModel
 
 router = APIRouter(prefix="/movie", tags=["movie"])

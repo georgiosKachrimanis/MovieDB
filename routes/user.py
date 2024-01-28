@@ -1,33 +1,65 @@
-from fastapi import APIRouter, Depends
-from schemas.users import UserBase, UserDisplay
+from fastapi import APIRouter,Depends ,HTTPException
+from schemas import UserBase, UserDisplay, UserUpdate
 from sqlalchemy.orm import Session
 from db.database import get_db
 from db import db_user
+from typing import List
 
 router = APIRouter(
     prefix='/user',
-    tags=['user']
+    tags=['Users Endpoints']
 )
 
 # CRUD Operations
-# TODO: Create User
+
+# Create User
+@router.post('/add', response_model=UserDisplay)
+def create_user(request: UserBase, db: Session = Depends(get_db)):
+    try:
+        new_user = db_user.create_user(db=db, request=request)
+        return new_user
+    except Exception as e:
+        return str(e)
 
 
-# @router.post('/add', response_model=UserDisplay)
-# def create_user(request: UserBase, db: Session = Depends(get_db)):
-#     return db_user.create_user(db=db, request=request)
+# Read All User With Reviews
+@router.get('/', response_model=List[UserDisplay])
+def get_all_users(db: Session = Depends(get_db)):
+  return db_user.get_all_users(db)
 
-@router.post('/add')
-def create_user(request: UserBase):
-    name = request.username
-    email = request.email
-    return {
-        "Name": name,
-        "email": email
-    } 
 
-# TODO: Read User
+# Read User By Id
+@router.get('/{user_id}', response_model=UserDisplay)
+def read_user_by_id(user_id: int, db: Session = Depends(get_db)):
+    try:
+        user = db_user.get_user(db, user_id)
+        if user is None:
+            raise HTTPException(status_code=404, detail=f"User not found with user id: {user_id}")
+        else:
+            return user 
+    except Exception as e:
+        raise HTTPException(status_code= e.status_code, detail =  e.detail)
 
-# TODO: Update User
+# Update User
+@router.post('/update/{user_id}', response_model=UserDisplay)
+def update_user(user_id: int, request: UserUpdate, db: Session = Depends(get_db)):
+    try:
+        user = db_user.get_user(db, user_id)
+        if user is None:
+            raise HTTPException(status_code=404, detail=f"User not found with user id: {user_id}")
+        return db_user.update_user(db=db, user_id=user_id, request=request)
+    except Exception as e:
+        raise HTTPException(status_code= e.status_code, detail =  e.detail)
+    
 
-# TODO: Delete User
+# Delete User
+@router.delete('/delete/{user_id}')
+def delete_user(user_id: int, db: Session = Depends(get_db)):
+    try:
+        user = db_user.get_user(db, user_id)
+        if user is None:
+            raise HTTPException(status_code=404, detail=f"User not found with user id: {user_id}")
+        db_user.delete_user(db, user_id)
+        return {"message": f"User with Id:{user_id} deleted successfully"}
+    except Exception as e:
+        raise HTTPException(status_code= e.status_code, detail =  e.detail)

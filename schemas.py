@@ -1,39 +1,61 @@
-from enum import Enum
-from typing import Dict, List, Optional
-from pydantic import BaseModel
+from pydantic import BaseModel, EmailStr
+from typing import Optional, List 
+from datetime import datetime
+from typing import Optional, List
 
+# User inside ReviewDisplay
+class User(BaseModel):
+    id: int
+    username: str
 
-class Image(BaseModel):
-    url: str
-    alias: str
-
+# Review inside UserDisplay
+class Review(BaseModel):
+    id: int
+    review_content: str
+    user_rate: int
+    created_at: datetime
 
 class UserBase(BaseModel):
-    username: str
-    email: str
-    password: str
-
+        username: str
+        email: EmailStr
+        user_type: str
+        password: str
+        created_at: Optional[datetime] = None
+    
+class UserUpdate(BaseModel):
+    username: Optional[str] = None
+    email: Optional[EmailStr] = None
+    user_type: Optional[str] = None
+    password: Optional[str]  = None
 
 class UserDisplay(BaseModel):
+    id: int
     username: str
-    email: str
-
-    class Config():
+    email: EmailStr
+    user_type: str
+    created_at: Optional[datetime] = None
+    reviews: List[Review] = []
+    class Config:
         orm_mode = True
 
 
-class MovieCategory(str, Enum):
-    action = "action"
-    comedy = "comedy"
-    drama = "drama"
-    thriller = 'thriller'
+
+class ReviewDisplay(BaseModel):
+    id: int
+    review_content: str
+    user_rate: int
+    created_at: datetime
+    user: User
+    class Config:
+        orm_mode = True
 
 
-class MovieModel(BaseModel):
-    title: str
-    type: MovieCategory
-    number_comments: int
-    year_published: int
-    actors: List[str] = ['actor1', 'actor2', 'actor3']
-    metadata: Dict[str, str] = {"key1": "value1"}
-    image: Optional[Image] = None
+
+class ReviewBase(BaseModel):
+    review_content: str
+    user_rate: int
+    user_id: int
+
+class ReviewUpdate(BaseModel):
+    review_content: Optional[str] = None
+    user_rate: Optional[int] = None
