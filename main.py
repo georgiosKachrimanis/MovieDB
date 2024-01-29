@@ -12,9 +12,6 @@ app.include_router(user.router)
 app.include_router(review.router)
 
 
-
-
-
 models.Base.metadata.create_all(engine)
 """
     ---> You NEED TO DECLARE THE TYPE IN THE FUNCTIONS <---
