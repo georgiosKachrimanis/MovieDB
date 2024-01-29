@@ -1,6 +1,5 @@
 from datetime import datetime
-
-from sqlalchemy import Column, ForeignKey, Integer
+from sqlalchemy import Column, ForeignKey, Integer, Text
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql.sqltypes import (
     Boolean,
@@ -16,11 +15,12 @@ class DbUser(Base):
     __tablename__ = "users"
     id = Column(Integer, primary_key=True, index=True)
     username = Column(String)
-    email = Column(String, unique=True)
+    email = Column(String, unique=True, index=True)
     user_type = Column(String)
     created_at = Column(DateTime, default=datetime.utcnow)
     fav_list = Column(String)
     password = Column(String)
+    reviews = relationship("DbReview", back_populates="user")
 
 
 class DbMovie(Base):
@@ -49,6 +49,16 @@ class DbActor(Base):
     movies = relationship("DbMovie", secondary="movie_actors", back_populates="actors")
 
 
+class DbReview(Base):
+    __tablename__ = "reviews"
+    id = Column(Integer, primary_key=True, index=True)
+    review_content = Column(Text)
+    created_at = Column(DateTime, default=datetime.utcnow)
+    user_id = Column(Integer, ForeignKey('users.id'))
+    user_rate = Column(Float)
+    user = relationship("DbUser", back_populates="reviews")
+
+
 class DbDirector(Base):
     __tablename__ = "directors"
     id = Column(Integer, primary_key=True, index=True)
@@ -63,11 +73,11 @@ class DbMovieActor(Base):
     actor_id = Column(Integer, ForeignKey("actors.id"), primary_key=True)
 
 
-class DbReview(Base):
-    __tablename__ = "reviews"
-    id = Column(Integer, primary_key=True, index=True)
-    review_content = Column(String)
-    created_at = Column(DateTime, default=datetime.utcnow)
-    user_id = Column(Integer, ForeignKey("users.id"))
-    movie_id = Column(Integer, ForeignKey("movies.id"))
-    user_rating = Column(Float)
+# class DbReview(Base):
+#     __tablename__ = "reviews"
+#     id = Column(Integer, primary_key=True, index=True)
+#     review_content = Column(String)
+#     created_at = Column(DateTime, default=datetime.utcnow)
+#     user_id = Column(Integer, ForeignKey("users.id"))
+#     movie_id = Column(Integer, ForeignKey("movies.id"))
+#     user_rating = Column(Float)
