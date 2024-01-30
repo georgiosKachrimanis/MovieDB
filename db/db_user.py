@@ -10,7 +10,7 @@ def create_user(db: Session, request: UserBase):
         email=request.email,  # Maybe we should just add a value here!
         password=Hash.bcrypt(request.password),
         user_type="user",  # All users start as user
-        fav_list=request.fav_list,      
+        fav_list=None,
     )
     db.add(new_user)
     db.commit()
@@ -29,6 +29,7 @@ def get_user(db: Session, id: int = None, email: str = None):
         return db.query(DbUser).filter(DbUser.email == email).first()
     else:
         return None
+
 
 # Maybe we should create 2 types of update.
 # One for the user to update his email/password and,

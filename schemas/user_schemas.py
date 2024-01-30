@@ -5,8 +5,8 @@ class UserBase(BaseModel):
     username: str
     email: str
     password: str
-    user_type: str
-    fav_list: str
+    # user_type: str
+    # fav_list: str
 
 
 class UserUpdate(BaseModel):
@@ -14,6 +14,7 @@ class UserUpdate(BaseModel):
     email: str
     user_type: str
     password: str
+    fav_list: str
 
 
 class UserDisplay(BaseModel):
