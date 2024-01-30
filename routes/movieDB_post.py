@@ -1,7 +1,7 @@
 from typing import Dict, List, Optional
 from fastapi import APIRouter, Body, Path, Query
 
-from schemas.movies import MovieBase, MovieCategory
+from schemas.movie_schemas import MovieBase, MovieCategory
 
 router = APIRouter(prefix="/movie", tags=["movie"])
 
