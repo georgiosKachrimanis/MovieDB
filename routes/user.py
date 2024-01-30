@@ -1,5 +1,5 @@
 from fastapi import APIRouter,Depends ,HTTPException
-from schemas import UserBase, UserDisplay, UserUpdate
+from schemas import UserBase, UserDisplayOne,UserDisplayAll,UserUpdate
 from sqlalchemy.orm import Session
 from db.database import get_db
 from db import db_user
@@ -13,7 +13,7 @@ router = APIRouter(
 # CRUD Operations
 
 # Create User
-@router.post('/add', response_model=UserDisplay)
+@router.post('/add', response_model=UserDisplayOne)
 def create_user(request: UserBase, db: Session = Depends(get_db)):
     try:
         new_user = db_user.create_user(db=db, request=request)
@@ -23,13 +23,13 @@ def create_user(request: UserBase, db: Session = Depends(get_db)):
 
 
 # Read All User With Reviews
-@router.get('/', response_model=List[UserDisplay])
+@router.get('/', response_model=List[UserDisplayAll])
 def get_all_users(db: Session = Depends(get_db)):
   return db_user.get_all_users(db)
 
 
 # Read User By Id
-@router.get('/{user_id}', response_model=UserDisplay)
+@router.get('/{user_id}', response_model=UserDisplayOne)
 def read_user_by_id(user_id: int, db: Session = Depends(get_db)):
     try:
         user = db_user.get_user(db, user_id)
@@ -41,7 +41,7 @@ def read_user_by_id(user_id: int, db: Session = Depends(get_db)):
         raise HTTPException(status_code= e.status_code, detail =  e.detail)
 
 # Update User
-@router.post('/update/{user_id}', response_model=UserDisplay)
+@router.put('/update/{user_id}', response_model=UserDisplayOne)
 def update_user(user_id: int, request: UserUpdate, db: Session = Depends(get_db)):
     try:
         user = db_user.get_user(db, user_id)

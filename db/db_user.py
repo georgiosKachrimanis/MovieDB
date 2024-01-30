@@ -1,11 +1,10 @@
-from typing import List
 from db.hash import Hash
 from sqlalchemy.orm.session import Session 
 from sqlalchemy.orm import joinedload
-from schemas import UserDisplay, UserUpdate, UserBase
-from db.models import User
-from fastapi import HTTPException
-from db.models import User
+from sqlalchemy import func
+from schemas import  UserUpdate, UserBase
+from db.models import User , Review
+
 
 # Create User
 def create_user(db: Session, request: UserBase):
@@ -15,7 +14,6 @@ def create_user(db: Session, request: UserBase):
       user_type = request.user_type,
       created_at = request.created_at,
       password = Hash.bcrypt(request.password),
-      # fav_list = [],
     )
   db.add(new_user)
   db.commit()
@@ -24,9 +22,11 @@ def create_user(db: Session, request: UserBase):
 
 # Get All Users
 def get_all_users(db: Session):
-  users = db.query(User).options(joinedload(User.reviews)).all()
-  return users
-
+    users = db.query(User).all()
+    for user in users:
+        user.review_count = db.query(func.count(Review.id)).filter(Review.user_id == user.id).scalar()
+    return users
+  
 
 # Get All Users with Reviews
 def get_all_users_with_reviews(db: Session):

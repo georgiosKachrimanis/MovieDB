@@ -1,5 +1,5 @@
 # Environments
 movieAppServer/
- __pycache__/
+db/__pycache__/
 routes/__pycache__/
-__pycache__/
+movieApp.db

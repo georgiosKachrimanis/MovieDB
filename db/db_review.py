@@ -1,21 +1,22 @@
 from sqlalchemy.orm.session import Session
-from schemas import ReviewDisplay,ReviewBase,ReviewUpdate
+from schemas import ReviewBase,ReviewUpdate
 from db.models import Review
-from fastapi import Response
+
 
 
 def get_review(db: Session, review_id: int):
     return db.query(Review).filter(Review.id == review_id).first()
 
-def get_all_reviews(db: Session, skip: int = 0):
-        return db.query(Review).all()
+def get_all_reviews(db: Session):
+    return db.query(Review).all()
 
-def create_review(db: Session, request:ReviewBase):
+def create_review(db: Session, request: ReviewBase):
     new_review = Review(
-                review_content = request.review_content,
-                user_rate = request.user_rate,
-                user_id = request.user_id,
-        )
+        review_content=request.review_content,
+        movie_rate=request.movie_rate,
+        user_id=request.user_id,
+        movie_id=request.movie_id
+    )
     db.add(new_review)
     db.commit()
     db.refresh(new_review)
