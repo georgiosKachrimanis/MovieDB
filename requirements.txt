@@ -4,3 +4,4 @@ pydantic
 sqlalchemy
 passlib
 bcrypt
+'pydantic[email]' # You need to run the comand as pip install 'pydantic[email]' no idea why 

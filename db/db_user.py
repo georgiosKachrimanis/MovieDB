@@ -42,7 +42,6 @@ def update_user(db: Session, id: int, request: UserUpdate):
         user.email = request.email
         user.user_type: request.user_type
         user.password = Hash.bcrypt(request.password)
-        user.fav_list = request.fav_list
 
         db.commit()
         return user

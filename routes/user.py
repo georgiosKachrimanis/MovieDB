@@ -136,7 +136,7 @@ def get_user(
     """
     return check_user(db=db, user_email=user_email, user_id=user_id)
 
-
+# I should change this code so will only change the values that are changed!
 @router.put("/update/", response_model=UserDisplay)
 def update_user(
     request: UserUpdate,
@@ -164,12 +164,14 @@ def update_user(
     """
     user = check_user(db=db, user_id=user_id, user_email=user_email)
     if user is not None:
-        db_user.update_user(db=db, id=user_id, request=request)
+        db_user.update_user(db=db, id=user.id, request=request)
     return user
 
 
-@router.delete("/{user_id}")
-def delete_user(user_id: int, db: Session = Depends(get_db)):
+@router.delete("/")
+def delete_user(db: Session = Depends(get_db),
+                user_id: Optional[int] = None,
+                user_email: Optional[str] = None):
     """
     Delete a user by their ID.
 
@@ -186,7 +188,7 @@ def delete_user(user_id: int, db: Session = Depends(get_db)):
     Raises:
     - HTTPException: 404 error if no user with the specified ID is found.
     """
-    user = check_user(db=db, user_id=user_id)
+    user = check_user(db=db, user_id=user_id, user_email=user_email)
     if user is not None:
-        db_user.delete_user(db=db, id=user_id)
-        return {"message": f"User with id:{user_id}  was deleted successfully"}
+        db_user.delete_user(db=db, id=user.id)
+        return {"message": f"User with id:{user.id}  was deleted successfully"}
