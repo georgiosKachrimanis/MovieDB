@@ -3,13 +3,7 @@ from schemas import ReviewBase,ReviewUpdate
 from db.models import Review
 
 
-
-def get_review(db: Session, review_id: int):
-    return db.query(Review).filter(Review.id == review_id).first()
-
-def get_all_reviews(db: Session):
-    return db.query(Review).all()
-
+# Create Review
 def create_review(db: Session, request: ReviewBase):
     new_review = Review(
         review_content=request.review_content,
@@ -22,7 +16,16 @@ def create_review(db: Session, request: ReviewBase):
     db.refresh(new_review)
     return new_review
 
+# Get Review By Id
+def get_review(db: Session, review_id: int):
+    return db.query(Review).filter(Review.id == review_id).first()
 
+# Get All Reviews
+def get_all_reviews(db: Session, skip: int = 0, limit: int = 100):
+    return db.query(Review).all()
+
+
+# Update Review
 def update_review(db: Session, review_id: int, review_data: ReviewUpdate):
     review = get_review(db, review_id)
     if review:
@@ -33,9 +36,9 @@ def update_review(db: Session, review_id: int, review_data: ReviewUpdate):
         return review
 
 
-
+# Delete Review
 def delete_review(db: Session, review_id: int):
-     db_review = db.query(Review).filter(Review.id == review_id).first()
+     review = db.query(Review).filter(Review.id == review_id).first()
      db.delete(db_review)
      db.commit()
-     return 'Review deleted successfully'
+     return 'Review with id :{review_id} deleted successfully'

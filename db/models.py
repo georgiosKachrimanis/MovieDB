@@ -11,7 +11,6 @@ movie_categories = Table('movie_categories', Base.metadata,
     Column('category_id', Integer, ForeignKey('categories.id'))
 )
 
-
 class User(Base):
   __tablename__ = 'users'
   id = Column(Integer, primary_key=True, index=True)
@@ -52,21 +51,3 @@ class Category(Base):
   id = Column(Integer, primary_key=True, index=True)
   category_name = Column(String)
   movies = relationship("Movie", secondary="movie_categories", back_populates="categories")
-
-
-
-
-
-# class DbActor(Base):
-#   __tablename__ = 'actors'
-#   id = Column(Integer, primary_key=True, index=True)
-#   actor_name = Column(String)
-#   photo_url = Column(String)
-#   movies = relationship("Movie", secondary=movie_actors, back_populates="actors")
-
-# class DbDirector(Base):
-#   __tablename__ = 'directors'
-#   id = Column(Integer, primary_key=True, index=True)
-#   director_name = Column(String)
-#   photo_url = Column(String)
-#   movies = relationship("Movie", back_populates="director")

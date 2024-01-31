@@ -12,7 +12,6 @@ router = APIRouter(
     tags=['Review Endpoints']
 )
 # CRUD Operations for Review
-
 # Create Review
 @router.post('/add', response_model=ReviewDisplay)
 def create_review(request: ReviewBase, db: Session = Depends(get_db)):

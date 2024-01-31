@@ -22,13 +22,13 @@ def create_user(request: UserBase, db: Session = Depends(get_db)):
         return str(e)
 
 
-# Read All User With Reviews
+# Get All User 
 @router.get('/', response_model=List[UserDisplayAll])
 def get_all_users(db: Session = Depends(get_db)):
   return db_user.get_all_users(db)
 
 
-# Read User By Id
+# Get User By Id
 @router.get('/{user_id}', response_model=UserDisplayOne)
 def read_user_by_id(user_id: int, db: Session = Depends(get_db)):
     try:

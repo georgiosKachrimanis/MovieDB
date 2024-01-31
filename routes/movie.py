@@ -17,7 +17,7 @@ def create_movie(movie: MovieBase, db: Session = Depends(get_db)):
     try:
         return db_movie.create_movie(db, movie)
     except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+        return str(e)
 
 # Get All Movies
 @router.get("/", response_model=List[MovieDisplayAll])
@@ -53,13 +53,12 @@ def update_movie(movie_id: int, movie: MovieUpdate, db: Session = Depends(get_db
 
 @router.delete("/movies/{movie_id}")
 def delete_movie(movie_id: int, db: Session = Depends(get_db)):
-    try:
+
         reviews = db_movie.get_movie_reviews(db, movie_id)
         if reviews:
-            raise HTTPException(status_code=400, detail="Cannot delete movie with associated reviews")
+            raise HTTPException(status_code=409, detail=f"Cannot delete movie with Id :{movie_id} , it has review/s ")
         success = db_movie.delete_movie(db, movie_id)
         if not success:
-            raise HTTPException(status_code=404, detail="Movie with Id :{movie_id} not found")
+            raise HTTPException(status_code=404, detail=f"Movie with Id :{movie_id} not found")
         return {"message": "Movie deleted"}
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+  

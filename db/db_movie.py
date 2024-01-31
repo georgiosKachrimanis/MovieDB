@@ -1,23 +1,28 @@
+from typing import List
 from sqlalchemy.orm import Session
-from .models import Movie , Review 
+from .models import Movie , Review,Category
 from schemas import MovieBase, MovieUpdate
 from sqlalchemy import func
 
-def create_movie(db: Session, request: MovieBase):
+
+def create_movie(db: Session, movie: MovieBase):
+    categories = db.query(Category).filter(Category.id.in_(movie.categories)).all()
+    
     new_movie = Movie(
-        title=request.title,
-        released_date=request.released_date,
-        categories=request.categories,
-        plot=request.plot,
-        poster_url=request.poster_url,
-        imdb_rate=request.imdb_rate
+        title=movie.title,
+        released_date=movie.released_date,
+        categories=categories,
+        plot=movie.plot,
+        poster_url=movie.poster_url,
+        imdb_rate=movie.imdb_rate
     )
+    
     db.add(new_movie)
     db.commit()
     db.refresh(new_movie)
     return new_movie
 
-def get_all_movies(db: Session, skip: int = 0):
+def get_all_movies(db: Session, skip: int = 0, limit: int = 100):
     movies = db.query(Movie).all()
     for movie in movies:
         movie.review_count = db.query(func.count(Review.id)).filter(Review.movie_id == movie.id).scalar()
@@ -32,8 +37,13 @@ def get_movie(db: Session, movie_id: int) :
 def update_movie(db: Session, movie_id: int, request: MovieUpdate):
     movie = get_movie(db, movie_id)
     if movie:
-        for key, value in request.dict(exclude_unset=True).items():
-            setattr(movie, key, value)
+        categories = [category.id for category in movie.categories]
+        for key, value in request.__dict__.items():
+            if key == "categories":
+                categories = db.query(Category).filter(Category.id.in_(value)).all()
+            else:
+                setattr(movie, key, value)
+        movie.categories = categories
         db.commit()
         db.refresh(movie)
         return movie
@@ -45,7 +55,7 @@ def delete_movie(db: Session, movie_id: int) -> bool:
     if movie:
         db.delete(movie)
         db.commit()
-        return True
+        return "Movie with id: {movie_id} deleted successfully"
     return False
 
 def get_movie_reviews(db: Session, movie_id: int):

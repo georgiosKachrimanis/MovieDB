@@ -7,7 +7,7 @@ from db.models import User , Review
 
 
 # Create User
-def create_user(db: Session, request: UserBase):
+def create_user(db: Session, request: UserBase,skip: int = 0, limit: int = 100):
   new_user = User(
       username = request.username,
       email = request.email,
@@ -53,4 +53,4 @@ def delete_user(db:Session, id: int ):
   user = db.query(User).filter(User.id == id).first()
   db.delete(user)
   db.commit()
-  return 'User deleted successfully'
+  return 'User with id: {id} deleted successfully'
