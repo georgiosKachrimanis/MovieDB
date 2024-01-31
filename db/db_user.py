@@ -7,10 +7,9 @@ from db.hash import Hash
 def create_user(db: Session, request: UserBase):
     new_user = DbUser(
         username=request.username,
-        email=request.email,  # Maybe we should just add a value here!
+        email=request.email,
         password=Hash.bcrypt(request.password),
-        user_type="user",  # All users start as user
-        fav_list=None,
+        user_type="user"  # We should maybe start here with a Null value and then populate by the table.
     )
     db.add(new_user)
     db.commit()
@@ -43,7 +42,6 @@ def update_user(db: Session, id: int, request: UserUpdate):
         user.email = request.email
         user.user_type: request.user_type
         user.password = Hash.bcrypt(request.password)
-        user.fav_list = request.fav_list
 
         db.commit()
         return user
