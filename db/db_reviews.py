@@ -1,10 +1,8 @@
 from sqlalchemy.orm.session import Session
-from schemas.reviews_schemas import (
-    ReviewBase,
-    ReviewUpdate,
-    CreateReview,
-)
+
 from db.models import DbReview
+from schemas.reviews_schemas import CreateReview, ReviewBase, ReviewUpdate
+
 # from fastapi import Response
 
 
@@ -29,7 +27,7 @@ def create_review(db: Session, request: CreateReview, user_id: int):
 
 
 def update_review(db: Session, review_id: int, review_data: ReviewUpdate):
-    review = get_review(db, review_id)
+    review = get_review(db=db, review_id=review_id)
     if review:
         for key, value in review_data.dict(exclude_unset=True).items():
             setattr(review, key, value)
