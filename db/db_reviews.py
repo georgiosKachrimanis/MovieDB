@@ -1,5 +1,9 @@
 from sqlalchemy.orm.session import Session
-from schemas.reviews_schemas import ReviewBase, ReviewUpdate
+from schemas.reviews_schemas import (
+    ReviewBase,
+    ReviewUpdate,
+    CreateReview,
+)
 from db.models import DbReview
 # from fastapi import Response
 
@@ -12,11 +16,11 @@ def get_all_reviews(db: Session, skip: int = 0):
     return db.query(DbReview).all()
 
 
-def create_review(db: Session, request: ReviewBase):
+def create_review(db: Session, request: CreateReview, user_id: int):
     new_review = DbReview(
         review_content=request.review_content,
         user_rate=request.user_rate,
-        user_id=request.user_id,
+        user_id=user_id,
     )
     db.add(new_review)
     db.commit()

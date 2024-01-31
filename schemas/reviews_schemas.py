@@ -9,7 +9,12 @@ from datetime import datetime
 class ReviewBase(BaseModel):
     review_content: str
     user_rate: float
-    user_id: int
+    user_id: Optional[int]
+
+
+class CreateReview(BaseModel):
+    review_content: str
+    user_rate: float
 
 
 class ReviewDisplay(BaseModel):
@@ -24,6 +29,7 @@ class ReviewDisplay(BaseModel):
 
 
 class ReviewUpdate(BaseModel):
+    user_id: User
     review_content: Optional[str] = None
     user_rate: Optional[float] = None
 

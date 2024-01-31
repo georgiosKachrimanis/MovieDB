@@ -1,5 +1,9 @@
 from sqlalchemy.orm.session import Session
-from schemas.users_schemas import UserBase, UserUpdate, UserTypeUpdate
+from schemas.users_schemas import (
+    UserBase,
+    UserUpdate,
+    UserTypeUpdate,
+)
 from db.models import DbUser
 from db.hash import Hash
 
@@ -9,7 +13,7 @@ def create_user(db: Session, request: UserBase):
         username=request.username,
         email=request.email,
         password=Hash.bcrypt(request.password),
-        user_type="user",  # We should maybe start here with a Null value and then populate by the table.
+        user_type="user",
     )
     db.add(new_user)
     db.commit()
