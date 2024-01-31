@@ -14,7 +14,17 @@ class UserUpdate(BaseModel):
     username: str
     email: EmailStr
     password: str
+
+
+class UserTypeUpdate(BaseModel):
     user_type: str
+
+
+class UserTypeDisplay(BaseModel):
+    user_type: str
+
+    class Config:
+        from_attributes = True
 
 
 class UserDisplay(BaseModel):

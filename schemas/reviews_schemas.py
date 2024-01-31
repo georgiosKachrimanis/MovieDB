@@ -1,5 +1,5 @@
 from pydantic import BaseModel
-from schemas.user_schemas import User
+from schemas.users_schemas import User
 from typing import Optional
 from datetime import datetime
 

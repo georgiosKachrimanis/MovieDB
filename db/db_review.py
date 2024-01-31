@@ -1,5 +1,5 @@
 from sqlalchemy.orm.session import Session
-from schemas.review_schemas import ReviewBase, ReviewUpdate
+from schemas.reviews_schemas import ReviewBase, ReviewUpdate
 from db.models import DbReview
 # from fastapi import Response
 

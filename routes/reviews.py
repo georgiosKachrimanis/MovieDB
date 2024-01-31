@@ -1,5 +1,5 @@
 from fastapi import APIRouter, Depends, HTTPException, Response
-from schemas.review_schemas import ReviewBase, ReviewUpdate, ReviewDisplay
+from schemas.reviews_schemas import ReviewBase, ReviewUpdate, ReviewDisplay
 from sqlalchemy.orm import Session
 from db.database import get_db
 from db import db_review

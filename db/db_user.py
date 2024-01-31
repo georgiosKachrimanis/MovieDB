@@ -1,5 +1,5 @@
 from sqlalchemy.orm.session import Session
-from schemas.user_schemas import UserBase, UserUpdate
+from schemas.users_schemas import UserBase, UserUpdate, UserTypeUpdate
 from db.models import DbUser
 from db.hash import Hash
 
@@ -9,7 +9,7 @@ def create_user(db: Session, request: UserBase):
         username=request.username,
         email=request.email,
         password=Hash.bcrypt(request.password),
-        user_type="user"  # We should maybe start here with a Null value and then populate by the table.
+        user_type="user",  # We should maybe start here with a Null value and then populate by the table.
     )
     db.add(new_user)
     db.commit()
@@ -29,9 +29,7 @@ def get_user(db: Session, id: int = None, email: str = None):
     else:
         return None
 
-# Maybe we should create 2 types of update.
-# One for the user to update his email/password and,
-# another for Admins to update the role!
+
 def update_user(db: Session, id: int, request: UserUpdate):
     user = db.query(DbUser).filter(DbUser.id == id).first()
     if user is None:
@@ -39,10 +37,17 @@ def update_user(db: Session, id: int, request: UserUpdate):
     else:
         user.username = request.username
         user.email = request.email
-        user.user_type: request.user_type
         user.password = Hash.bcrypt(request.password)
-        user.fav_list = request.fav_list
+        db.commit()
+        return user
 
+
+def update_user_type(db: Session, id: int, request: UserTypeUpdate):
+    user = db.query(DbUser).filter(DbUser.id == id).first()
+    if user is None:
+        return None
+    else:
+        user.user_type = request.user_type  # request.user_type
         db.commit()
         return user
 

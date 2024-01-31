@@ -1,16 +1,19 @@
 from fastapi import FastAPI
-from routes import movieDB_get
-from routes import movieDB_post
-from routes import user
-from routes import review
+from routes import movieDB_get, movieDB_post, reviews, users
+from auth import authentication
 from db import models
 from db.database import engine
 
-app = FastAPI()
+app = FastAPI(
+    title="MoviesDB API",
+    description="This is an movie DB API from the 40+ of the group!",
+    version="1.0.0"
+)
 # app.include_router(movieDB_get.router)
 # app.include_router(movieDB_post.router)
-app.include_router(user.router)
-app.include_router(review.router)
+app.include_router(users.router)
+app.include_router(reviews.router)
+app.include_router(authentication.router)
 
 
 @app.get("/")

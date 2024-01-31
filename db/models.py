@@ -18,7 +18,6 @@ class DbUser(Base):
     email = Column(String, unique=True, index=True)
     user_type = Column(String)
     created_at = Column(DateTime, default=datetime.utcnow)
-    fav_list = Column(String)
     password = Column(String)
     reviews = relationship("DbReview", back_populates="user")
 
