@@ -29,7 +29,6 @@ class ReviewDisplay(BaseModel):
 
 
 class ReviewUpdate(BaseModel):
-    user_id: User
     review_content: Optional[str] = None
     user_rate: Optional[float] = None
 
