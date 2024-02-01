@@ -1,11 +1,27 @@
 from pydantic import BaseModel
-from schemas.users_schemas import User
 from typing import Optional
 from datetime import datetime
 
 
+# User inside Reviews (Same as User in user_schemas)
+class User(BaseModel):
+    id: int
+    username: str
+
+    class Config:
+        from_attributes = True
+
+
+# Movie inside ReviewDisplay
+class Movie(BaseModel):
+    id: int
+    title: str
+
+    class Config:
+        from_attributes = True
+
+
 # Review Schemas
-# Review inside UserDisplay
 class ReviewBase(BaseModel):
     review_content: str
     user_rate: float
@@ -15,12 +31,14 @@ class ReviewBase(BaseModel):
 class CreateReview(BaseModel):
     review_content: str
     user_rate: float
+    # Sezgin uses movie_rate here!
 
 
 class ReviewDisplay(BaseModel):
     id: int
     review_content: str
     user_rate: float
+    # Sezgin uses movie_rate here!
     created_at: datetime
     user: User  # From user_schemas
 
@@ -30,11 +48,13 @@ class ReviewDisplay(BaseModel):
 
 class ReviewUpdate(BaseModel):
     review_content: Optional[str] = None
+    # Sezgin uses movie_rate here!
     user_rate: Optional[float] = None
 
 
 class Review(BaseModel):
     id: int
     review_content: str
+    # Sezgin uses movie_rate here!
     user_rate: float
     created_at: datetime

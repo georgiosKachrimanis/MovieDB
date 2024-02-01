@@ -86,7 +86,7 @@ def create_user(request: UserBase, db: Session = Depends(get_db)):
 
     if db_users.get_user(db=db, email=request.email) is not None:
         raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
+            status_code=status.HTTP_409_CONFLICT,
             detail=f"User with email: {request.email} already exists!",
         )
     new_user = db_users.create_user(db=db, request=request)
@@ -128,6 +128,8 @@ def get_users(
         return users
     else:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED)
+
+
 
 
 # Get User Information (Only User)

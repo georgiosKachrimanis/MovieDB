@@ -1,5 +1,11 @@
 from datetime import datetime
-from sqlalchemy import Column, ForeignKey, Integer, Text
+from sqlalchemy import (
+    Column,
+    ForeignKey,
+    Integer,
+    Text,
+    Table,
+)
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql.sqltypes import (
     Boolean,
@@ -7,7 +13,6 @@ from sqlalchemy.sql.sqltypes import (
     Float,
     String,
 )
-
 from db.database import Base
 
 
@@ -19,6 +24,7 @@ class DbUser(Base):
     user_type = Column(String)
     created_at = Column(DateTime, default=datetime.utcnow)
     password = Column(String)
+    # One <--> Many relationship
     reviews = relationship("DbReview", back_populates="user")
 
 
@@ -27,16 +33,28 @@ class DbMovie(Base):
     id = Column(Integer, primary_key=True, index=True)
     title = Column(String)
     released_date = Column(DateTime)
-    categories = Column(String)
+    categories = relationship(
+        "DbCategory",
+        secondary="movie_categories",
+        back_populates="movies",
+    )
+    reviews = relationship(
+        "DbReview",
+        back_populates="movie",
+    )
     director_id = Column(Integer, ForeignKey("directors.id"))
-    director = relationship("DbDirector", back_populates="movies")
-    actors = relationship("DbActor", secondary="movie_actors", back_populates="movies")
+    director = relationship(
+        "DbDirector",
+        back_populates="movies",
+    )
+    actors = relationship(
+        "DbActor",
+        secondary="movie_actors",
+        back_populates="movies",
+    )
     plot = Column(String)
-    language = Column(String)
-    country = Column(String)
-    awards = Column(String)
     poster_url = Column(String)
-    average_user_rate = Column(Float)
+    average_movie_rate = Column(Float, default=0.0)
     imdb_rate = Column(Float)
 
 
@@ -45,7 +63,11 @@ class DbActor(Base):
     id = Column(Integer, primary_key=True, index=True)
     actor_name = Column(String)
     photo_url = Column(String)
-    movies = relationship("DbMovie", secondary="movie_actors", back_populates="actors")
+    movies = relationship(
+        "DbMovie",
+        secondary="movie_actors",
+        back_populates="actors",
+    )
 
 
 class DbReview(Base):
@@ -53,9 +75,16 @@ class DbReview(Base):
     id = Column(Integer, primary_key=True, index=True)
     review_content = Column(Text)
     created_at = Column(DateTime, default=datetime.utcnow)
-    user_id = Column(Integer, ForeignKey('users.id'))
+    # Foreign key to establish the one<-->many relationship
+    user_id = Column(Integer, ForeignKey("users.id"))
     user_rate = Column(Float)
+    # One<-->many relationship
     user = relationship("DbUser", back_populates="reviews")
+    movie_rate = Column(Float)
+    # Foreign key to establish the one-to-many relationship
+    movie_id = Column(Integer, ForeignKey("movies.id"))
+    # # One<-->many relationship
+    movie = relationship("DbMovie", back_populates="reviews")
 
 
 class DbDirector(Base):
@@ -72,11 +101,21 @@ class DbMovieActor(Base):
     actor_id = Column(Integer, ForeignKey("actors.id"), primary_key=True)
 
 
-# class DbReview(Base):
-#     __tablename__ = "reviews"
-#     id = Column(Integer, primary_key=True, index=True)
-#     review_content = Column(String)
-#     created_at = Column(DateTime, default=datetime.utcnow)
-#     user_id = Column(Integer, ForeignKey("users.id"))
-#     movie_id = Column(Integer, ForeignKey("movies.id"))
-#     user_rating = Column(Float)
+class DbCategory(Base):
+    __tablename__ = "categories"
+    id = Column(Integer, primary_key=True, index=True)
+    category_name = Column(String)
+    movies = relationship(
+        "DbMovie", secondary="movie_categories", back_populates="categories"
+    )  # Many-to-many relationship
+
+
+"""Special many <--> many relations tables"""
+movie_categories = Table(
+    "movie_categories",
+    Base.metadata,
+    Column("movie_id", Integer, ForeignKey("movies.id")),  # Many-to-many relationship
+    Column(
+        "category_id", Integer, ForeignKey("categories.id")
+    ),  # Many-to-many relationship
+)

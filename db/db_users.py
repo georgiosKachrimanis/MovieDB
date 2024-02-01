@@ -1,10 +1,12 @@
+from sqlalchemy import func
 from sqlalchemy.orm.session import Session
+from sqlalchemy.orm import joinedload
 from schemas.users_schemas import (
     UserBase,
     UserUpdate,
     UserTypeUpdate,
 )
-from db.models import DbUser
+from db.models import DbUser, DbReview
 from db.hash import Hash
 
 
@@ -22,7 +24,10 @@ def create_user(db: Session, request: UserBase):
 
 
 def get_all_users(db: Session):
-    return db.query(DbUser).all()
+    users = db.query(DbUser).all()
+    for user in users:
+        user.review_count = db.query(func.count(DbReview.id)).filter(DbReview.user_id == user.id).scalar()
+    return users
 
 
 def get_user(db: Session, id: int = None, email: str = None):
@@ -61,3 +66,8 @@ def delete_user(db: Session, id: int):
     db.delete(user)
     db.commit()
     return user
+
+
+# Get All Users with Reviews
+def get_all_users_with_reviews(db: Session):
+    return db.query(DbUser).options(joinedload(DbUser.reviews)).all()

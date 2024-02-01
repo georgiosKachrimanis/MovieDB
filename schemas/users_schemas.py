@@ -1,4 +1,6 @@
 from pydantic import BaseModel, EmailStr
+from typing import Optional, List
+from datetime import datetime
 
 
 # User Schemas
@@ -25,13 +27,34 @@ class UserTypeDisplay(BaseModel):
         from_attributes = True
 
 
+class Review(BaseModel):
+    id: int
+    review_content: str
+    user_rate: float
+    created_at: datetime
+
+
 class UserDisplay(BaseModel):
+    id: int
     username: str
     email: EmailStr
-    user_type: str
+    created_at: Optional[datetime] = None
+    reviews: List[Review] = []
 
     class Config:
         from_attributes = True
+
+
+class UserDisplayAll(BaseModel):
+    id: int
+    username: str
+    email: EmailStr
+    user_type: str
+    created_at: Optional[datetime] = None
+    review_count: int
+
+    class Config:
+        from_attributes = True 
 
 
 # User inside Reviews
