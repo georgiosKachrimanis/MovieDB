@@ -34,12 +34,6 @@ def get_user(db: Session, id: int = None, email: str = None):
         return None
 
 
-<<<<<<< HEAD:db/db_users.py
-=======
-# Maybe we should create 2 types of update.
-# One for the user to update his email/password and,
-# another for Admins to update the role!
->>>>>>> main:db/db_user.py
 def update_user(db: Session, id: int, request: UserUpdate):
     user = db.query(DbUser).filter(DbUser.id == id).first()
     if user is None:
@@ -48,11 +42,8 @@ def update_user(db: Session, id: int, request: UserUpdate):
         user.username = request.username
         user.email = request.email
         user.password = Hash.bcrypt(request.password)
-<<<<<<< HEAD:db/db_users.py
         db.commit()
         return user
-=======
->>>>>>> main:db/db_user.py
 
 
 def update_user_type(db: Session, id: int, request: UserTypeUpdate):

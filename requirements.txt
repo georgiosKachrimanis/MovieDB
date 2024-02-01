@@ -4,10 +4,6 @@ pydantic
 sqlalchemy
 passlib
 bcrypt
-<<<<<<< HEAD
 python-multipart
 python-jose
 # Also use this command for this pip install 'pydantic[email]'
-=======
-'pydantic[email]' # You need to run the comand as pip install 'pydantic[email]' no idea why 
->>>>>>> main
