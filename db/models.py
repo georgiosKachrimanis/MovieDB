@@ -11,6 +11,11 @@ movie_categories = Table('movie_categories', Base.metadata,
     Column('category_id', Integer, ForeignKey('categories.id')) # Many-to-many relationship
 )
 
+movie_actors = Table('movie_actors', Base.metadata,
+    Column('movie_id', Integer, ForeignKey('movies.id')), # Many-to-many relationship
+    Column('actor_id', Integer, ForeignKey('actors.id')) # Many-to-many relationship
+)
+
 class User(Base):
   __tablename__ = 'users'
   id = Column(Integer, primary_key=True, index=True)
@@ -55,14 +60,14 @@ class Category(Base):
   category_name = Column(String)
   movies = relationship("Movie", secondary="movie_categories", back_populates="categories") # Many-to-many relationship
 
-# class Actors(Base):
-#   __tablename__ = 'actors'
-#   id = Column(Integer, primary_key=True, index=True)
-#   actor_name = Column(String)
-#   movies = relationship("Movie", secondary="movie_actors", back_populates="actors") # Many-to-many relationship
+class Actors(Base):
+  __tablename__ = 'actors'
+  id = Column(Integer, primary_key=True, index=True)
+  actor_name = Column(String)
+  movies = relationship("Movie", secondary="movie_actors", back_populates="actors") # Many-to-many relationship
 
-# class Directors(Base):
-#   __tablename__ = 'directors'
-#   id = Column(Integer, primary_key=True, index=True)
-#   director_name = Column(String)
-#   movies = relationship("Movie", back_populates="director") # One-to-many relationship
+class Directors(Base):
+  __tablename__ = 'directors'
+  id = Column(Integer, primary_key=True, index=True)
+  director_name = Column(String)
+  movies = relationship("Movie", back_populates="director") # One-to-many relationship

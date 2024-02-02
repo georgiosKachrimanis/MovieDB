@@ -24,9 +24,6 @@ class Movie(BaseModel):
 class CategoryBase(BaseModel):
     category_name: str
 
-class Category(CategoryBase):
-    id: int
-
 class CategoryDisplay(BaseModel):
     id: int
     category_name: str
@@ -91,7 +88,7 @@ class ReviewUpdate(BaseModel):
 class MovieBase(BaseModel):
     title: str
     released_date: datetime
-    categories: List[int] = []
+    categories: List[int]
     plot: str
     poster_url: str
     imdb_rate: float
@@ -101,7 +98,7 @@ class MovieDisplayOne(BaseModel):
     id: int
     title: str
     released_date: datetime
-    categories: List[Category]
+    categories: List[CategoryBase]
     plot: str
     poster_url: str
     average_movie_rate : Optional[float] = None

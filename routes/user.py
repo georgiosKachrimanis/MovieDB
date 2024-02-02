@@ -4,6 +4,8 @@ from sqlalchemy.orm import Session
 from db.database import get_db
 from db import db_user
 from typing import List
+from auth.oauth2 import oauth2_scheme
+
 
 router = APIRouter(
     prefix='/user',
@@ -30,9 +32,9 @@ def get_all_users(db: Session = Depends(get_db)):
 
 # Get User By Id
 @router.get('/{user_id}', response_model=UserDisplayOne)
-def read_user_by_id(user_id: int, db: Session = Depends(get_db)):
+def read_user_by_id(user_id: int, db: Session = Depends(get_db),token: str = Depends(oauth2_scheme)):
     try:
-        user = db_user.get_user(db, user_id)
+        user = db_user.get_user(db, user_id) 
         if user is None:
             raise HTTPException(status_code=404, detail=f"User not found with user id: {user_id}")
         else:

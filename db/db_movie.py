@@ -55,8 +55,9 @@ def delete_movie(db: Session, movie_id: int) -> bool:
     if movie:
         db.delete(movie)
         db.commit()
-        return "Movie with id: {movie_id} deleted successfully"
+        return True
     return False
+
 
 def get_movie_reviews(db: Session, movie_id: int):
     return db.query(Review).filter(Review.movie_id == movie_id).all()
