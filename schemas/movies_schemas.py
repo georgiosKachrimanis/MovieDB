@@ -17,7 +17,7 @@ class CategoryID(BaseModel):
 # expenses
 class Category(BaseModel):
     id: int
-    name: str
+    category_name: str
 
 
 # Class to be used for the creation and management of Movie Category table
@@ -47,15 +47,17 @@ class MovieBase(BaseModel):
     poster_url: Optional[str]
     imdb_rate: Optional[float]
 
+
 class MovieTestDisplay(BaseModel):
     title: str
     released_date: Optional[datetime]
     plot: str
     poster_url: Optional[str]
     imdb_rate: Optional[float]
-    
+
     class Config:
         from_attributes = True
+
 
 class MovieDisplayOne(BaseModel):
     id: int
@@ -63,10 +65,10 @@ class MovieDisplayOne(BaseModel):
     released_date: datetime
     categories: List[Category]
     plot: str
-    poster_url: str
+    poster_url: Optional[str] = None
     average_movie_rate: Optional[float] = None
-    imdb_rate: float
-    reviews: List[Review] = []
+    imdb_rate: Optional[float]
+    # reviews: List[Review] = []
 
     class Config:
         from_attributes = True
