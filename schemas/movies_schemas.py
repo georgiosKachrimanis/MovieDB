@@ -2,7 +2,7 @@ from enum import Enum
 from typing import List, Optional
 from pydantic import BaseModel
 from datetime import datetime
-from schemas.users_reviews_schemas import Review
+# from schemas.users_reviews_schemas import Review
 
 
 class Image(BaseModel):

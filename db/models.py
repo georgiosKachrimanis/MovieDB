@@ -31,7 +31,7 @@ class DbUser(Base):
 class DbMovie(Base):
     __tablename__ = "movies"
     id = Column(Integer, primary_key=True, index=True)
-    title = Column(String)
+    title = Column(String, unique=True, index=True)
     released_date = Column(DateTime)
     categories = relationship(
         "DbCategory",

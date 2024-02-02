@@ -1,4 +1,5 @@
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, Request, status
+from db.models import DbMovie
 from schemas.movies_schemas import (
     MovieBase,
     MovieDisplayAll,
@@ -16,12 +17,24 @@ from typing import List, Optional
 router = APIRouter(prefix="/movies", tags=["Movies Endpoints"])
 
 
-@router.post("/add", response_model=MovieDisplayOne)
+def check_existing_movie(movie: MovieBase, db: Session):
+    # Check if a movie with the given title already exists
+    existing_movie = db.query(DbMovie).filter(DbMovie.title == movie.title).first()
+    if existing_movie:
+
+        raise HTTPException(
+            status_code=400, detail="A movie with the given title already exists."
+        )
+    return "ok"
+
+
+@router.post("/", response_model=MovieDisplayOne)
 def create_movie(movie: MovieBase, db: Session = Depends(get_db)):
-    try:
-        return db_movies.create_movie(db, movie)
-    except Exception as e:
-        return str(e)
+    if check_existing_movie(movie=movie, db=db) == "ok":
+        try:
+            return db_movies.create_movie(db, movie)
+        except Exception as e:
+            return str(e)
 
 
 # Get Movie By Id

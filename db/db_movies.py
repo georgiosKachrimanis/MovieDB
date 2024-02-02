@@ -1,7 +1,11 @@
-from typing import List
+# from typing import List
 from sqlalchemy.orm import Session, joinedload
 from db.models import DbMovie, DbReview, DbCategory
-from schemas.movies_schemas import MovieBase, MovieUpdate, MovieDisplayOne
+from schemas.movies_schemas import (
+    MovieBase,
+    MovieUpdate,
+    MovieDisplayOne,
+)
 from sqlalchemy import func
 
 
@@ -43,8 +47,12 @@ def get_all_movies(db: Session, skip: int = 0, limit: int = 100):
 
 
 def get_movie(db: Session, movie_id: int):
-    movie = db.query(DbMovie).options(joinedload(DbMovie.categories)).filter(DbMovie.id == movie_id).first()
-    
+    movie = (
+        db.query(DbMovie)
+        .options(joinedload(DbMovie.categories))
+        .filter(DbMovie.id == movie_id)
+        .first()
+    )
 
     # movie.average_movie_rate = (
     #     db.query(func.avg(DbReview.movie_rate))

@@ -17,8 +17,6 @@ def seed_categories(session: Session):
     session.commit()
 
 
-
-
 def create_tables_and_seed():
     Base.metadata.create_all(bind=engine)  # Create database tables
 
@@ -26,4 +24,4 @@ def create_tables_and_seed():
         seed_categories(session)  # Seed the categories table
 
 
-# Remember to call create_tables_and_seed() at an appropriate place in your application
+# Remember to call create_tables_and_seed() appropriate place
