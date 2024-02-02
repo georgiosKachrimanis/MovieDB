@@ -104,9 +104,11 @@ class DbMovieActor(Base):
 class DbCategory(Base):
     __tablename__ = "categories"
     id = Column(Integer, primary_key=True, index=True)
-    category_name = Column(String)
+    category_name = Column(String, unique=True)
     movies = relationship(
-        "DbMovie", secondary="movie_categories", back_populates="categories"
+        "DbMovie",
+        secondary="movie_categories",
+        back_populates="categories",
     )  # Many-to-many relationship
 
 
@@ -114,8 +116,8 @@ class DbCategory(Base):
 movie_categories = Table(
     "movie_categories",
     Base.metadata,
-    Column("movie_id", Integer, ForeignKey("movies.id")),  # Many-to-many relationship
+    Column("movie_id", Integer, ForeignKey("movies.id")),
     Column(
         "category_id", Integer, ForeignKey("categories.id")
-    ),  # Many-to-many relationship
+    ),
 )
