@@ -6,7 +6,7 @@ from fastapi import (
     HTTPException,
 )
 from typing import Optional, List
-from schemas.users_schemas import (
+from schemas.users_reviews_schemas import (
     UserBase,
     UserDisplay,
     UserUpdate,

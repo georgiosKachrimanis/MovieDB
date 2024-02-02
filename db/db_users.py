@@ -1,7 +1,7 @@
 from sqlalchemy import func
 from sqlalchemy.orm.session import Session
 from sqlalchemy.orm import joinedload
-from schemas.users_schemas import (
+from schemas.users_reviews_schemas import (
     UserBase,
     UserUpdate,
     UserTypeUpdate,

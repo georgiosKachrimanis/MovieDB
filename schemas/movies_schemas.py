@@ -2,6 +2,7 @@ from enum import Enum
 from typing import List, Optional
 from pydantic import BaseModel
 from datetime import datetime
+from schemas.users_reviews_schemas import Review
 
 
 class Image(BaseModel):
@@ -13,47 +14,54 @@ class CategoryID(BaseModel):
     id: int
 
 
+# expenses
 class Category(BaseModel):
     id: int
     name: str
 
 
-class Review(BaseModel):
-    id: int
-    review_content: str
-    # Sezgin uses movie_rate here!
-    user_rate: float
-    created_at: datetime
+# Class to be used for the creation and management of Movie Category table
+class MovieCategoryType(Enum):
+    action = (1, "Action")
+    animation = (2, "Animation")
+    documentary = (3, "Documentary")
+    comedy = (4, "Comedy")
+    drama = (5, "Drama")
+    fantasy = (6, "Fantasy")
+    musical = (7, "Musical")
+    romance = (8, "Romance")
+    scifi = (9, "Science Fiction")
+    thriller = (10, "Thriller")
+    western = (11, "Western")
 
-
-class MovieCategory(str, Enum):
-    action = "Action"
-    animation = "Animation"
-    documentary = "Documentary"
-    comedy = "Comedy"
-    drama = "Drama"
-    fantasy = "Fantasy"
-    musical = "Musical"
-    romance = "Romance"
-    scifi = "Science Fiction"
-    thriller = "Thriller"
-    western = "Western"
+    def __init__(self, num, label):
+        self.num = num
+        self.label = label
 
 
 class MovieBase(BaseModel):
     title: str
-    released_date: Optional[datetime] = None
-    categories: Optional[List[CategoryID]] = None
+    released_date: Optional[datetime]
+    categories: List[int] = []
     plot: str
-    poster_url: Optional[str] = None
-    imdb_rate: Optional[float] = None
+    poster_url: Optional[str]
+    imdb_rate: Optional[float]
 
+class MovieTestDisplay(BaseModel):
+    title: str
+    released_date: Optional[datetime]
+    plot: str
+    poster_url: Optional[str]
+    imdb_rate: Optional[float]
+    
+    class Config:
+        from_attributes = True
 
 class MovieDisplayOne(BaseModel):
     id: int
     title: str
     released_date: datetime
-    categories: List[Category] = []
+    categories: List[Category]
     plot: str
     poster_url: str
     average_movie_rate: Optional[float] = None

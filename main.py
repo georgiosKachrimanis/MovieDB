@@ -1,5 +1,5 @@
 from fastapi import FastAPI
-from routes import movieDB_get, movieDB_post, reviews, users
+from routes import reviews, users, movies
 from auth import authentication
 from db import models
 from db.database import engine
@@ -10,7 +10,7 @@ app = FastAPI(
     version="1.0.0"
 )
 # app.include_router(movieDB_get.router)
-# app.include_router(movieDB_post.router)
+app.include_router(movies.router)
 app.include_router(users.router)
 app.include_router(reviews.router)
 app.include_router(authentication.router)
