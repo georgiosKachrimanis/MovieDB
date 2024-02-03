@@ -1,5 +1,5 @@
 from fastapi import FastAPI
-from routes import reviews, users, movies, categories
+from routes import reviews, users, movies
 from auth import authentication
 from db import models
 from db.database import engine
@@ -10,12 +10,11 @@ app = FastAPI(
     description="This is an movie DB API from the 40+ of the group!",
     version="1.0.0",
 )
-# app.include_router(movieDB_get.router)
+
 app.include_router(movies.router)
 app.include_router(users.router)
 app.include_router(reviews.router)
 app.include_router(authentication.router)
-app.include_router(categories.router)
 
 
 @app.get("/")
@@ -24,6 +23,8 @@ def index():
 
 
 models.Base.metadata.create_all(engine)
+
+# Auto creating the Movie Categories
 create_tables_and_seed()
 
 

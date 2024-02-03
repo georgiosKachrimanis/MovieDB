@@ -1,14 +1,15 @@
-from typing import List
-
-from fastapi import HTTPException
 from sqlalchemy import func
-from sqlalchemy.orm import Session, joinedload
-from routes.categories import validate_category
-from db.models import DbCategory, DbMovie, DbReview
+from sqlalchemy.orm import (
+    Session,
+    joinedload,
+)
+from db.models import (
+    DbCategory,
+    DbMovie,
+    DbReview,
+)
 from schemas.movies_schemas import (
     MovieBase,
-    MovieCategoryType,
-    MovieDisplayOne,
     MovieUpdate,
 )
 
@@ -106,15 +107,7 @@ def get_movie_reviews(db: Session, movie_id: int):
     return db.query(DbReview).filter(DbReview.movie_id == movie_id).all()
 
 
-def get_movies_by_category(category: MovieCategoryType, db: Session):
-    category = (
-        db.query(DbCategory).filter(DbCategory.category_name == category.label).first()
-    )
-    print(category)
-    if not category:
-        raise HTTPException(
-            status_code=404, detail=f"Category {category.label} not found"
-        )
+def get_movies_by_category(category: str, db: Session):
 
     movies = (
         db.query(DbMovie)
@@ -122,10 +115,5 @@ def get_movies_by_category(category: MovieCategoryType, db: Session):
         .filter(DbCategory.id == category.id)
         .all()
     )
-    if not movies:
-        raise HTTPException(
-            status_code=404,
-            detail=f"No movies found for category {category.label}",
-        )
 
     return movies

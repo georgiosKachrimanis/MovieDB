@@ -49,7 +49,7 @@ class MovieCategoryType(Enum):
     def __init__(self, num, label):
         self.num = num
         self.label = label
-
+    
 
 class MovieBase(BaseModel):
     title: str

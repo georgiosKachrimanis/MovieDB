@@ -124,12 +124,10 @@ def get_users(
             status_code=status.HTTP_404_NOT_FOUND,
             detail="Users table is empty!",
         )
-    elif payload.get('user_type') == 'admin':
+    elif payload.get("user_type") == "admin":
         return users
     else:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED)
-
-
 
 
 # Get User Information (Only User)

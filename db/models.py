@@ -8,7 +8,6 @@ from sqlalchemy import (
 )
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql.sqltypes import (
-    Boolean,
     DateTime,
     Float,
     String,

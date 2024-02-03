@@ -1,11 +1,17 @@
 from typing import List, Optional
-from fastapi import APIRouter, Depends, HTTPException, Request, status
+from fastapi import (
+    APIRouter,
+    Depends,
+    HTTPException,
+)
 from sqlalchemy.orm import Session
-from routes.categories import validate_category
 from auth import oauth2
 from db import db_movies
 from db.database import get_db
-from db.models import DbMovie
+from db.models import (
+    DbMovie,
+    DbCategory,
+)
 from schemas.movies_schemas import (
     MovieBase,
     MovieCategoryType,
@@ -23,7 +29,8 @@ def check_existing_movie(movie: MovieBase, db: Session):
     existing_movie = db.query(DbMovie).filter(DbMovie.title == movie.title).first()
     if existing_movie:
         raise HTTPException(
-            status_code=400, detail="A movie with the given title already exists."
+            status_code=400,
+            detail="A movie with the given title already exists.",
         )
     return "ok"
 
@@ -66,11 +73,37 @@ def get_movie_by_id(movie_id: int, db: Session = Depends(get_db)):
     return movie
 
 
-# TODO: Check how the request is created
-@router.get("/category/{category_label}", response_model=List[MovieDisplayOne])
-def get_movies_by_category(
-    category: str = Depends(validate_category), db: Session = Depends(get_db)
-):
-    movies = db_movies.get_movies_by_category(category=category, db=db)
+# Return Movie Categories
+@router.get("/categories/")
+def get_movie_categories(db: Session = Depends(get_db)):
+    categories = db.query(DbCategory.category_name).all()
+    return [category.category_name for category in categories]
+
+
+# Return All Movies of the requested Category
+@router.get(
+    "/categories/{category_label}",
+    response_model=List[MovieDisplayOne],
+)
+def get_movies_by_category(category: str, db: Session = Depends(get_db)):
+    category_check = (
+        db.query(DbCategory)
+        .filter(DbCategory.category_name == category.capitalize())
+        .first()
+    )
+    if not category_check:
+        raise HTTPException(
+            status_code=404,
+            detail=f"Category {category} not found",
+        )
+    movies = db_movies.get_movies_by_category(
+        category=category_check,
+        db=db,
+    )
+    if not movies:
+        raise HTTPException(
+            status_code=404,
+            detail=f"No movies found in category {category.capitalize()}",
+        )
 
     return movies
