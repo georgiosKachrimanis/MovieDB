@@ -1,12 +1,16 @@
-# from typing import List
+from typing import List
+
+from fastapi import HTTPException
+from sqlalchemy import func
 from sqlalchemy.orm import Session, joinedload
-from db.models import DbMovie, DbReview, DbCategory
+from routes.categories import validate_category
+from db.models import DbCategory, DbMovie, DbReview
 from schemas.movies_schemas import (
     MovieBase,
-    MovieUpdate,
+    MovieCategoryType,
     MovieDisplayOne,
+    MovieUpdate,
 )
-from sqlalchemy import func
 
 
 def create_movie(db: Session, request: MovieBase):
@@ -46,13 +50,24 @@ def get_all_movies(db: Session, skip: int = 0, limit: int = 100):
     return movies
 
 
-def get_movie(db: Session, movie_id: int):
-    movie = (
-        db.query(DbMovie)
-        .options(joinedload(DbMovie.categories))
-        .filter(DbMovie.id == movie_id)
-        .first()
-    )
+def get_movie(db: Session, movie_id: int = None, movie_title: str = None):
+    if movie_id is not None:
+        movie = (
+            db.query(DbMovie)
+            .options(joinedload(DbMovie.categories))
+            .filter(DbMovie.id == movie_id)
+            .first()
+        )
+    elif movie_title is not None:
+        movie = (
+            db.query(DbMovie)
+            .options(joinedload(DbMovie.categories))
+            .filter(DbMovie.title == movie_title)
+            .first()
+        )
+    # We can raise an exception here but maybe is better to just have a fun
+    # function if you do not provide a search parameter!
+    return movie
 
     # movie.average_movie_rate = (
     #     db.query(func.avg(DbReview.movie_rate))
@@ -89,3 +104,28 @@ def delete_movie(db: Session, movie_id: int) -> bool:
 
 def get_movie_reviews(db: Session, movie_id: int):
     return db.query(DbReview).filter(DbReview.movie_id == movie_id).all()
+
+
+def get_movies_by_category(category: MovieCategoryType, db: Session):
+    category = (
+        db.query(DbCategory).filter(DbCategory.category_name == category.label).first()
+    )
+    print(category)
+    if not category:
+        raise HTTPException(
+            status_code=404, detail=f"Category {category.label} not found"
+        )
+
+    movies = (
+        db.query(DbMovie)
+        .join(DbMovie.categories)
+        .filter(DbCategory.id == category.id)
+        .all()
+    )
+    if not movies:
+        raise HTTPException(
+            status_code=404,
+            detail=f"No movies found for category {category.label}",
+        )
+
+    return movies

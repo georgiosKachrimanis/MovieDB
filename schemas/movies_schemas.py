@@ -2,6 +2,7 @@ from enum import Enum
 from typing import List, Optional
 from pydantic import BaseModel
 from datetime import datetime
+
 # from schemas.users_reviews_schemas import Review
 
 
@@ -23,16 +24,27 @@ class Category(BaseModel):
 # Class to be used for the creation and management of Movie Category table
 class MovieCategoryType(Enum):
     action = (1, "Action")
-    animation = (2, "Animation")
-    documentary = (3, "Documentary")
-    comedy = (4, "Comedy")
-    drama = (5, "Drama")
-    fantasy = (6, "Fantasy")
-    musical = (7, "Musical")
-    romance = (8, "Romance")
-    scifi = (9, "Science Fiction")
-    thriller = (10, "Thriller")
-    western = (11, "Western")
+    adventure = (2, "Adventure")
+    animation = (3, "Animation")
+    biography = (4, "Biography")
+    comedy = (5, "Comedy")
+    crime = (6, "Crime")
+    documentary = (7, "Documentary")
+    drama = (8, "Drama")
+    family = (9, "Family")
+    fantasy = (10, "Fantasy")
+    film_noir = (11, "Film Noir")
+    history = (12, "History")
+    horror = (13, "Horror")
+    musical = (14, "Musical")
+    mystery = (15, "Mystery")
+    romance = (16, "Romance")
+    sci_fi = (17, "Science Fiction")
+    sport = (18, "Sport")
+    superhero = (19, "Superhero")
+    thriller = (20, "Thriller")
+    war = (21, "War")
+    western = (22, "Western")
 
     def __init__(self, num, label):
         self.num = num

@@ -1,5 +1,5 @@
 from fastapi import FastAPI
-from routes import reviews, users, movies
+from routes import reviews, users, movies, categories
 from auth import authentication
 from db import models
 from db.database import engine
@@ -15,6 +15,7 @@ app.include_router(movies.router)
 app.include_router(users.router)
 app.include_router(reviews.router)
 app.include_router(authentication.router)
+app.include_router(categories.router)
 
 
 @app.get("/")
