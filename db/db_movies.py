@@ -44,7 +44,7 @@ def get_all_movies(db: Session, skip: int = 0, limit: int = 100):
             .scalar()
         )
         movie.average_movie_rate = (
-            db.query(func.avg(DbReview.movie_rate))
+            db.query(func.avg(DbReview.user_rate))
             .filter(DbReview.movie_id == movie.id)
             .scalar()
         )
@@ -66,15 +66,17 @@ def get_movie(db: Session, movie_id: int = None, movie_title: str = None):
             .filter(DbMovie.title == movie_title)
             .first()
         )
-    # We can raise an exception here but maybe is better to just have a fun
-    # function if you do not provide a search parameter!
-    return movie
 
-    # movie.average_movie_rate = (
-    #     db.query(func.avg(DbReview.movie_rate))
-    #     .filter(DbReview.movie_id == movie.id)
-    #     .scalar()
-    # )
+    if movie:
+        print(movie.id)
+        average_rate = (
+            db.query(func.avg(DbReview.user_rate))
+            .filter(DbReview.movie_id == movie.id)
+            .scalar()
+        )
+        print(average_rate)
+    movie.average_movie_rate = average_rate if average_rate is not None else 0
+
     return movie
 
 
@@ -96,11 +98,12 @@ def update_movie(db: Session, movie_id: int, request: MovieUpdate):
 
 def delete_movie(db: Session, movie_id: int) -> bool:
     movie = db.query(DbMovie).filter(DbMovie.id == movie_id).first()
-    if movie:
-        db.delete(movie)
-        db.commit()
-        return "Movie with id: {movie_id} deleted successfully"
-    return False
+    if not movie:
+        return False
+    db.delete(movie)
+    db.commit()
+
+    return True
 
 
 def get_movie_reviews(db: Session, movie_id: int):

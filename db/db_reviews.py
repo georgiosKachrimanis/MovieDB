@@ -21,6 +21,7 @@ def create_review(db: Session, request: CreateReview, user_id: int):
     new_review = DbReview(
         review_content=request.review_content,
         user_rate=request.user_rate,
+        movie_id=request.movie_id,
         user_id=user_id,
     )
     db.add(new_review)

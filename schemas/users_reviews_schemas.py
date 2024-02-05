@@ -86,7 +86,8 @@ class ReviewBase(BaseModel):
 class CreateReview(BaseModel):
     review_content: str
     user_rate: float
-    # Sezgin uses movie_rate here!
+    movie_id: int
+    # Sezgin movie_rate here!
 
 
 class ReviewDisplay(BaseModel):

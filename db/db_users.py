@@ -26,7 +26,11 @@ def create_user(db: Session, request: UserBase):
 def get_all_users(db: Session):
     users = db.query(DbUser).all()
     for user in users:
-        user.review_count = db.query(func.count(DbReview.id)).filter(DbReview.user_id == user.id).scalar()
+        user.review_count = (
+            db.query(func.count(DbReview.id))
+            .filter(DbReview.user_id == user.id)
+            .scalar()
+        )
     return users
 
 

@@ -5,7 +5,7 @@ from fastapi import (
     status,
     HTTPException,
 )
-from typing import Optional, List
+from typing import List
 from schemas.users_reviews_schemas import (
     UserBase,
     UserDisplay,
@@ -21,7 +21,7 @@ from auth import oauth2
 router = APIRouter(prefix="/users", tags=["Users Endpoints"])
 
 
-def check_user(db: Session, user_id: int = None, user_email: str = None):
+def check_user(db: Session, user_id: int):
     """
     Check if a user exists in the database by ID or email.
 
@@ -41,26 +41,12 @@ def check_user(db: Session, user_id: int = None, user_email: str = None):
     - HTTPException: 404 error if neither user_id nor user_email is provided,
                      or if no user is found with the provided identifier.
     """
-    if user_id is not None:
-        user = db_users.get_user(db=db, id=user_id)
-    elif user_email is not None:
-        user = db_users.get_user(db=db, email=user_email)
-    else:
+    user = db_users.get_user(db=db, id=user_id)
+    if user is None:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail="User ID or email must be provided",
+            detail=f"User with ID: {user_id} not found",
         )
-    if user is None:
-        if user_id is None:
-            raise HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND,
-                detail=f"User with email: {user_email} not found",
-            )
-        else:
-            raise HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND,
-                detail=f"User with ID: {user_id} not found",
-            )
     return user
 
 
@@ -94,7 +80,7 @@ def create_user(request: UserBase, db: Session = Depends(get_db)):
 
 
 # Get all the users(Only Admins)
-@router.get("/all", response_model=List[UserDisplay])
+@router.get("/", response_model=List[UserDisplay])
 def get_users(
     db: Session = Depends(get_db),
     token: str = Depends(oauth2.oauth2_schema),
@@ -131,12 +117,11 @@ def get_users(
 
 
 # Get User Information (Only User)
-@router.get("/", response_model=UserDisplay)
+@router.get("/{user_id}", response_model=UserDisplay)
 def get_user(
     response: Response,
+    user_id: int,
     db: Session = Depends(get_db),
-    user_id: Optional[int] = None,
-    user_email: Optional[str] = None,
     token: str = Depends(oauth2.oauth2_schema),
 ):
     """
@@ -162,7 +147,8 @@ def get_user(
     """
 
     payload = oauth2.decode_access_token(token=token)
-    user = check_user(db=db, user_email=user_email, user_id=user_id)
+    user = check_user(db=db, user_id=user_id)
+
     if payload.get("user_id") == user.id:
         return user
     else:
@@ -173,9 +159,8 @@ def get_user(
 @router.put("/", response_model=UserDisplay)
 def update_user(
     request: UserUpdate,
+    user_id: int,
     db: Session = Depends(get_db),
-    user_id: Optional[int] = None,
-    user_email: Optional[str] = None,
     token: str = Depends(oauth2.oauth2_schema),
 ):
     """
@@ -201,7 +186,7 @@ def update_user(
     """
 
     payload = oauth2.decode_access_token(token=token)
-    user = check_user(db=db, user_id=user_id, user_email=user_email)
+    user = check_user(db=db, user_id=user_id)
 
     if payload.get("user_id") == user.id:
         db_users.update_user(db=db, id=user_id, request=request)
@@ -211,12 +196,11 @@ def update_user(
 
 
 # Update User Type Information (Admin User)
-@router.put("/type", response_model=UserTypeDisplay)
+@router.patch("/{user_id}", response_model=UserTypeDisplay)
 def update_user_type(
     request: UserTypeUpdate,
+    user_id: int,
     db: Session = Depends(get_db),
-    user_id: Optional[int] = None,
-    user_email: Optional[str] = None,
     token: str = Depends(oauth2.oauth2_schema),
 ):
     """
@@ -240,7 +224,7 @@ def update_user_type(
     - HTTPException: 401 error if the user making the request is not an admin.
     """
     payload = oauth2.decode_access_token(token=token)
-    user = check_user(db=db, user_id=user_id, user_email=user_email)
+    user = check_user(db=db, user_id=user_id)
 
     if payload.get("user_type") == "admin":
         db_users.update_user_type(db=db, id=user_id, request=request)

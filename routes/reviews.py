@@ -1,11 +1,5 @@
-from fastapi import (
-    APIRouter,
-    Depends,
-    HTTPException,
-    status,
-)
+from fastapi import APIRouter, Depends, HTTPException, status
 from schemas.users_reviews_schemas import (
-    ReviewBase,
     ReviewUpdate,
     ReviewDisplay,
     CreateReview,
