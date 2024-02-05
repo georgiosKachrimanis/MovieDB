@@ -1,6 +1,5 @@
 from typing import List, Optional
-
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Body
 from sqlalchemy.orm import Session
 from auth import oauth2
 from db import db_movies
@@ -49,8 +48,9 @@ def get_movie_by_id(movie_id: int, db: Session = Depends(get_db)):
     return movie
 
 
+# Update Movie
 @router.put("/{movie_id}", response_model=Optional[MovieDisplay])
-def update_all_movie_data(
+def update_movie_data(
     movie_id: int,
     movie_updates: MovieUpdate,
     db: Session = Depends(get_db),
@@ -71,33 +71,56 @@ def update_all_movie_data(
     return updated_movie
 
 
-@router.patch("/{movie_id}", response_model=Optional[MovieDisplay])
-def patch_movie_data(
+# Update some items in the movie
+@router.patch("/title/{movie_id}", response_model=Optional[MovieDisplay])
+def update_movie_title(
     movie_id: int,
-    movie_updates: MoviePatchUpdate,
+    title: str = Body(..., embed=True),
     db: Session = Depends(get_db),
 ):
 
     movie = db_movies.get_movie(db, movie_id)
+    if movie:
+        db_movies.patch_movie(db=db, movie=movie, title_update=title)
+    return movie
 
-    if movie is None:
-        raise HTTPException(
-            status_code=404, detail="Movie with Id :{movie_id} not found"
-        )
-    elif db_movies.get_movie(db=db, movie_title=movie_updates.title):
-        raise HTTPException(
-            status_code=409,
-            detail=f"A movie with the title '{movie_updates.title}' exists.",
-        )
-    else:
-        partially_updated_movie = db_movies.update_movie(
-            db=db,
-            movie=movie,
-            request=movie_updates,
-        )
 
-    return partially_updated_movie
+@router.patch("/plot/{movie_id}", response_model=Optional[MovieDisplay])
+def update_movie_plot(
+    movie_id: int,
+    plot: str = Body(..., embed=True),
+    db: Session = Depends(get_db),
+):
 
+    movie = db_movies.get_movie(db, movie_id)
+    if movie:
+        db_movies.patch_movie(db=db, movie=movie, plot=plot)
+    return movie
+
+
+@router.patch("/poster_url/{movie_id}", response_model=Optional[MovieDisplay])
+def update_movie_poster_url(
+    movie_id: int,
+    poster_url: str = Body(..., embed=True),
+    db: Session = Depends(get_db),
+):
+
+    movie = db_movies.get_movie(db, movie_id)
+    if movie:
+        db_movies.patch_movie(db=db, movie=movie, poster_url=poster_url)
+    return movie
+
+
+@router.patch("/categories/{movie_id}", response_model=Optional[MovieDisplay])
+def update_movie_categories(
+    movie_id: int,
+    category_ids: List[int] = Body(..., embed=True),
+    db: Session = Depends(get_db)
+):
+    movie = db_movies.get_movie(db, movie_id)
+    if movie:
+        db_movies.patch_movie(db=db, movie=movie, category_ids=category_ids)
+    return movie
 
 @router.delete("/{movie_id}")
 def delete_movie(
@@ -122,7 +145,10 @@ def delete_movie(
 @router.get("/categories/")
 def get_movie_categories(db: Session = Depends(get_db)):
     categories = db.query(DbCategory.id, DbCategory.category_name).all()
-    return [{"id": category.id, "category_name": category.category_name} for category in categories]
+    return [
+        {"id": category.id, "category_name": category.category_name}
+        for category in categories
+    ]
 
 
 # Return All Movies of the requested Category
@@ -131,11 +157,7 @@ def get_movie_categories(db: Session = Depends(get_db)):
     response_model=List[MovieDisplay],
 )
 def get_movies_by_category(category: int, db: Session = Depends(get_db)):
-    category_check = (
-        db.query(DbCategory)
-        .filter(DbCategory.id == category)
-        .first()
-    )
+    category_check = db.query(DbCategory).filter(DbCategory.id == category).first()
     if not category_check:
         raise HTTPException(
             status_code=404,

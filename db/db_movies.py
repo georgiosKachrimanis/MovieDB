@@ -1,5 +1,6 @@
 from sqlalchemy import func
 from sqlalchemy.sql.functions import coalesce
+from typing import List
 from sqlalchemy.orm import (
     Session,
     joinedload,
@@ -62,33 +63,25 @@ def get_movie(db: Session, movie_id: int = None, movie_title: str = None):
     return movie
 
 
+# TODO: Find a better way to make the patch!
+# Maybe I should use a different type of update.
 def patch_movie(
     db: Session,
     movie: DbMovie,
-    request: MoviePatchUpdate,
+    title_update: str = None,
+    plot: str = None, 
+    poster_url: str = None,
+    category_ids: List[int] = None,
 ):
-    
-    update_request_data = request.dict(exclude_unset=True)
-    for key, value in update_request_data.items():
-        # Handle 'categories' with special logic
-        if (
-            key == "categories" and value is not None
-        ):  # Proceed only if 'categories' is explicitly provided
-            new_categories = (
-                db.query(DbCategory).filter(DbCategory.id.in_(value)).all()
-                if value
-                else []
-            )
-            movie.categories = new_categories
-        else:
-            # For other fields, check if the value is meaningfully different from a placeholder
-            if (
-                value is not None
-                and not (isinstance(value, int) and value == 0)
-                and not (isinstance(value, str) and value == "")
-            ):
-                setattr(movie, key, value)
-
+    if title_update:
+        movie.title = title_update
+    if plot:
+        movie.plot = plot
+    if poster_url:
+        movie.poster_url = poster_url
+    if category_ids:
+        categories = db.query(DbCategory).filter(DbCategory.id.in_(category_ids)).all()
+        movie.categories = categories
     db.commit()
     db.refresh(movie)
     return movie
