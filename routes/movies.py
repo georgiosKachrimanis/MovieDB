@@ -1,23 +1,15 @@
 from typing import List, Optional
-from fastapi import (
-    APIRouter,
-    Depends,
-    HTTPException,
-)
+
+from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from auth import oauth2
 from db import db_movies
 from db.database import get_db
-from db.models import (
-    DbMovie,
-    DbCategory,
-)
+from db.models import DbCategory, DbMovie
 from schemas.movies_schemas import (
     MovieBase,
-    MovieCategoryType,
-    MovieDisplayAll,
-    MovieDisplayOne,
-    MovieTestDisplay,
+    MovieDisplay,
+    MoviePatchUpdate,
     MovieUpdate,
 )
 
@@ -25,7 +17,7 @@ router = APIRouter(prefix="/movies", tags=["Movies Endpoints"])
 
 
 # Create a new movie
-@router.post("/", response_model=MovieDisplayOne)
+@router.post("/", response_model=MovieDisplay)
 def create_movie(movie: MovieBase, db: Session = Depends(get_db)):
     if db_movies.get_movie(db=db, movie_title=movie.title):
         raise HTTPException(
@@ -35,25 +27,7 @@ def create_movie(movie: MovieBase, db: Session = Depends(get_db)):
     return db_movies.create_movie(db, movie)
 
 
-# Get Movie By Title
-# @router.get("/", response_model=Optional[MovieDisplayOne])
-# def get_movie_by_title(
-#     movie_title: Optional[str] = None,
-#     db: Session = Depends(get_db),
-# ):
-#     if movie_title:
-#         movie = db_movies.get_movie(db=db, movie_title=movie_title)
-#         if movie is None:
-#             raise HTTPException(
-#                 status_code=404,
-#                 detail=f"Movie named: {movie_title} not found",
-#             )
-#         return movie
-
-#     raise HTTPException(status_code=400, detail="Movie title is required")
-
-
-@router.get("/", response_model=Optional[List[MovieDisplayOne]])
+@router.get("/", response_model=Optional[List[MovieDisplay]])
 def get_movies(db: Session = Depends(get_db)):
     movies = db_movies.get_all_movies(db=db)
     if not movies:
@@ -65,7 +39,7 @@ def get_movies(db: Session = Depends(get_db)):
 
 
 # Get Movie By Id
-@router.get("/{movie_id}", response_model=Optional[MovieDisplayOne])
+@router.get("/{movie_id}", response_model=Optional[MovieDisplay])
 def get_movie_by_id(movie_id: int, db: Session = Depends(get_db)):
     movie = db_movies.get_movie(db, movie_id)
     if movie is None:
@@ -75,8 +49,61 @@ def get_movie_by_id(movie_id: int, db: Session = Depends(get_db)):
     return movie
 
 
+@router.put("/{movie_id}", response_model=Optional[MovieDisplay])
+def update_all_movie_data(
+    movie_id: int,
+    movie_updates: MovieUpdate,
+    db: Session = Depends(get_db),
+):
+    movie = db_movies.get_movie(db, movie_id)
+
+    if movie is None:
+        raise HTTPException(
+            status_code=404, detail="Movie with Id :{movie_id} not found"
+        )
+    else:
+        updated_movie = db_movies.update_movie(
+            db=db,
+            movie=movie,
+            request=movie_updates,
+        )
+
+    return updated_movie
+
+
+@router.patch("/{movie_id}", response_model=Optional[MovieDisplay])
+def patch_movie_data(
+    movie_id: int,
+    movie_updates: MoviePatchUpdate,
+    db: Session = Depends(get_db),
+):
+
+    movie = db_movies.get_movie(db, movie_id)
+
+    if movie is None:
+        raise HTTPException(
+            status_code=404, detail="Movie with Id :{movie_id} not found"
+        )
+    elif db_movies.get_movie(db=db, movie_title=movie_updates.title):
+        raise HTTPException(
+            status_code=409,
+            detail=f"A movie with the title '{movie_updates.title}' exists.",
+        )
+    else:
+        partially_updated_movie = db_movies.update_movie(
+            db=db,
+            movie=movie,
+            request=movie_updates,
+        )
+
+    return partially_updated_movie
+
+
 @router.delete("/{movie_id}")
-def delete_movie(movie_id: int, db: Session = Depends(get_db)):
+def delete_movie(
+    movie_id: int,
+    db: Session = Depends(get_db),
+):
     reviews = db_movies.get_movie_reviews(db, movie_id)
     if reviews:
         raise HTTPException(
@@ -88,25 +115,25 @@ def delete_movie(movie_id: int, db: Session = Depends(get_db)):
         raise HTTPException(
             status_code=404, detail=f"Movie with Id :{movie_id} not found"
         )
-    return f'Movie with id: {movie_id} deleted successfully'
+    return f"Movie with id: {movie_id} deleted successfully"
 
 
 # Return Movie Categories
 @router.get("/categories/")
 def get_movie_categories(db: Session = Depends(get_db)):
-    categories = db.query(DbCategory.category_name).all()
-    return [category.category_name for category in categories]
+    categories = db.query(DbCategory.id, DbCategory.category_name).all()
+    return [{"id": category.id, "category_name": category.category_name} for category in categories]
 
 
 # Return All Movies of the requested Category
 @router.get(
-    "/categories/{category_label}",
-    response_model=List[MovieDisplayOne],
+    "/categories/{category_id}",
+    response_model=List[MovieDisplay],
 )
-def get_movies_by_category(category: str, db: Session = Depends(get_db)):
+def get_movies_by_category(category: int, db: Session = Depends(get_db)):
     category_check = (
         db.query(DbCategory)
-        .filter(DbCategory.category_name == category.capitalize())
+        .filter(DbCategory.id == category)
         .first()
     )
     if not category_check:

@@ -1,7 +1,8 @@
+from datetime import datetime
 from enum import Enum
 from typing import List, Optional
+
 from pydantic import BaseModel
-from datetime import datetime
 
 # from schemas.users_reviews_schemas import Review
 
@@ -49,7 +50,7 @@ class MovieCategoryType(Enum):
     def __init__(self, num, label):
         self.num = num
         self.label = label
-    
+
 
 class MovieBase(BaseModel):
     title: str
@@ -71,7 +72,7 @@ class MovieTestDisplay(BaseModel):
         from_attributes = True
 
 
-class MovieDisplayOne(BaseModel):
+class MovieDisplay(BaseModel):
     id: int
     title: str
     released_date: datetime
@@ -86,24 +87,21 @@ class MovieDisplayOne(BaseModel):
         from_attributes = True
 
 
-class MovieDisplayAll(BaseModel):
-    id: int
-    title: str
-    released_date: datetime
-    plot: str
-    poster_url: str
-    average_movie_rate: Optional[float] = None
-    imdb_rate: float
-    review_count: int
-
-    class Config:
-        from_attributes = True
-
-
-class MovieUpdate(BaseModel):
+# to be used with the patch(update) function
+class MoviePatchUpdate(BaseModel):
     title: Optional[str] = None
     released_date: Optional[datetime] = None
-    categories: List[CategoryID]
+    categories: Optional[List[int]] = None
     plot: Optional[str] = None
     poster_url: Optional[str] = None
     imdb_rate: Optional[float] = None
+
+
+# To be used with the put(update) function
+class MovieUpdate(BaseModel):
+    title: str
+    released_date: datetime
+    categories: List[int]
+    plot: str
+    poster_url: str
+    imdb_rate: float
