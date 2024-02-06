@@ -3,15 +3,6 @@ from typing import Optional, List
 from datetime import datetime
 
 
-# Movie inside ReviewDisplay
-# class Movie(BaseModel):
-#     id: int
-#     title: str
-
-#     class Config:
-#         from_attributes = True
-
-
 # User Schemas
 class UserBase(BaseModel):
     username: str
@@ -31,8 +22,7 @@ class UserReviewModel(BaseModel):
 class Review(BaseModel):
     id: int
     review_content: str
-    # Sezgin uses movie_rate here!
-    user_rate: float
+    user_movie_rate: float
     created_at: datetime
 
 
@@ -79,22 +69,20 @@ class UserDisplayAll(BaseModel):
 # Review Schemas
 class ReviewBase(BaseModel):
     review_content: str
-    user_rate: float
+    user_movie_rate: float
     user_id: Optional[int]
 
 
 class CreateReview(BaseModel):
     review_content: str
-    user_rate: float
+    user_movie_rate: float
     movie_id: int
-    # Sezgin movie_rate here!
 
 
 class ReviewDisplay(BaseModel):
     id: int
     review_content: str
-    user_rate: float
-    # Sezgin uses movie_rate here!
+    user_movie_rate: float
     created_at: datetime
     user: UserReviewModel  # From user_schemas
 
@@ -104,5 +92,4 @@ class ReviewDisplay(BaseModel):
 
 class ReviewUpdate(BaseModel):
     review_content: Optional[str] = None
-    # Sezgin uses movie_rate here!
-    user_rate: Optional[float] = None
+    user_movie_rate: Optional[float] = None

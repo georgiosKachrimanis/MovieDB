@@ -76,10 +76,9 @@ class DbReview(Base):
     created_at = Column(DateTime, default=datetime.utcnow)
     # Foreign key to establish the one<-->many relationship
     user_id = Column(Integer, ForeignKey("users.id"))
-    user_rate = Column(Float)
+    user_movie_rate = Column(Float)
     # One<-->many relationship
     user = relationship("DbUser", back_populates="reviews")
-    movie_rate = Column(Float)
     # Foreign key to establish the one-to-many relationship
     movie_id = Column(Integer, ForeignKey("movies.id"))
     # # One<-->many relationship

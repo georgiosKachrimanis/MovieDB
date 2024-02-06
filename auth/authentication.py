@@ -41,7 +41,7 @@ def get_token(
     The returned token should be included in the 'Authorization' header of
     subsequent requests as 'Bearer {token}'.
     """
-    print(request.username)
+    
     user = (
         db.query(models.DbUser)
         .filter(models.DbUser.username == request.username)

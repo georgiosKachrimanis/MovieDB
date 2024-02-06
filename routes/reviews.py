@@ -44,6 +44,7 @@ def get_review_from_db(
     return review
 
 
+# TODO: Check id the user has a review for the same movie!
 # Create Review
 @router.post("/", response_model=ReviewDisplay)
 def create_review(
@@ -76,6 +77,7 @@ def create_review(
 
 
 # Read All Review With User
+
 @router.get("/", response_model=List[ReviewDisplay])
 def get_all_reviews(db: Session = Depends(get_db)):
     """

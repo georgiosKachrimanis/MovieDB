@@ -29,9 +29,8 @@ def create_movie(db: Session, request: MovieBase):
     db.add(new_movie)
     db.commit()
     db.refresh(new_movie)
-
-    movie_display = get_movie(db=db, movie_id=new_movie.id)
-    return movie_display
+    
+    return new_movie
 
 
 def get_all_movies(db: Session, skip: int = 0, limit: int = 100):
@@ -68,19 +67,16 @@ def get_movie(db: Session, movie_id: int = None, movie_title: str = None):
 def patch_movie(
     db: Session,
     movie: DbMovie,
-    title_update: str = None,
-    plot: str = None, 
-    poster_url: str = None,
-    category_ids: List[int] = None,
+    request: MoviePatchUpdate,
 ):
-    if title_update:
-        movie.title = title_update
-    if plot:
-        movie.plot = plot
-    if poster_url:
-        movie.poster_url = poster_url
-    if category_ids:
-        categories = db.query(DbCategory).filter(DbCategory.id.in_(category_ids)).all()
+    if request.title:
+        movie.title = request.title
+    if request.plot:
+        movie.plot = request.plot
+    if request.poster_url:
+        movie.poster_url = request.poster_url
+    if request.categories:
+        categories = db.query(DbCategory).filter(DbCategory.id.in_(request.categories)).all()
         movie.categories = categories
     db.commit()
     db.refresh(movie)
@@ -127,7 +123,7 @@ def get_movies_by_category(category: int, db: Session):
 
 def calculate_average(movie: DbMovie, db: Session):
     average_rate = (
-        db.query(coalesce(func.avg(DbReview.user_rate), 0))
+        db.query(coalesce(func.avg(DbReview.user_movie_rate), 0))
         .filter(DbReview.movie_id == movie.id)
         .scalar()
     )

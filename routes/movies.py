@@ -4,13 +4,15 @@ from sqlalchemy.orm import Session
 from auth import oauth2
 from db import db_movies
 from db.database import get_db
+from routes.reviews import create_review
 from db.models import DbCategory, DbMovie
 from schemas.movies_schemas import (
     MovieBase,
     MovieDisplay,
-    MoviePatchUpdate,
     MovieUpdate,
+    MoviePatchUpdate,
 )
+from schemas.users_reviews_schemas import ReviewDisplay, ReviewUpdate, CreateReview
 
 router = APIRouter(prefix="/movies", tags=["Movies Endpoints"])
 
@@ -24,6 +26,26 @@ def create_movie(movie: MovieBase, db: Session = Depends(get_db)):
             detail=f"A movie with the title {movie.title} already exists.",
         )
     return db_movies.create_movie(db, movie)
+
+
+@router.post("/{movie_id}/review", response_model=ReviewDisplay)
+def post_review_for_movie(
+    movie_id: int,
+    review_request: ReviewUpdate,
+    db: Session = Depends(get_db),
+    token: str = Depends(oauth2.oauth2_schema),
+):
+
+    new_review = CreateReview(
+        movie_id=movie_id,
+        user_movie_rate=review_request.user_movie_rate,
+        review_content=review_request.review_content,
+        )
+    return create_review(
+        request=new_review,
+        db=db,
+        token=token,
+    )
 
 
 @router.get("/", response_model=Optional[List[MovieDisplay]])
@@ -71,56 +93,27 @@ def update_movie_data(
     return updated_movie
 
 
-# Update some items in the movie
-@router.patch("/title/{movie_id}", response_model=Optional[MovieDisplay])
-def update_movie_title(
+@router.patch("/{movie_id}", response_model=Optional[MovieDisplay])
+def patch_movie(
     movie_id: int,
-    title: str = Body(..., embed=True),
+    movie_updates: Optional[MoviePatchUpdate],
     db: Session = Depends(get_db),
 ):
-
     movie = db_movies.get_movie(db, movie_id)
-    if movie:
-        db_movies.patch_movie(db=db, movie=movie, title_update=title)
-    return movie
 
+    if movie is None:
+        raise HTTPException(
+            status_code=404, detail="Movie with Id :{movie_id} not found"
+        )
+    else:
+        updated_movie = db_movies.patch_movie(
+            db=db,
+            movie=movie,
+            request=movie_updates,
+        )
 
-@router.patch("/plot/{movie_id}", response_model=Optional[MovieDisplay])
-def update_movie_plot(
-    movie_id: int,
-    plot: str = Body(..., embed=True),
-    db: Session = Depends(get_db),
-):
+    return updated_movie
 
-    movie = db_movies.get_movie(db, movie_id)
-    if movie:
-        db_movies.patch_movie(db=db, movie=movie, plot=plot)
-    return movie
-
-
-@router.patch("/poster_url/{movie_id}", response_model=Optional[MovieDisplay])
-def update_movie_poster_url(
-    movie_id: int,
-    poster_url: str = Body(..., embed=True),
-    db: Session = Depends(get_db),
-):
-
-    movie = db_movies.get_movie(db, movie_id)
-    if movie:
-        db_movies.patch_movie(db=db, movie=movie, poster_url=poster_url)
-    return movie
-
-
-@router.patch("/categories/{movie_id}", response_model=Optional[MovieDisplay])
-def update_movie_categories(
-    movie_id: int,
-    category_ids: List[int] = Body(..., embed=True),
-    db: Session = Depends(get_db)
-):
-    movie = db_movies.get_movie(db, movie_id)
-    if movie:
-        db_movies.patch_movie(db=db, movie=movie, category_ids=category_ids)
-    return movie
 
 @router.delete("/{movie_id}")
 def delete_movie(
@@ -133,8 +126,8 @@ def delete_movie(
             status_code=409,
             detail=f"Cannot delete movie with Id: {movie_id}, it has review/s",
         )
-    success = db_movies.delete_movie(db, movie_id)
-    if not success:
+
+    if not db_movies.delete_movie(db, movie_id):
         raise HTTPException(
             status_code=404, detail=f"Movie with Id :{movie_id} not found"
         )
