@@ -1,15 +1,17 @@
 from fastapi import FastAPI
-from routes import user,review,movie,category
+from routes import categories, directors, movies, reviews, users,actors
+from auth import authentication
 from db import models
 from db.database import engine
 
 app = FastAPI()
-
-app.include_router(user.router)
-app.include_router(movie.router)
-app.include_router(review.router)
-app.include_router(category.router)
-
+app.include_router(authentication.router)
+app.include_router(users.router)
+app.include_router(movies.router)
+app.include_router(reviews.router)
+app.include_router(categories.router)
+app.include_router(directors.router)
+app.include_router(actors.router)
 
 
 

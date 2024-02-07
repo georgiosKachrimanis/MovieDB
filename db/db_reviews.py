@@ -1,10 +1,10 @@
 from sqlalchemy.orm.session import Session
-from schemas import ReviewBase,ReviewUpdate
+from schemas import reviews_schemas
 from db.models import Review
 
 
 # Create Review
-def create_review(db: Session, request: ReviewBase):
+def create_review(db: Session, request: reviews_schemas.ReviewBase):
     new_review = Review(
         review_content=request.review_content,
         movie_rate=request.movie_rate,
@@ -16,6 +16,7 @@ def create_review(db: Session, request: ReviewBase):
     db.refresh(new_review)
     return new_review
 
+
 # Get Review By Id
 def get_review(db: Session, review_id: int):
     return db.query(Review).filter(Review.id == review_id).first()
@@ -26,7 +27,7 @@ def get_all_reviews(db: Session, skip: int = 0, limit: int = 100):
 
 
 # Update Review
-def update_review(db: Session, review_id: int, review_data: ReviewUpdate):
+def update_review(db: Session, review_id: int, review_data: reviews_schemas.ReviewUpdate):
     review = get_review(db, review_id)
     if review:
         for key, value in review_data.dict(exclude_unset=True).items():
@@ -39,6 +40,6 @@ def update_review(db: Session, review_id: int, review_data: ReviewUpdate):
 # Delete Review
 def delete_review(db: Session, review_id: int):
      review = db.query(Review).filter(Review.id == review_id).first()
-     db.delete(db_review)
+     db.delete(review)
      db.commit()
      return 'Review with id :{review_id} deleted successfully'
