@@ -7,7 +7,7 @@ from db.hash import Hash
 from auth import oauth2
 
 
-router = APIRouter(tags=["authentication"])
+router = APIRouter(tags=["Authentication Endpoints"])
 
 
 # name needs to be the same as the  --> oauth2_schema = OAuth2PasswordBearer(tokenUrl="token")

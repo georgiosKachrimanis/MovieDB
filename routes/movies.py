@@ -47,29 +47,6 @@ def create_movie(
     return db_movies.create_movie(db, movie)
 
 
-@router.post(
-    "/{movie_id}/reviews",
-    response_model=ReviewDisplayOne,
-    status_code=status.HTTP_201_CREATED,
-)
-def post_review_for_movie(
-    movie_id: int,
-    review_request: ReviewUpdate,
-    db: Session = Depends(get_db),
-    token: str = Depends(oauth2.oauth2_schema),
-):
-
-    new_review = CreateReview(
-        movie_id=movie_id,
-        user_rating=review_request.user_rating,
-        review_content=review_request.review_content,
-    )
-    return create_review(
-        request=new_review,
-        db=db,
-        token=token,
-    )
-
 
 @router.get(
     "/",
@@ -103,6 +80,29 @@ def get_movie_by_id(
 
     return movie
 
+
+@router.post(
+    "/{movie_id}/reviews",
+    response_model=ReviewDisplayOne,
+    status_code=status.HTTP_201_CREATED,
+)
+def post_review_for_movie(
+    review_request: ReviewUpdate,
+    movie_id: int = Depends(get_movie_by_id),
+    db: Session = Depends(get_db),
+    token: str = Depends(oauth2.oauth2_schema),
+):
+
+    new_review = CreateReview(
+        movie_id=movie_id,
+        user_rating=review_request.user_rating,
+        review_content=review_request.review_content,
+    )
+    return create_review(
+        request=new_review,
+        db=db,
+        token=token,
+    )
 
 # Get Movie By Id
 @router.get(
