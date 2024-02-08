@@ -50,21 +50,32 @@ class MovieCategoryType(Enum):
         self.label = label
 
 
+class Director(BaseModel):
+    director_name: str
+
+
 class MovieBase(BaseModel):
     title: str
     released_date: Optional[datetime]
     categories: List[int] = []
+    directors_id: Optional[int] = None
     plot: str
     poster_url: Optional[str]
     imdb_rate: Optional[float]
 
 
-class MovieTestDisplay(BaseModel):
+class MovieDirectorDisplay(BaseModel):
+    id: int
     title: str
-    released_date: Optional[datetime]
-    plot: str
-    poster_url: Optional[str]
-    imdb_rate: Optional[float]
+
+    class Config:
+        from_attributes = True
+
+
+class DirectorDisplay(BaseModel):
+    id: int
+    director_name: str
+    movies: List[MovieDirectorDisplay] = []
 
     class Config:
         from_attributes = True
@@ -80,6 +91,7 @@ class MovieDisplayAll(BaseModel):
     average_movie_rate: Optional[float] = None
     imdb_rate: Optional[float]
     reviews_count: Optional[int] = None
+    director: Optional[Director]
 
     class Config:
         from_attributes = True
@@ -95,6 +107,7 @@ class MovieDisplayOne(BaseModel):
     average_movie_rate: Optional[float] = None
     imdb_rate: Optional[float]
     reviews: List[Review] = []
+    director: Optional[Director]
 
     class Config:
         from_attributes = True
@@ -118,3 +131,4 @@ class MovieUpdate(BaseModel):
     plot: str
     poster_url: str
     imdb_rate: float
+    directors_id: Optional[int] = None

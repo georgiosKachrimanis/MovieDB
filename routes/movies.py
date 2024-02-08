@@ -20,7 +20,7 @@ from routes.categories import (
     get_categories,
     get_movies_by_category,
 )
-from schemas.movies_schemas import (
+from schemas.movies_directors_schemas import (
     MovieBase,
     MovieDisplayOne,
     MovieDisplayAll,
@@ -301,17 +301,3 @@ def get_movie_categories(
     categories: List[Category] = Depends(get_categories),
 ):
     return movie.categories
-
-
-# # Return All Movies of the requested Category
-# @router.get(
-#     "/categories/{category_id}",
-#     response_model=List[MovieDisplayOne],
-# )
-# def get_movies_by_category(
-#     category: int,
-#     db: Session = Depends(get_db),
-#     movies: List[MovieDisplayOne] = Depends(get_movies_by_category),
-# ):
-
-#     return movies

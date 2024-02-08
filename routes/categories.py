@@ -3,7 +3,7 @@ from db.database import get_db
 from sqlalchemy.orm import Session
 from db import db_categories, db_movies
 from typing import List
-from schemas.movies_schemas import Category, CategoryName, MovieDisplayOne
+from schemas.movies_directors_schemas import Category, CategoryName, MovieDisplayOne
 from auth import oauth2
 import routes.movies
 

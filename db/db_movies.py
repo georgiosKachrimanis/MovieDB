@@ -8,8 +8,9 @@ from db.models import (
     DbCategory,
     DbMovie,
     DbReview,
+    DbDirector,
 )
-from schemas.movies_schemas import (
+from schemas.movies_directors_schemas import (
     MovieBase,
     MoviePatchUpdate,
     MovieUpdate,
@@ -31,6 +32,7 @@ def create_movie(
         plot=request.plot,
         poster_url=request.poster_url,
         imdb_rate=request.imdb_rate,
+        director_id=request.directors_id
     )
     db.add(new_movie)
     db.commit()
@@ -52,6 +54,7 @@ def get_all_movies(
             .filter(DbReview.movie_id == movie.id)
             .scalar()
         )
+        movie.director_name = db.query(DbDirector.director_name).filter(DbDirector.id == movie.director_id).scalar()
     return movies
 
 
