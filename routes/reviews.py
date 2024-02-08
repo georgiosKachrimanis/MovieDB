@@ -82,7 +82,7 @@ def get_review(
 
 # Read reviews by movie_id
 @router.get(
-    "/all/{movie_id}",
+    "/movies/{movie_id}",
     response_model=Optional[List[ReviewDisplayOne]],
 )
 def all_reviews_for_movie(
@@ -157,6 +157,6 @@ def delete_review(
         return review
     else:
         raise HTTPException(
-            status_code=status.HTTP_418_IM_A_TEAPOT,
+            status_code=status.HTTP_403_FORBIDDEN,
             detail="Not your review, you can not delete it!",
         )

@@ -13,6 +13,8 @@ from routes.reviews import (
     create_review,
     all_reviews_for_movie,
     get_review,
+    update_review,
+    delete_review,
 )
 from routes.categories import (
     get_categories,
@@ -101,7 +103,7 @@ def get_movie_by_id(
 
 
 @router.post(
-    "/{movie_id}/reviews",
+    "/{movie_id}/reviews/",
     response_model=ReviewDisplayOne,
     status_code=status.HTTP_201_CREATED,
 )
@@ -124,6 +126,56 @@ def post_review_for_movie(
     )
 
 
+@router.put(
+    "/{movie_id}/reviews/{review_id}",
+    response_model=ReviewDisplayOne,
+)
+def update_review_for_movie(
+    request: ReviewUpdate,
+    review: ReviewDisplayOne = Depends(get_review),
+    movie: MovieBase = Depends(get_movie_by_id),
+    db: Session = Depends(get_db),
+    token: str = Depends(oauth2.oauth2_schema),
+):
+    checked_review = get_review_for_movie(movie=movie, review=review, db=db)
+
+    if not checked_review:
+        raise HTTPException(
+            status_code=409,
+            detail=f"Review: {review.id}, doesn't belong to Movie: {movie.id}",
+        )
+    return update_review(
+        review_id=review.id,
+        db=db,
+        token=token,
+        request=request,
+    )
+
+
+@router.delete(
+    "/{movie_id}/reviews/{review_id}",
+    status_code=status.HTTP_204_NO_CONTENT,
+)
+def delete_review_for_movie(
+    review: ReviewDisplayOne = Depends(get_review),
+    movie: MovieBase = Depends(get_movie_by_id),
+    db: Session = Depends(get_db),
+    token: str = Depends(oauth2.oauth2_schema),
+):
+    checked_review = get_review_for_movie(movie=movie, review=review, db=db)
+
+    if not checked_review:
+        raise HTTPException(
+            status_code=409,
+            detail=f"Review: {review.id}, doesn't belong to Movie: {movie.id}",
+        )
+    return delete_review(
+        review_id=review.id,
+        db=db,
+        token=token,
+    )
+
+
 @router.get(
     "/{movie_id}/reviews",
     response_model=Optional[List[ReviewDisplayOne]],
@@ -131,7 +183,7 @@ def post_review_for_movie(
 def get_all_reviews_for_movie(
     movie: MovieDisplayOne = Depends(get_movie_by_id),
     db: Session = Depends(get_db),
-    reviews: Optional[List[ReviewDisplayOne]] = Depends(all_reviews_for_movie)
+    reviews: Optional[List[ReviewDisplayOne]] = Depends(all_reviews_for_movie),
 ):
     return reviews
 
