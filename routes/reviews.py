@@ -1,19 +1,40 @@
 from typing import List, Optional
-
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import (
+    APIRouter,
+    Depends,
+    HTTPException,
+    status,
+)
 from sqlalchemy.orm import Session
-
 from auth import oauth2
 from db import db_reviews
 from db.database import get_db
 from schemas.users_reviews_schemas import (
     CreateReview,
-    ReviewDisplayAll,
     ReviewDisplayOne,
     ReviewUpdate,
 )
 
 router = APIRouter(prefix="/reviews", tags=["Review Endpoints"])
+
+
+# Returns all Reviews from a movie
+def all_reviews_for_movie(
+    movie_id: int,
+    db: Session = Depends(get_db),
+):
+    reviews = get_all_reviews(db=db)
+    movie_reviews = []
+    for review in reviews:
+        if review.movie_id == movie_id:
+            movie_reviews.append(review)
+
+    if movie_reviews == []:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="No reviews to show!",
+        )
+    return movie_reviews
 
 
 # CRUD Operations for Review
@@ -80,29 +101,6 @@ def get_review(
     return get_review_from_db(review_id=review_id, db=db)
 
 
-# Read reviews by movie_id
-@router.get(
-    "/movies/{movie_id}",
-    response_model=Optional[List[ReviewDisplayOne]],
-)
-def all_reviews_for_movie(
-    movie_id: int,
-    db: Session = Depends(get_db),
-):
-    reviews = get_all_reviews(db=db)
-    movie_reviews = []
-    for review in reviews:
-        if review.movie_id == movie_id:
-            movie_reviews.append(review)
-
-    if movie_reviews == []:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="No reviews to show!",
-        )
-    return movie_reviews
-
-
 # Update Review
 @router.put("/{review_id}")
 def update_review(
@@ -126,8 +124,8 @@ def update_review(
         return review
     else:
         raise HTTPException(
-            status_code=status.HTTP_418_IM_A_TEAPOT,
-            detail="Not your review, you can not change it!",
+            status_code=status.HTTP_403,
+            detail="Not Author of review, you are not allowed to change it!",
         )
 
 
@@ -158,5 +156,5 @@ def delete_review(
     else:
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
-            detail="Not your review, you can not delete it!",
+            detail="Not Author of review, you are not allowed to change it!",
         )

@@ -200,7 +200,12 @@ def get_review_for_movie(
 ):
     for movie_review in movie.reviews:
         if movie_review.id == review.id:
-            return review
+            return movie_review
+
+    raise HTTPException(
+            status_code=409,
+            detail=f"Review: {review.id}, doesn't belong to Movie: {movie.id}",
+        )
 
 
 # Update Movie
@@ -289,23 +294,24 @@ def delete_movie(
 
 
 # Return Movie Categories
-@router.get("/categories/", response_model=List[Category])
+@router.get("/{movie_id}/categories/",)
 def get_movie_categories(
     db: Session = Depends(get_db),
+    movie: MovieDisplayOne = Depends(get_movie_by_id),
     categories: List[Category] = Depends(get_categories),
 ):
-    return categories
+    return movie.categories
 
 
-# Return All Movies of the requested Category
-@router.get(
-    "/categories/{category_id}",
-    response_model=List[MovieDisplayOne],
-)
-def get_movies_by_category(
-    category: int,
-    db: Session = Depends(get_db),
-    movies: List[MovieDisplayOne] = Depends(get_movies_by_category),
-):
+# # Return All Movies of the requested Category
+# @router.get(
+#     "/categories/{category_id}",
+#     response_model=List[MovieDisplayOne],
+# )
+# def get_movies_by_category(
+#     category: int,
+#     db: Session = Depends(get_db),
+#     movies: List[MovieDisplayOne] = Depends(get_movies_by_category),
+# ):
 
-    return movies
+#     return movies

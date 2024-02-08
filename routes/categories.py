@@ -58,7 +58,10 @@ def get_category_by_id(
 ):
     category = db_categories.get_category(db, category_id)
     if category is None:
-        raise HTTPException(status_code=404, detail="Category not found")
+        raise HTTPException(
+            status_code=404,
+            detail="Category not found",
+        )
     return category
 
 
@@ -83,7 +86,7 @@ def get_movies_by_category(
     if not movies:
         raise HTTPException(
             status_code=404,
-            detail=f"No movies found in category {category_check.category_name}",
+            detail=f"No movies in category {category_check.category_name}",
         )
 
     return movies

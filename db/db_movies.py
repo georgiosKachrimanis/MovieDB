@@ -1,12 +1,25 @@
-from typing import List
 from sqlalchemy import func
-from sqlalchemy.orm import Session, joinedload
+from sqlalchemy.orm import (
+    Session,
+    joinedload,
+)
 from sqlalchemy.sql.functions import coalesce
-from db.models import DbCategory, DbMovie, DbReview
-from schemas.movies_schemas import MovieBase, MoviePatchUpdate, MovieUpdate
+from db.models import (
+    DbCategory,
+    DbMovie,
+    DbReview,
+)
+from schemas.movies_schemas import (
+    MovieBase,
+    MoviePatchUpdate,
+    MovieUpdate,
+)
 
 
-def create_movie(db: Session, request: MovieBase):
+def create_movie(
+    db: Session,
+    request: MovieBase,
+):
     categories = (
         db.query(DbCategory).filter(DbCategory.id.in_(request.categories)).all()
     )
@@ -26,15 +39,27 @@ def create_movie(db: Session, request: MovieBase):
     return new_movie
 
 
-def get_all_movies(db: Session, skip: int = 0, limit: int = 100):
+def get_all_movies(
+    db: Session,
+    skip: int = 0,
+    limit: int = 100,
+):
     movies = db.query(DbMovie).all()
     for movie in movies:
         movie.average_movie_rate = calculate_average(db=db, movie=movie)
-        movie.reviews_count = db.query(func.count(DbReview.id)).filter(DbReview.movie_id == movie.id).scalar()
+        movie.reviews_count = (
+            db.query(func.count(DbReview.id))
+            .filter(DbReview.movie_id == movie.id)
+            .scalar()
+        )
     return movies
 
 
-def get_movie(db: Session, movie_id: int = None, movie_title: str = None):
+def get_movie(
+    db: Session,
+    movie_id: int = None,
+    movie_title: str = None,
+):
     if movie_id is not None:
         movie = (
             db.query(DbMovie)
@@ -55,7 +80,6 @@ def get_movie(db: Session, movie_id: int = None, movie_title: str = None):
     return movie
 
 
-# TODO: Find a better way to make the patch!
 # Maybe I should use a different type of update.
 def patch_movie(
     db: Session,
@@ -78,7 +102,11 @@ def patch_movie(
     return movie
 
 
-def update_movie(db: Session, movie: DbMovie, request: MovieUpdate):
+def update_movie(
+    db: Session,
+    movie: DbMovie,
+    request: MovieUpdate,
+):
     # get the categories that the movie is having
     categories = [category.id for category in movie.categories]
     for key, value in request.__dict__.items():
@@ -92,7 +120,10 @@ def update_movie(db: Session, movie: DbMovie, request: MovieUpdate):
     return movie
 
 
-def delete_movie(db: Session, movie_id: int) -> bool:
+def delete_movie(
+    db: Session,
+    movie_id: int,
+):
     movie = db.query(DbMovie).filter(DbMovie.id == movie_id).first()
     if not movie:
         return False
@@ -101,11 +132,17 @@ def delete_movie(db: Session, movie_id: int) -> bool:
     return True
 
 
-def get_movie_reviews(db: Session, movie_id: int):
+def get_movie_reviews(
+    db: Session,
+    movie_id: int,
+):
     return db.query(DbReview).filter(DbReview.movie_id == movie_id).all()
 
 
-def get_movies_by_category(category: int, db: Session):
+def get_movies_by_category(
+    category: int,
+    db: Session,
+):
     movies = (
         db.query(DbMovie)
         .join(DbMovie.categories)
@@ -116,7 +153,10 @@ def get_movies_by_category(category: int, db: Session):
     return movies
 
 
-def calculate_average(movie: DbMovie, db: Session):
+def calculate_average(
+    movie: DbMovie,
+    db: Session,
+):
     average_rate = (
         db.query(coalesce(func.avg(DbReview.user_rating), 0))
         .filter(DbReview.movie_id == movie.id)

@@ -51,7 +51,6 @@ def create_user(request: UserBase, db: Session = Depends(get_db)):
 # Get all the users(Only Admins)
 @router.get(
     "/",
-    status_code=status.HTTP_202_ACCEPTED,
     response_model=List[UserDisplay],
 )
 def get_users(
@@ -75,7 +74,6 @@ def get_users(
 # Get User Information (Only User)
 @router.get(
     "/{user_id}",
-    status_code=status.HTTP_200_OK,
     response_model=UserDisplay,
 )
 def get_user(
@@ -97,7 +95,6 @@ def get_user(
 # Update User Information (Only User)
 @router.put(
     "/",
-    status_code=status.HTTP_202_ACCEPTED,
     response_model=UserDisplay,
 )
 def update_user(
@@ -121,7 +118,6 @@ def update_user(
 @router.patch(
     "/{user_id}",
     response_model=UserTypeDisplay,
-    status_code=status.HTTP_202_ACCEPTED,
 )
 def update_user_type(
     request: UserTypeUpdate,
@@ -141,7 +137,10 @@ def update_user_type(
 
 
 # Delete User (Only Admins)
-@router.delete("/{user_id}", status_code=status.HTTP_204_NO_CONTENT)
+@router.delete(
+    "/{user_id}",
+    status_code=status.HTTP_204_NO_CONTENT,
+)
 def delete_user(
     user_id: int,
     db: Session = Depends(get_db),
