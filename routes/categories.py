@@ -10,10 +10,20 @@ import routes.movies
 router = APIRouter(prefix="/categories", tags=["Categories Endpoints"])
 
 
+# Authenticating User!
+def admin_authentication(token: str):
+
+    if oauth2.decode_access_token(token=token).get("user_type") != "admin":
+        raise HTTPException(
+            status_code=403,
+            detail="You are not authorized, please contact an admin for help.",
+        )
+
+
 # CRUD Operations for Category
 # Create Category
 @router.post(
-    "/add",
+    "/",
     response_model=Category,
     status_code=201,
 )
@@ -22,10 +32,10 @@ def create_category(
     db: Session = Depends(get_db),
     token: str = Depends(oauth2.oauth2_schema),
 ):
-    if oauth2.decode_access_token(token=token).get("user_type") == "admin":
-        return db_categories.add_category(db, category_name)
-    else:
-        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED)
+    # Authenticating User!
+    admin_authentication(token=token)
+
+    return db_categories.add_category(db, category_name)
 
 
 # Get All Categories
@@ -52,7 +62,10 @@ def get_category_by_id(
     return category
 
 
-@router.get("/{category_id}/movies", response_model=List[MovieDisplayOne])
+@router.get(
+    "/{category_id}/movies",
+    response_model=List[MovieDisplayOne],
+)
 def get_movies_by_category(
     category: int,
     db: Session = Depends(get_db),
@@ -87,19 +100,19 @@ def update_category(
     token: str = Depends(oauth2.oauth2_schema),
     db: Session = Depends(get_db),
 ):
+    # Authenticating User!
+    admin_authentication(token=token)
+
     category = db_categories.get_category(db=db, category_id=category_id)
 
     if category is None:
         raise HTTPException(status_code=404, detail="Category not found")
 
-    if oauth2.decode_access_token(token=token).get("user_type") == "admin":
-        return db_categories.update_category(
-            db=db,
-            category_id=category_id,
-            request=request,
-        )
-    else:
-        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED)
+    return db_categories.update_category(
+        db=db,
+        category_id=category_id,
+        request=request,
+    )
 
 
 @router.delete(
@@ -111,10 +124,11 @@ def delete_category(
     db: Session = Depends(get_db),
     token: str = Depends(oauth2.oauth2_schema),
 ):
+    # Authenticating User!
+    admin_authentication(token=token)
+
     category = db_categories.get_category(db, category_id)
     if category is None:
         raise HTTPException(status_code=404, detail="Category not found")
-    success = db_categories.delete_category(db, category_id)
-    if not success:
-        raise HTTPException(status_code=500, detail="Something went wrong")
-    return "Category with id: {category_id} deleted successfully"
+
+    db_categories.delete_category(db, category_id)
