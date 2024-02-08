@@ -1,19 +1,16 @@
-from typing import List
-from fastapi import (
-    APIRouter,
-    Depends,
-    HTTPException,
-    status,
-)
+from typing import List, Optional
+
+from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
+
 from auth import oauth2
 from db import db_reviews
 from db.database import get_db
 from schemas.users_reviews_schemas import (
     CreateReview,
+    ReviewDisplayAll,
     ReviewDisplayOne,
     ReviewUpdate,
-    ReviewDisplayAll,
 )
 
 router = APIRouter(prefix="/reviews", tags=["Review Endpoints"])
@@ -58,7 +55,7 @@ def create_review(
 # Read All Review With User
 @router.get(
     "/",
-    response_model=List[ReviewDisplayAll],
+    response_model=List[ReviewDisplayOne],
 )
 def get_all_reviews(db: Session = Depends(get_db)):
 
@@ -71,10 +68,10 @@ def get_all_reviews(db: Session = Depends(get_db)):
     return reviews
 
 
-# Read User By Id
+# Read review By Id
 @router.get(
     "/{review_id}",
-    response_model=ReviewDisplayOne,
+    response_model=List[ReviewDisplayOne],
 )
 def get_review(
     review_id: int,
@@ -83,9 +80,31 @@ def get_review(
     return get_review_from_db(review_id=review_id, db=db)
 
 
+# Read reviews by movie_id
+@router.get(
+    "/all/{movie_id}",
+    response_model=Optional[List[ReviewDisplayOne]],
+)
+def all_reviews_for_movie(
+    movie_id: int,
+    db: Session = Depends(get_db),
+):
+    reviews = get_all_reviews(db=db)
+    movie_reviews = []
+    for review in reviews:
+        if review.movie_id == movie_id:
+            movie_reviews.append(review)
+
+    if movie_reviews == []:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="No reviews to show!",
+        )
+    return movie_reviews
+
+
 # Update Review
-@router.put(
-    "/{review_id}")
+@router.put("/{review_id}")
 def update_review(
     review_id: int,
     request: ReviewUpdate,

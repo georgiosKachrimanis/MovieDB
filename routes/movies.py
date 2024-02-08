@@ -1,7 +1,6 @@
 from typing import List, Optional
 from fastapi import (
     APIRouter,
-    Body,
     Depends,
     HTTPException,
     status,
@@ -10,8 +9,15 @@ from sqlalchemy.orm import Session
 from auth import oauth2
 from db import db_movies
 from db.database import get_db
-from routes.reviews import create_review, get_review
-from routes.categories import get_categories, get_category_by_id, get_movies_by_category
+from routes.reviews import (
+    create_review,
+    all_reviews_for_movie,
+    get_review,
+)
+from routes.categories import (
+    get_categories,
+    get_movies_by_category,
+)
 from schemas.movies_schemas import (
     MovieBase,
     MovieDisplayOne,
@@ -52,7 +58,7 @@ def create_movie(
 ):
     # Authenticating User!
     admin_authentication(token=token)
-    
+
     if db_movies.get_movie(db=db, movie_title=movie.title):
         raise HTTPException(
             status_code=409,
@@ -101,15 +107,15 @@ def get_movie_by_id(
 )
 def post_review_for_movie(
     review_request: ReviewUpdate,
-    movie_id: int = Depends(get_movie_by_id),
+    movie: MovieBase = Depends(get_movie_by_id),
     db: Session = Depends(get_db),
     token: str = Depends(oauth2.oauth2_schema),
 ):
-    
+
     new_review = CreateReview(
-        movie_id=movie_id,
-        user_rating=review_request.user_rating,
         review_content=review_request.review_content,
+        user_rating=review_request.user_rating,
+        movie_id=movie.id,
     )
     return create_review(
         request=new_review,
@@ -118,33 +124,31 @@ def post_review_for_movie(
     )
 
 
-# Get Movie By Id
+@router.get(
+    "/{movie_id}/reviews",
+    response_model=Optional[List[ReviewDisplayOne]],
+)
+def get_all_reviews_for_movie(
+    movie: MovieDisplayOne = Depends(get_movie_by_id),
+    db: Session = Depends(get_db),
+    reviews: Optional[List[ReviewDisplayOne]] = Depends(all_reviews_for_movie)
+):
+    return reviews
+
+
+# Get Review By Id
 @router.get(
     "/{movie_id}/reviews/{review_id}",
     response_model=Optional[ReviewDisplayOne],
 )
 def get_review_for_movie(
-    movie_id: int,
-    review_id: int,
+    movie: MovieDisplayOne = Depends(get_movie_by_id),
     db: Session = Depends(get_db),
+    review: ReviewDisplayOne = Depends(get_review),
 ):
-    movie = db_movies.get_movie(db, movie_id)
-
-    if movie is None:
-        raise HTTPException(
-            status_code=404,
-            detail=f"Movie with Id: {movie_id} not found",
-        )
-
-    review = next((review for review in movie.reviews if review.id == review_id), None)
-
-    if review is not None:
-        return get_review(db=db, review_id=review_id)
-
-    raise HTTPException(
-        status_code=404,
-        detail=f"Movie with Id: {movie_id} does not have a review with Id: {review_id}",
-    )
+    for movie_review in movie.reviews:
+        if movie_review.id == review.id:
+            return review
 
 
 # Update Movie
@@ -158,7 +162,7 @@ def update_movie_data(
     db: Session = Depends(get_db),
     token: str = Depends(oauth2.oauth2_schema),
 ):
-    
+
     # Authenticating User!
     admin_authentication(token=token)
     movie = db_movies.get_movie(db, movie_id)
@@ -189,7 +193,7 @@ def patch_movie(
 ):
     # Authenticating User!
     admin_authentication(token=token)
-    
+
     movie = db_movies.get_movie(db, movie_id)
 
     if movie is None:
@@ -214,10 +218,10 @@ def delete_movie(
     movie_id: int,
     db: Session = Depends(get_db),
     token: str = Depends(oauth2.oauth2_schema),
-):  
+):
     # Authenticating User!
     admin_authentication(token=token)
-    
+
     reviews = db_movies.get_movie_reviews(db, movie_id)
     if reviews:
         raise HTTPException(

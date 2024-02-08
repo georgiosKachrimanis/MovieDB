@@ -1,0 +1,49 @@
+{
+"review_content": "A thrilling ride from start to finish!",
+"user_rating": 9.2
+}
+
+{
+"review_content": "Disappointing. Expected more from this film.",
+"user_rating": 5.8
+}
+
+{
+"review_content": "Absolutely stunning cinematography!",
+"user_rating": 8.9
+}
+
+{
+"review_content": "Mediocre plot but great performances.",
+"user_rating": 7.1
+}
+
+{
+"review_content": "The ending left me speechless!",
+"user_rating": 9.6
+}
+
+{
+"review_content": "Boring storyline with poor execution.",
+"user_rating": 4.3
+}
+
+{
+"review_content": "A masterpiece of storytelling and visuals!",
+"user_rating": 10.0
+}
+
+{
+"review_content": "Not my cup of tea, but others might enjoy it.",
+"user_rating": 6.2
+}
+
+{
+"review_content": "A rollercoaster of emotions!",
+"user_rating": 8.7
+}
+
+{
+"review_content": "Lacked originality but still entertaining.",
+"user_rating": 6.9
+}
