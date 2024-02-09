@@ -18,7 +18,10 @@ from db.database import get_db
 from db import db_users
 from auth import oauth2
 
-router = APIRouter(prefix="/users", tags=["Users Endpoints"])
+router = APIRouter(
+    prefix="/users",
+    tags=["Users Endpoints"],
+)
 
 
 def check_user(db: Session, user_id: int):
