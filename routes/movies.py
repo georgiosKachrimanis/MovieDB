@@ -41,6 +41,8 @@ router = APIRouter(
     tags=["Movies Endpoints"],
 )
 
+AUTHENTICATION_TEXT = "You are not authorized to add, edit or delete a movie!"
+
 
 # Create a new movie
 @router.post(
@@ -53,8 +55,11 @@ def create_movie(
     db: Session = Depends(get_db),
     token: str = Depends(oauth2.oauth2_schema),
 ):
-    # Authenticating User!
-    oauth2.admin_authentication(token=token)
+
+    oauth2.admin_authentication(
+        token=token,
+        exception_text=AUTHENTICATION_TEXT,
+    )
 
     if db_movies.get_movie(db=db, movie_title=movie.title):
         raise HTTPException(
@@ -215,7 +220,10 @@ def update_movie_data(
     token: str = Depends(oauth2.oauth2_schema),
 ):
 
-    oauth2.admin_authentication(token=token)
+    oauth2.admin_authentication(
+        token=token,
+        exception_text=AUTHENTICATION_TEXT,
+    )
 
     if movie is None:
         raise HTTPException(
@@ -242,7 +250,10 @@ def patch_movie(
     token: str = Depends(oauth2.oauth2_schema),
 ):
 
-    oauth2.admin_authentication(token=token)
+    oauth2.admin_authentication(
+        token=token,
+        exception_text=AUTHENTICATION_TEXT,
+    )
 
     movie = db_movies.get_movie(db, movie_id)
 
@@ -270,7 +281,10 @@ def delete_movie(
     token: str = Depends(oauth2.oauth2_schema),
 ):
 
-    oauth2.admin_authentication(token=token)
+    oauth2.admin_authentication(
+        token=token,
+        exception_text=AUTHENTICATION_TEXT,
+    )
 
     reviews = db_movies.get_movie_reviews(db, movie_id)
     if reviews:

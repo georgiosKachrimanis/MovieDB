@@ -20,6 +20,8 @@ router = APIRouter(
     tags=["Directors Endpoints"],
 )
 
+AUTHENTICATION_TEXT = "You are not authorized to add, edit or delete directors"
+
 
 # CRUD Operations for Directors
 # Create Director
@@ -33,7 +35,11 @@ def create_director(
     db: Session = Depends(get_db),
     token: str = Depends(oauth2.oauth2_schema),
 ):
-    oauth2.admin_authentication(token=token)
+    oauth2.admin_authentication(
+        token=token,
+        exception_text=AUTHENTICATION_TEXT,
+    )
+
     return db_directors.create_director(
         db=db,
         request=request,
@@ -82,7 +88,10 @@ def update_director(
     db: Session = Depends(get_db),
     token: str = Depends(oauth2.oauth2_schema),
 ):
-    oauth2.admin_authentication(token=token)
+    oauth2.admin_authentication(
+        token=token,
+        exception_text=AUTHENTICATION_TEXT,
+    )
 
     return db_directors.update_director(
         db=db,
@@ -101,7 +110,10 @@ def delete_director(
     db: Session = Depends(get_db),
     token: str = Depends(oauth2.oauth2_schema),
 ):
-    oauth2.admin_authentication(token=token)
+    oauth2.admin_authentication(
+        token=token,
+        exception_text=AUTHENTICATION_TEXT,
+    )
 
     movies = db_directors.check_director_in_movie(db, director.id)
     if movies:
