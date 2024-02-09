@@ -6,9 +6,10 @@ from db.models import (
     DbDirector,
     DbMovie,
     DbReview,
+    DbActor
 )
 from routes.directors import get_director_by_id
-from schemas.movies_directors_schemas import (
+from schemas.mov_dir_actors_schemas import (
     MovieBase,
     MoviePatchUpdate,
     MovieUpdate,

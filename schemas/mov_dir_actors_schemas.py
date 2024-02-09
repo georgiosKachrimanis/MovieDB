@@ -82,12 +82,29 @@ class DirectorDisplay(Director):
         from_attributes = True
 
 
+# =================================== Actors ==================================
+
+
+# Movie inside ActorDisplay
+class Actor(BaseModel):
+    actor_name: str
+
+
+class ActorDisplay(Actor):
+    id: int
+    movies: List[MovieDirectorDisplay] = []
+
+    class Config:
+        from_attributes = True
+
+
 # =========================== Movies Schemas ==================================
 class MovieBase(BaseModel):
     title: str
     released_date: Optional[datetime]
     categories: List[int] = []
     director_id: Optional[int] = None
+    actors: Optional[List[int]] = []
     plot: str
     poster_url: Optional[str]
     imdb_rate: Optional[float]
@@ -119,6 +136,7 @@ class MovieDisplayOne(BaseModel):
     average_movie_rate: Optional[float] = None
     imdb_rate: Optional[float]
     reviews: List[Review] = []
+    actors: Optional[List[Actor]]
     director: Optional[DirectorDisplay]
 
     class Config:
@@ -134,6 +152,7 @@ class MoviePatchUpdate(BaseModel):
     poster_url: Optional[str] = None
     imdb_rate: Optional[float] = None
     director_id: Optional[int] = None
+    actors: Optional[List[int]] = None
 
 
 # To be used with the put(update) function
@@ -144,4 +163,5 @@ class MovieUpdate(BaseModel):
     plot: str
     poster_url: str
     imdb_rate: float
+    actors: List[int]
     director_id: Optional[int]

@@ -10,7 +10,7 @@ from db import (
     db_movies,
 )
 from typing import List
-from schemas.movies_directors_schemas import (
+from schemas.mov_dir_actors_schemas import (
     Category,
     CategoryName,
     MovieDisplayOne,

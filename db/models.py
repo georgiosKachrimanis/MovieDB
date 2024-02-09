@@ -93,7 +93,6 @@ class DbActor(Base):
         unique=True,
         index=True,
     )
-    photo_url = Column(String)
     movies = relationship(
         "DbMovie",
         secondary="movie_actors",
@@ -201,3 +200,20 @@ movie_categories = Table(
         ForeignKey("categories.id"),
     ),
 )
+
+
+# movie_actors = Table(
+#     "movie_actors",
+#     Base.metadata,
+#     Column(
+#         "movie_id",
+#         Integer,
+#         ForeignKey("movies.id"),
+#     ),
+#     Column(
+#         "actor_id",
+#         Integer,
+#         ForeignKey("actors.id"),
+#     ),
+    
+# )

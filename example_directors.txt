@@ -1,0 +1,39 @@
+{
+  "director_name": "Christopher Nolan"
+}
+
+{
+  "director_name": "Quentin Tarantino"
+}
+
+{
+  "director_name": "Steven Spielberg"
+}
+
+{
+  "director_name": "Martin Scorsese"
+}
+
+{
+  "director_name": "Greta Gerwig"
+}
+
+{
+  "director_name": "Ava DuVernay"
+}
+
+{
+  "director_name": "Denis Villeneuve"
+}
+
+{
+  "director_name": "Spike Lee"
+}
+
+{
+  "director_name": "Alfonso Cuarón"
+}
+
+{
+  "director_name": "Guillermo del Toro"
+}

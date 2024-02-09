@@ -1,49 +1,122 @@
 {
-"review_content": "A thrilling ride from start to finish!",
-"user_rating": 9.2
+  "review_content": "Great movie, loved the plot twists!",
+  "user_rating": 8.5,
+  "movie_id": 1
 }
 
 {
-"review_content": "Disappointing. Expected more from this film.",
-"user_rating": 5.8
+  "review_content": "A masterpiece, truly captivating.",
+  "user_rating": 9.2,
+  "movie_id": 2
 }
 
 {
-"review_content": "Absolutely stunning cinematography!",
-"user_rating": 8.9
+  "review_content": "Disappointing, didn't live up to expectations.",
+  "user_rating": 3.8,
+  "movie_id": 3
 }
 
 {
-"review_content": "Mediocre plot but great performances.",
-"user_rating": 7.1
+  "review_content": "Solid performances but predictable storyline.",
+  "user_rating": 6.4,
+  "movie_id": 4
 }
 
 {
-"review_content": "The ending left me speechless!",
-"user_rating": 9.6
+  "review_content": "Visually stunning but lacked depth.",
+  "user_rating": 7.1,
+  "movie_id": 5
 }
 
 {
-"review_content": "Boring storyline with poor execution.",
-"user_rating": 4.3
+  "review_content": "Incredible cinematography, a must-watch!",
+  "user_rating": 8.9,
+  "movie_id": 6
 }
 
 {
-"review_content": "A masterpiece of storytelling and visuals!",
-"user_rating": 10.0
+  "review_content": "Didn't hold my interest, felt too long.",
+  "user_rating": 5.2,
+  "movie_id": 7
 }
 
 {
-"review_content": "Not my cup of tea, but others might enjoy it.",
-"user_rating": 6.2
+  "review_content": "Entertaining from start to finish!",
+  "user_rating": 8.3,
+  "movie_id": 8
 }
 
 {
-"review_content": "A rollercoaster of emotions!",
-"user_rating": 8.7
+  "review_content": "Mediocre at best, forgettable.",
+  "user_rating": 4.6,
+  "movie_id": 9
 }
 
 {
-"review_content": "Lacked originality but still entertaining.",
-"user_rating": 6.9
+  "review_content": "Brilliant storytelling, left me speechless.",
+  "user_rating": 9.7,
+  "movie_id": 1
 }
+
+{
+  "review_content": "Uninspired and cliché.",
+  "user_rating": 2.9,
+  "movie_id": 2
+}
+
+{
+  "review_content": "Engaging characters but weak ending.",
+  "user_rating": 6.7,
+  "movie_id": 3
+}
+
+{
+  "review_content": "Mind-blowing visuals, a feast for the eyes.",
+  "user_rating": 8.1,
+  "movie_id": 4
+}
+
+{
+  "review_content": "Overrated, didn't live up to the hype.",
+  "user_rating": 5.8,
+  "movie_id": 5
+}
+
+{
+  "review_content": "Captivating performance by the lead actor.",
+  "user_rating": 7.6,
+  "movie_id": 6
+}
+
+{
+  "review_content": "Emotionally gripping, brought tears to my eyes.",
+  "user_rating": 9.4,
+  "movie_id": 7
+}
+
+{
+  "review_content": "Witty dialogue, thoroughly enjoyable.",
+  "user_rating": 8.7,
+  "movie_id": 8
+}
+
+{
+  "review_content": "Unforgettable, a true cinematic gem.",
+  "user_rating": 9.9,
+  "movie_id": 9
+}
+
+{
+  "review_content": "Lacks substance, style over substance.",
+  "user_rating": 4.2,
+  "movie_id": 1
+}
+
+{
+  "review_content": "A rollercoaster of emotions, couldn't look away.",
+  "user_rating": 9.1,
+  "movie_id": 2
+}
+
+
+

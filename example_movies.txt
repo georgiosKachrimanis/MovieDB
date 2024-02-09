@@ -1,197 +1,91 @@
 {
-  "title": "Movie 1",
-  "released_date": "2024-02-08T07:01:22.222Z",
-  "categories": [1, 2, 3],
-  "plot": "Nice Plot Movie 1",
-  "poster_url": "Movie 1 Poster",
-  "imdb_rate": 0
+  "title": "The Mystery of Time",
+  "released_date": "2024-02-09T13:05:23.240Z",
+  "categories": [3, 12],
+  "director_id": 7,
+  "actors": [4, 12, 25],
+  "plot": "A thrilling journey through the fabric of time.",
+  "poster_url": "https://example.com/mystery_of_time_poster.jpg",
+  "imdb_rate": 7.8
+}
+{
+  "title": "In the Shadows",
+  "released_date": "2024-02-09T13:05:23.240Z",
+  "categories": [5, 18],
+  "director_id": 3,
+  "actors": [8, 15, 28],
+  "plot": "A tale of secrets lurking in the darkness.",
+  "poster_url": "https://example.com/in_the_shadows_poster.jpg",
+  "imdb_rate": 6.9
+}
+{
+  "title": "City of Dreams",
+  "released_date": "2024-02-09T13:05:23.240Z",
+  "categories": [9, 22],
+  "director_id": 6,
+  "actors": [2, 17, 21],
+  "plot": "Exploring the ambitions and struggles in a bustling metropolis.",
+  "poster_url": "https://example.com/city_of_dreams_poster.jpg",
+  "imdb_rate": 8.1
+}
+{
+  "title": "Echoes of Yesterday",
+  "released_date": "2024-02-09T13:05:23.240Z",
+  "categories": [2, 10],
+  "director_id": 9,
+  "actors": [7, 11, 29],
+  "plot": "Confronting the echoes of the past to find redemption.",
+  "poster_url": "https://example.com/echoes_of_yesterday_poster.jpg",
+  "imdb_rate": 7.5
+}
+{
+  "title": "Beyond the Stars",
+  "released_date": "2024-02-09T13:05:23.240Z",
+  "categories": [6, 15],
+  "director_id": 2,
+  "actors": [5, 13, 30],
+  "plot": "A cosmic journey of discovery and adventure.",
+  "poster_url": "https://example.com/beyond_the_stars_poster.jpg",
+  "imdb_rate": 8.3
+}
+{
+  "title": "Under the Surface",
+  "released_date": "2024-02-09T13:05:23.240Z",
+  "categories": [1, 8],
+  "director_id": 1,
+  "actors": [9, 18, 22],
+  "plot": "Unveiling the hidden truths beneath the calm exterior.",
+  "poster_url": "https://example.com/under_the_surface_poster.jpg",
+  "imdb_rate": 7.2
 }
 
 {
-  "title": "Movie 2",
-  "released_date": "2024-02-08T07:01:22.222Z",
-  "categories": [2,3,4],
-  "plot": "Nice Plot Movie 2",
-  "poster_url": "Movie 2 Poster",
-  "imdb_rate": 0
+  "title": "Lost in Translation",
+  "released_date": "2024-02-09T13:05:23.240Z",
+  "categories": [4, 11],
+  "director_id": 5,
+  "actors": [6, 14, 27],
+  "plot": "Navigating the complexities of language and culture.",
+  "poster_url": "https://example.com/lost_in_translation_poster.jpg",
+  "imdb_rate": 7.6
 }
-
 {
-  "title": "Movie 3",
-  "released_date": "2024-02-08T07:01:22.222Z",
-  "categories": [3,4,5],
-  "plot": "Nice Plot movie 3",
-  "poster_url": "Movie 3 Poster",
-  "imdb_rate": 0
+  "title": "The Forgotten Kingdom",
+  "released_date": "2024-02-09T13:05:23.240Z",
+  "categories": [7, 20],
+  "director_id": 8,
+  "actors": [10, 19, 23],
+  "plot": "Rediscovering a lost realm and its secrets.",
+  "poster_url": "https://example.com/forgotten_kingdom_poster.jpg",
+  "imdb_rate": 8.0
 }
-
 {
-  "title": "Movie 4",
-  "released_date": "2024-02-08T07:01:22.222Z",
-  "categories": [4,5,6],
-  "plot": "Nice Plot Movie 4",
-  "poster_url": "Movie 4 Poster",
-  "imdb_rate": 0
-}
-
-{
-  "title": "Movie 5",
-  "released_date": "2024-02-08T07:01:22.222Z",
-  "categories": [5,6,7],
-  "plot": "Nice Plot Movie 5",
-  "poster_url": "Movie 5 Poster",
-  "imdb_rate": 0
-}
-
-{
-  "title": "Movie 6",
-  "released_date": "2024-02-08T07:01:22.222Z",
-  "categories": [6,7,8],
-  "plot": "Nice Plot Movie 6",
-  "poster_url": "Movie 6 Poster",
-  "imdb_rate": 0
-}
-
-{
-  "title": "Movie 7",
-  "released_date": "2024-02-08T07:01:22.222Z",
-  "categories": [7,8,9],
-  "plot": "Nice Plot Movie 7",
-  "poster_url": "Movie 7 Poster",
-  "imdb_rate": 0
-}
-
-{
-  "title": "Movie 8",
-  "released_date": "2024-02-08T07:01:22.222Z",
-  "categories": [8,9,10],
-  "plot": "Nice Plot Movie 8",
-  "poster_url": "Movie 8 Poster",
-  "imdb_rate": 0
-}
-
-{
-  "title": "Movie 9",
-  "released_date": "2024-02-08T07:01:22.222Z",
-  "categories": [9,10,11],
-  "plot": "Nice Plot Movie 9",
-  "poster_url": "Movie 9 Poster",
-  "imdb_rate": 0
-}
-
-{
-  "title": "Movie 10",
-  "released_date": "2024-02-08T07:01:22.222Z",
-  "categories": [10,11,12],
-  "plot": "Nice Plot Movie 10",
-  "poster_url": "Movie 10 Poster",
-  "imdb_rate": 0
-}
-
-{
-  "title": "Movie 11",
-  "released_date": "2024-02-08T07:01:22.222Z",
-  "categories": [11,12,13],
-  "plot": "Nice Plot Movie 11",
-  "poster_url": "Movie 11 Poster",
-  "imdb_rate": 0
-}
-
-{
-  "title": "Movie 12",
-  "released_date": "2024-02-08T07:01:22.222Z",
-  "categories": [12,13,14],
-  "plot": "Nice Plot Movie 12",
-  "poster_url": "Movie 12 Poster",
-  "imdb_rate": 0
-}
-
-{
-  "title": "Movie 13",
-  "released_date": "2024-02-08T07:01:22.222Z",
-  "categories": [13,14,15],
-  "plot": "Nice Plot Movie 13",
-  "poster_url": "Movie 13 Poster",
-  "imdb_rate": 0
-}
-
-{
-  "title": "Movie 14",
-  "released_date": "2024-02-08T07:01:22.222Z",
-  "categories": [14,15,16],
-  "plot": "Nice Plot Movie 14",
-  "poster_url": "Movie 14 Poster",
-  "imdb_rate": 0
-}
-
-{
-  "title": "Movie 15",
-  "released_date": "2024-02-08T07:01:22.222Z",
-  "categories": [15,16,17],
-  "plot": "Nice Plot Movie 15",
-  "poster_url": "Movie 15 Poster",
-  "imdb_rate": 0
-}
-
-{
-  "title": "Movie 16",
-  "released_date": "2024-02-08T07:01:22.222Z",
-  "categories": [16,17,18],
-  "plot": "Nice Plot Movie 16",
-  "poster_url": "Movie 16 Poster",
-  "imdb_rate": 0
-}
-
-{
-  "title": "Movie 17",
-  "released_date": "2024-02-08T07:01:22.222Z",
-  "categories": [17,18,19],
-  "plot": "Nice Plot Movie 17",
-  "poster_url": "Movie 17 Poster",
-  "imdb_rate": 0
-}
-
-{
-  "title": "Movie 18",
-  "released_date": "2024-02-08T07:01:22.222Z",
-  "categories": [18,19,20],
-  "plot": "Nice Plot Movie 18",
-  "poster_url": "Movie 18 Poster",
-  "imdb_rate": 0
-}
-
-{
-  "title": "Movie 19",
-  "released_date": "2024-02-08T07:01:22.222Z",
-  "categories": [19,20,21],
-  "plot": "Nice Plot Movie 19",
-  "poster_url": "Movie 19 Poster",
-  "imdb_rate": 0
-}
-
-{
-  "title": "Movie 20",
-  "released_date": "2024-02-08T07:01:22.222Z",
-  "categories": [20,21,22],
-  "plot": "Nice Plot Movie 20",
-  "poster_url": "Movie 20 Poster",
-  "imdb_rate": 0
-}
-
-{
-  "title": "Movie 21",
-  "released_date": "2024-02-08T07:01:22.222Z",
-  "categories": [21,22,23],
-  "plot": "Nice Plot Movie 21",
-  "poster_url": "Movie 21 Poster",
-  "imdb_rate": 0
-}
-
-{
-  "title": "Movie 22",
-  "released_date": "2024-02-08T07:01:22.222Z",
-  "categories": [22,23,24],
-  "plot": "Nice Plot Movie 22",
-  "poster_url": "Movie 22 Poster",
-  "imdb_rate": 0
+  "title": "Through the Looking Glass",
+  "released_date": "2024-02-09T13:05:23.240Z",
+  "categories": [5, 13],
+  "director_id": 10,
+  "actors": [12, 21, 26],
+  "plot": "A surreal journey into the depths of imagination.",
+  "poster_url": "https://example.com/through_the_looking_glass_poster.jpg",
+  "imdb_rate": 7.9
 }

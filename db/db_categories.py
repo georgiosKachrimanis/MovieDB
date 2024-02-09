@@ -1,6 +1,6 @@
 from db.models import DbCategory
 from sqlalchemy.orm import Session
-from schemas.movies_directors_schemas import CategoryName
+from schemas.mov_dir_actors_schemas import CategoryName
 
 
 # Create Category

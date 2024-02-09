@@ -22,7 +22,7 @@ from routes.reviews import (
 from routes.categories import (
     get_categories,
 )
-from schemas.movies_directors_schemas import (
+from schemas.mov_dir_actors_schemas import (
     MovieBase,
     MovieDisplayOne,
     MovieDisplayAll,
