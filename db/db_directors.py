@@ -9,7 +9,9 @@ def create_director(
     db: Session,
     request: Director,
 ):
-    new_director = DbDirector(director_name=request.director_name)
+    new_director = DbDirector(
+        director_name=request.director_name,
+    )
     db.add(new_director)
     db.commit()
     db.refresh(new_director)
@@ -33,11 +35,17 @@ def get_all_directors(
 # Update Director
 def update_director(
     db: Session,
-    director_id: int,
+    director: Director,
     request: Director,
 ):
-    director = get_director(db, director_id)
+    from db.db_movies import get_movie
+
     director.director_name = request.director_name
+    if request.movies:
+        for new_movie in request.movies:
+            director.movies.append(get_movie(movie_id=new_movie, db=db))
+    elif request.movies == []:
+        director.movies = []
     db.commit()
     db.refresh(director)
     return director
@@ -63,8 +71,5 @@ def delete_director(
 # Check if director is in any movie
 def check_director_in_movie(db: Session, director_id: int) -> bool:
     return (
-        db.query(DbDirector)
-        .filter(DbDirector.id == director_id)
-        .first()
-        .movies != []
+        db.query(DbDirector).filter(DbDirector.id == director_id).first().movies != []
     )

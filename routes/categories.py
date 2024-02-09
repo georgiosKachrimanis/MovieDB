@@ -1,23 +1,26 @@
-from fastapi import HTTPException, Depends, APIRouter, status
+from fastapi import (
+    HTTPException,
+    Depends,
+    APIRouter,
+)
 from db.database import get_db
 from sqlalchemy.orm import Session
-from db import db_categories, db_movies
+from db import (
+    db_categories,
+    db_movies,
+)
 from typing import List
-from schemas.movies_directors_schemas import Category, CategoryName, MovieDisplayOne
+from schemas.movies_directors_schemas import (
+    Category,
+    CategoryName,
+    MovieDisplayOne,
+)
 from auth import oauth2
-import routes.movies
 
-router = APIRouter(prefix="/categories", tags=["Categories Endpoints"])
-
-
-# Authenticating User!
-def admin_authentication(token: str):
-
-    if oauth2.decode_access_token(token=token).get("user_type") != "admin":
-        raise HTTPException(
-            status_code=403,
-            detail="You are not authorized, please contact an admin for help.",
-        )
+router = APIRouter(
+    prefix="/categories",
+    tags=["Categories Endpoints"],
+)
 
 
 # CRUD Operations for Category
@@ -32,10 +35,13 @@ def create_category(
     db: Session = Depends(get_db),
     token: str = Depends(oauth2.oauth2_schema),
 ):
-    # Authenticating User!
-    admin_authentication(token=token)
 
-    return db_categories.add_category(db, category_name)
+    oauth2.admin_authentication(token=token)
+
+    return db_categories.add_category(
+        db,
+        category_name,
+    )
 
 
 # Get All Categories
@@ -56,7 +62,10 @@ def get_category_by_id(
     category_id: int,
     db: Session = Depends(get_db),
 ):
-    category = db_categories.get_category(db, category_id)
+    category = db_categories.get_category(
+        db,
+        category_id,
+    )
     if category is None:
         raise HTTPException(
             status_code=404,
@@ -73,7 +82,10 @@ def get_movies_by_category(
     category: int,
     db: Session = Depends(get_db),
 ):
-    category_check = get_category_by_id(category_id=category, db=db)
+    category_check = get_category_by_id(
+        category_id=category,
+        db=db,
+    )
     if not category_check:
         raise HTTPException(
             status_code=404,
@@ -103,10 +115,13 @@ def update_category(
     token: str = Depends(oauth2.oauth2_schema),
     db: Session = Depends(get_db),
 ):
-    # Authenticating User!
-    admin_authentication(token=token)
 
-    category = db_categories.get_category(db=db, category_id=category_id)
+    oauth2.admin_authentication(token=token)
+
+    category = db_categories.get_category(
+        db=db,
+        category_id=category_id,
+    )
 
     if category is None:
         raise HTTPException(status_code=404, detail="Category not found")
@@ -127,8 +142,8 @@ def delete_category(
     db: Session = Depends(get_db),
     token: str = Depends(oauth2.oauth2_schema),
 ):
-    # Authenticating User!
-    admin_authentication(token=token)
+
+    oauth2.admin_authentication(token=token)
 
     category = db_categories.get_category(db, category_id)
     if category is None:

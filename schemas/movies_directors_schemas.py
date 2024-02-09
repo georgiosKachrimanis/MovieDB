@@ -1,7 +1,9 @@
 from datetime import datetime
 from enum import Enum
 from typing import List, Optional
+
 from pydantic import BaseModel
+
 from schemas.users_reviews_schemas import Review
 
 
@@ -10,11 +12,11 @@ class Image(BaseModel):
     alias: str
 
 
+# ============================== Categories Schemas==========================
 class CategoryName(BaseModel):
     category_name: str
 
 
-# expenses
 class Category(BaseModel):
     id: int
     category_name: str
@@ -50,18 +52,18 @@ class MovieCategoryType(Enum):
         self.label = label
 
 
+# =========================== Directors Schemas ===============================
 class Director(BaseModel):
     director_name: str
 
 
-class MovieBase(BaseModel):
-    title: str
-    released_date: Optional[datetime]
-    categories: List[int] = []
-    directors_id: Optional[int] = None
-    plot: str
-    poster_url: Optional[str]
-    imdb_rate: Optional[float]
+class DirectorFullUpdate(Director):
+    movies: List[int] = []
+
+
+class DirectorMovieUpdate(BaseModel):
+    id: int
+    movie_id: int
 
 
 class MovieDirectorDisplay(BaseModel):
@@ -72,13 +74,23 @@ class MovieDirectorDisplay(BaseModel):
         from_attributes = True
 
 
-class DirectorDisplay(BaseModel):
+class DirectorDisplay(Director):
     id: int
-    director_name: str
     movies: List[MovieDirectorDisplay] = []
 
     class Config:
         from_attributes = True
+
+
+# =========================== Movies Schemas ==================================
+class MovieBase(BaseModel):
+    title: str
+    released_date: Optional[datetime]
+    categories: List[int] = []
+    director_id: Optional[int] = None
+    plot: str
+    poster_url: Optional[str]
+    imdb_rate: Optional[float]
 
 
 class MovieDisplayAll(BaseModel):
@@ -107,7 +119,7 @@ class MovieDisplayOne(BaseModel):
     average_movie_rate: Optional[float] = None
     imdb_rate: Optional[float]
     reviews: List[Review] = []
-    director: Optional[Director]
+    director: Optional[DirectorDisplay]
 
     class Config:
         from_attributes = True
@@ -121,6 +133,7 @@ class MoviePatchUpdate(BaseModel):
     plot: Optional[str] = None
     poster_url: Optional[str] = None
     imdb_rate: Optional[float] = None
+    director_id: Optional[int] = None
 
 
 # To be used with the put(update) function
@@ -131,4 +144,4 @@ class MovieUpdate(BaseModel):
     plot: str
     poster_url: str
     imdb_rate: float
-    directors_id: Optional[int] = None
+    director_id: Optional[int]

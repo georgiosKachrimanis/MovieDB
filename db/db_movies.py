@@ -1,20 +1,10 @@
 from sqlalchemy import func
-from sqlalchemy.orm import (
-    Session,
-    joinedload,
-)
+from sqlalchemy.orm import Session, joinedload
 from sqlalchemy.sql.functions import coalesce
-from db.models import (
-    DbCategory,
-    DbMovie,
-    DbReview,
-    DbDirector,
-)
-from schemas.movies_directors_schemas import (
-    MovieBase,
-    MoviePatchUpdate,
-    MovieUpdate,
-)
+
+from db.models import DbCategory, DbDirector, DbMovie, DbReview
+from routes.directors import get_director_by_id
+from schemas.movies_directors_schemas import MovieBase, MoviePatchUpdate, MovieUpdate
 
 
 def create_movie(
@@ -32,7 +22,7 @@ def create_movie(
         plot=request.plot,
         poster_url=request.poster_url,
         imdb_rate=request.imdb_rate,
-        director_id=request.directors_id
+        director_id=request.director_id,
     )
     db.add(new_movie)
     db.commit()
@@ -54,7 +44,11 @@ def get_all_movies(
             .filter(DbReview.movie_id == movie.id)
             .scalar()
         )
-        movie.director_name = db.query(DbDirector.director_name).filter(DbDirector.id == movie.director_id).scalar()
+        movie.director_name = (
+            db.query(DbDirector.director_name)
+            .filter(DbDirector.id == movie.director_id)
+            .first()
+        )
     return movies
 
 
@@ -80,16 +74,19 @@ def get_movie(
 
     if movie:
         movie.average_movie_rate = calculate_average(db=db, movie=movie)
+        
     return movie
 
 
 # Maybe I should use a different type of update.
 def patch_movie(
     db: Session,
-    movie: DbMovie,
+    movie: MovieBase,
     request: MoviePatchUpdate,
 ):
+
     if request.title:
+
         movie.title = request.title
     if request.plot:
         movie.plot = request.plot
@@ -100,6 +97,9 @@ def patch_movie(
             db.query(DbCategory).filter(DbCategory.id.in_(request.categories)).all()
         )
         movie.categories = categories
+    if request.directors_id:
+        get_director_by_id(director_id=request.directors_id, db=db)
+        movie.director_id = request.directors_id
     db.commit()
     db.refresh(movie)
     return movie
@@ -110,7 +110,7 @@ def update_movie(
     movie: DbMovie,
     request: MovieUpdate,
 ):
-    # get the categories that the movie is having
+
     categories = [category.id for category in movie.categories]
     for key, value in request.__dict__.items():
         if key == "categories":
@@ -120,6 +120,7 @@ def update_movie(
     movie.categories = categories
     db.commit()
     db.refresh(movie)
+    print(movie.director_id)
     return movie
 
 

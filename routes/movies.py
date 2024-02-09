@@ -1,4 +1,7 @@
-from typing import List, Optional
+from typing import (
+    List,
+    Optional,
+)
 from fastapi import (
     APIRouter,
     Depends,
@@ -18,7 +21,6 @@ from routes.reviews import (
 )
 from routes.categories import (
     get_categories,
-    get_movies_by_category,
 )
 from schemas.movies_directors_schemas import (
     MovieBase,
@@ -34,17 +36,10 @@ from schemas.users_reviews_schemas import (
     ReviewUpdate,
 )
 
-router = APIRouter(prefix="/movies", tags=["Movies Endpoints"])
-
-
-# Authenticating User!
-def admin_authentication(token: str):
-
-    if oauth2.decode_access_token(token=token).get("user_type") != "admin":
-        raise HTTPException(
-            status_code=403,
-            detail="You are not authorized, please contact an admin for help.",
-        )
+router = APIRouter(
+    prefix="/movies",
+    tags=["Movies Endpoints"],
+)
 
 
 # Create a new movie
@@ -59,7 +54,7 @@ def create_movie(
     token: str = Depends(oauth2.oauth2_schema),
 ):
     # Authenticating User!
-    admin_authentication(token=token)
+    oauth2.admin_authentication(token=token)
 
     if db_movies.get_movie(db=db, movie_title=movie.title):
         raise HTTPException(
@@ -203,26 +198,24 @@ def get_review_for_movie(
             return movie_review
 
     raise HTTPException(
-            status_code=409,
-            detail=f"Review: {review.id}, doesn't belong to Movie: {movie.id}",
-        )
+        status_code=409,
+        detail=f"Review: {review.id}, doesn't belong to Movie: {movie.id}",
+    )
 
 
 # Update Movie
 @router.put(
     "/{movie_id}",
-    response_model=Optional[MovieDisplayOne],
+    response_model=MovieDisplayOne,
 )
 def update_movie_data(
-    movie_id: int,
     movie_updates: MovieUpdate,
+    movie: MovieBase = Depends(get_movie_by_id),
     db: Session = Depends(get_db),
     token: str = Depends(oauth2.oauth2_schema),
 ):
 
-    # Authenticating User!
-    admin_authentication(token=token)
-    movie = db_movies.get_movie(db, movie_id)
+    oauth2.admin_authentication(token=token)
 
     if movie is None:
         raise HTTPException(
@@ -248,8 +241,8 @@ def patch_movie(
     db: Session = Depends(get_db),
     token: str = Depends(oauth2.oauth2_schema),
 ):
-    # Authenticating User!
-    admin_authentication(token=token)
+
+    oauth2.admin_authentication(token=token)
 
     movie = db_movies.get_movie(db, movie_id)
 
@@ -276,8 +269,8 @@ def delete_movie(
     db: Session = Depends(get_db),
     token: str = Depends(oauth2.oauth2_schema),
 ):
-    # Authenticating User!
-    admin_authentication(token=token)
+
+    oauth2.admin_authentication(token=token)
 
     reviews = db_movies.get_movie_reviews(db, movie_id)
     if reviews:
@@ -294,7 +287,9 @@ def delete_movie(
 
 
 # Return Movie Categories
-@router.get("/{movie_id}/categories/",)
+@router.get(
+    "/{movie_id}/categories/",
+)
 def get_movie_categories(
     db: Session = Depends(get_db),
     movie: MovieDisplayOne = Depends(get_movie_by_id),

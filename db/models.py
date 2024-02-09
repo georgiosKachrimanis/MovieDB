@@ -48,11 +48,7 @@ class DbMovie(Base):
         primary_key=True,
         index=True,
     )
-    title = Column(
-        String,
-        unique=True,
-        index=True,
-    )
+    title = Column(String)
     released_date = Column(DateTime)
     categories = relationship(
         "DbCategory",

@@ -8,7 +8,7 @@ from db.seed_db import create_tables_and_seed
 app = FastAPI(
     title="MoviesDB API",
     description="This is an movie DB API from the 40+ of the group!",
-    version="1.3.0",
+    version="1.3.1",
 )
 
 app.include_router(movies.router)

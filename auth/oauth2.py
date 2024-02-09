@@ -34,3 +34,12 @@ def decode_access_token(token: str):
         raise HTTPException(status_code=401, detail="Token has expired")
     except jwt.JWTError:
         raise HTTPException(status_code=401, detail="Invalid token")
+
+
+# Authenticating Admin User!
+def admin_authentication(token: str):
+    if decode_access_token(token=token).get("user_type") != "admin":
+        raise HTTPException(
+            status_code=403,
+            detail="You are not authorized, please contact an admin for help.",
+        )
