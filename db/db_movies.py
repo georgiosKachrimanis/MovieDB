@@ -1,10 +1,29 @@
 from sqlalchemy import func
 from sqlalchemy.orm import Session, joinedload
 from sqlalchemy.sql.functions import coalesce
-
-from db.models import DbCategory, DbDirector, DbMovie, DbReview
+from db.models import (
+    DbCategory,
+    DbDirector,
+    DbMovie,
+    DbReview,
+)
 from routes.directors import get_director_by_id
-from schemas.movies_directors_schemas import MovieBase, MoviePatchUpdate, MovieUpdate
+from schemas.movies_directors_schemas import (
+    MovieBase,
+    MoviePatchUpdate,
+    MovieUpdate,
+)
+
+
+# TODO: Optimize the code, remove same code
+def check_director(
+    director_id: int,
+    db: Session,
+):
+    return get_director_by_id(
+        director_id=director_id,
+        db=db,
+    ).id
 
 
 def create_movie(
@@ -22,7 +41,10 @@ def create_movie(
         plot=request.plot,
         poster_url=request.poster_url,
         imdb_rate=request.imdb_rate,
-        director_id=request.director_id,
+        director_id=check_director(
+            director_id=request.director_id,
+            db=db,
+        ),
     )
     db.add(new_movie)
     db.commit()
@@ -74,7 +96,7 @@ def get_movie(
 
     if movie:
         movie.average_movie_rate = calculate_average(db=db, movie=movie)
-        
+
     return movie
 
 
@@ -97,9 +119,8 @@ def patch_movie(
             db.query(DbCategory).filter(DbCategory.id.in_(request.categories)).all()
         )
         movie.categories = categories
-    if request.directors_id:
-        get_director_by_id(director_id=request.directors_id, db=db)
-        movie.director_id = request.directors_id
+    if request.director_id:
+        movie.director_id = check_director(request.director_id, db=db)
     db.commit()
     db.refresh(movie)
     return movie
@@ -112,6 +133,7 @@ def update_movie(
 ):
 
     categories = [category.id for category in movie.categories]
+    check_director(request.director_id, db=db)
     for key, value in request.__dict__.items():
         if key == "categories":
             categories = db.query(DbCategory).filter(DbCategory.id.in_(value)).all()
@@ -120,7 +142,6 @@ def update_movie(
     movie.categories = categories
     db.commit()
     db.refresh(movie)
-    print(movie.director_id)
     return movie
 
 

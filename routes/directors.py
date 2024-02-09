@@ -1,8 +1,11 @@
 from typing import List
-
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import (
+    APIRouter,
+    Depends,
+    HTTPException,
+    status,
+)
 from sqlalchemy.orm import Session
-
 from auth import oauth2
 from db import db_directors
 from db.database import get_db
@@ -31,7 +34,10 @@ def create_director(
     token: str = Depends(oauth2.oauth2_schema),
 ):
     oauth2.admin_authentication(token=token)
-    return db_directors.create_director(db=db, request=request)
+    return db_directors.create_director(
+        db=db,
+        request=request,
+    )
 
 
 # Get Director By Id
@@ -43,7 +49,10 @@ def get_director_by_id(
     director_id: int,
     db: Session = Depends(get_db),
 ):
-    director = db_directors.get_director(db=db, director_id=director_id)
+    director = db_directors.get_director(
+        db=db,
+        director_id=director_id,
+    )
     if director:
         return director
     else:
@@ -68,33 +77,18 @@ def get_all_directors(db: Session = Depends(get_db)):
     response_model=DirectorDisplay,
 )
 def update_director(
-    director_id: int,
     request: DirectorFullUpdate,
+    director: Director = Depends(get_director_by_id),
     db: Session = Depends(get_db),
     token: str = Depends(oauth2.oauth2_schema),
 ):
     oauth2.admin_authentication(token=token)
-    director = get_director_by_id(director_id=director_id, db=db)
+
     return db_directors.update_director(
         db=db,
         director=director,
         request=request,
     )
-    # payload = oauth2.decode_access_token(token=token)
-    # if payload.get("user_type") != "admin":
-    #     raise HTTPException(
-    #         status_code=status.HTTP_401_UNAUTHORIZED,
-    #         detail="You are not authorized to update a director",
-    #     )
-    # else:
-    #     director = db_directors.get_director(db, director_id)
-    #     if director is None:
-    #         raise HTTPException(
-    #             status_code=status.HTTP_404_NOT_FOUND,
-    #             detail=f"Director with id {director_id} not found",
-    #         )
-    #     else:
-    #         return db_directors.update_director(db, director_id, request)
 
 
 # Delete Director
@@ -103,27 +97,17 @@ def update_director(
     status_code=status.HTTP_204_NO_CONTENT,
 )
 def delete_director(
-    director_id: int,
+    director: Director = Depends(get_director_by_id),
     db: Session = Depends(get_db),
     token: str = Depends(oauth2.oauth2_schema),
 ):
     oauth2.admin_authentication(token=token)
 
-    director = db_directors.get_director(
-        db=db,
-        director_id=director_id,
-    )
-    if director is None:
+    movies = db_directors.check_director_in_movie(db, director.id)
+    if movies:
         raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail=f"Director with id {director_id} not found",
+            status_code=status.HTTP_409_CONFLICT,
+            detail="Director is associated with movies. Can't be deleted!",
         )
     else:
-        movies = db_directors.check_director_in_movie(db, director_id)
-        if movies:
-            raise HTTPException(
-                status_code=status.HTTP_409_CONFLICT,
-                detail="Director is associated with movies. Can't be deleted!",
-            )
-        else:
-            return db_directors.delete_director(db, director_id)
+        return db_directors.delete_director(db, director.id)
