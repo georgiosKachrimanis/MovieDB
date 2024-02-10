@@ -15,7 +15,7 @@ router = APIRouter(prefix="/actors", tags=["Actors Endpoints"])
 # Create Actors
 @router.post("/", response_model=actors_schemas.ActorDisplay)
 def create_actor(
-    actor_name: str,
+    actor: actors_schemas.ActorBase,
     db: Session = Depends(get_db),
     token: str = Depends(oauth2.oauth2_schema),
 ):
@@ -26,7 +26,7 @@ def create_actor(
             detail="You are not authorized to create a actor",
         )
     else:
-        return db_actors.create_actor(db, actor_name)
+        return db_actors.create_actor(db, actor)
 
 
 # Get All Actors

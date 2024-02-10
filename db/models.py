@@ -51,7 +51,7 @@ class Movie(Base):
     plot = Column(String)
     poster_url = Column(String)
     average_movie_rate = Column(Float, default=0.0)
-    imdb_rate = Column(Float)
+    imdb_id = Column(String)
     
 
 class Category(Base):

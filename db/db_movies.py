@@ -1,8 +1,9 @@
 from typing import List
 from sqlalchemy.orm import Session
-from db.models import Movie, Review, Category, Actor,Director
+from db.models import Movie, Review, Category, Actor, Director
 from sqlalchemy import func
 from schemas import movies_schemas
+from services.movie_service import get_movie_extra_data
 
 
 # Create Movie
@@ -17,6 +18,7 @@ def create_movie(db: Session, movie: movies_schemas.MovieBase):
         actors=db.query(Actor).filter(Actor.id.in_(movie.actors)).all(),
         plot=movie.plot,
         poster_url=movie.poster_url,
+        imdb_id=movie.imdb_id,
         imdb_rate=movie.imdb_rate,
     )
 
@@ -24,6 +26,7 @@ def create_movie(db: Session, movie: movies_schemas.MovieBase):
     db.commit()
     db.refresh(new_movie)
     return new_movie
+
 
 # Get All Movies
 def get_all_movies(db: Session, skip: int = 0, limit: int = 100):
@@ -37,8 +40,13 @@ def get_all_movies(db: Session, skip: int = 0, limit: int = 100):
             .filter(Review.movie_id == movie.id)
             .scalar()
         )
-        movie.director_name = db.query(Director.director_name).filter(Director.id == movie.director_id).scalar()
+        movie.director_name = (
+            db.query(Director.director_name)
+            .filter(Director.id == movie.director_id)
+            .scalar()
+        )
     return movies
+
 
 # Get Movie By Id
 def get_movie(db: Session, movie_id: int):
@@ -49,6 +57,7 @@ def get_movie(db: Session, movie_id: int):
         .scalar()
     )
     return movie
+
 
 # Update Movie
 def update_movie(db: Session, movie_id: int, request: movies_schemas.MovieUpdate):
@@ -65,12 +74,13 @@ def update_movie(db: Session, movie_id: int, request: movies_schemas.MovieUpdate
             if key == "actors":
                 actors = db.query(Actor).filter(Actor.id.in_(value)).all()
             else:
-                setattr(movie, key, value)        
+                setattr(movie, key, value)
         movie.actors = actors
         db.commit()
         db.refresh(movie)
         return movie
     return None
+
 
 # Delete Movie
 def delete_movie(db: Session, movie_id: int) -> bool:
@@ -81,12 +91,15 @@ def delete_movie(db: Session, movie_id: int) -> bool:
         return True
     return False
 
+
 # Check if movie is in any review
 def check_movie_in_reviews(db: Session, movie_id: int):
     return db.query(Movie).filter(Movie.id == movie_id).first().reviews != []
 
+
 from sqlalchemy.orm import Session
-from .models import Movie  
+from .models import Movie
+
 
 def update_movie_poster_url(db: Session, movie, file_path: str):
     if movie:
@@ -94,3 +107,14 @@ def update_movie_poster_url(db: Session, movie, file_path: str):
         db.commit()
         db.refresh(movie)
         return True
+
+
+# Get Movie Extra Data
+def get_movie_extra(db: Session, movie_id):
+    movie = get_movie(db, movie_id)
+    if movie.imdb_id is None:
+        return "No imdb_id found for this movie."
+    else:
+        imdb_id = movie.imdb_id
+        result = get_movie_extra_data(imdb_id)
+        return result

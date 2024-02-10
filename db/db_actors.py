@@ -5,8 +5,8 @@ from db.models import  Actor as DbActors
 from sqlalchemy import select
 from db.models import movie_actors
 
-def create_actor(db: Session, actor_name: str):
-    actor = DbActors(actor_name=actor_name)
+def create_actor(db: Session, actor: actors_schemas.ActorBase):
+    actor = DbActors(actor_name=actor.actor_name)
     db.add(actor)
     db.commit()
     db.refresh(actor)
