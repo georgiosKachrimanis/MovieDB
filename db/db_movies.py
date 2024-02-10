@@ -85,3 +85,12 @@ def delete_movie(db: Session, movie_id: int) -> bool:
 def check_movie_in_reviews(db: Session, movie_id: int):
     return db.query(Movie).filter(Movie.id == movie_id).first().reviews != []
 
+from sqlalchemy.orm import Session
+from .models import Movie  
+
+def update_movie_poster_url(db: Session, movie, file_path: str):
+    if movie:
+        movie.poster_url = file_path
+        db.commit()
+        db.refresh(movie)
+        return True

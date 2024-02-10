@@ -8,3 +8,4 @@ pydantic[email]
 python-jose
 python-multipart
 pytest
+httpx

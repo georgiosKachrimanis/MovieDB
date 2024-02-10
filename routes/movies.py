@@ -1,10 +1,12 @@
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, status, UploadFile, File
 from sqlalchemy.orm import Session
 from typing import List, Optional
 from db.database import get_db
 from schemas import movies_schemas
 from db import db_movies
 from auth import oauth2
+import os
+from db.db_movies import update_movie_poster_url
 
 router = APIRouter(prefix="/movie", tags=["Movie Endpoints"])
 
@@ -81,7 +83,7 @@ def delete_movie(
 ):
     payload = oauth2.decode_access_token(token=token)
     if payload.get("user_type") == "admin":
-        if  db_movies.check_movie_in_reviews(db, movie_id):
+        if db_movies.check_movie_in_reviews(db, movie_id):
             raise HTTPException(
                 status_code=409,
                 detail=f"Cannot delete movie with Id :{movie_id} , it has review/s ",
@@ -97,3 +99,38 @@ def delete_movie(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="You are not authorized to delete a movie",
         )
+
+
+# Upload Movie Poster Image
+@router.post("/upload_poster/{movie_id}")
+async def upload_file(
+    movie_id: int,
+    upload_file: UploadFile = File(...),
+    db: Session = Depends(get_db),
+    token: str = Depends(oauth2.oauth2_schema),
+):
+    file_extension = os.path.splitext(upload_file.filename)[-1]  # get file extension
+    if file_extension not in [".jpg", ".png"]:
+        return "Invalid file type. Please upload a jpg or png file."
+
+    movie = db_movies.get_movie(db, movie_id)
+    title = movie.title.replace(" ", "_")  # replace spaces with underscores
+    new_filename = f"{movie_id}_{title}{file_extension}"  # create new filename
+
+    contents = await upload_file.read()
+
+    # Check if the directory exists and if not, create it
+    directory = "assets/posters"
+    if not os.path.exists(directory):
+        os.makedirs(directory)
+
+    with open(f"{directory}/{new_filename}", "wb") as f:
+            f.write(contents)
+
+    file_path = os.path.abspath(f"{directory}/{new_filename}")
+
+    result = update_movie_poster_url(db, movie, file_path)
+    if result is True:
+        return f"File uploaded successfully. The file path is: {file_path_in_database} "
+    else:
+        return f"File uploaded successfully. But the file path could not be updated in the database."

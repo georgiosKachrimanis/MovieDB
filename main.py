@@ -3,6 +3,7 @@ from routes import categories, directors, movies, reviews, users,actors
 from auth import authentication
 from db import models
 from db.database import engine
+from fastapi.middleware.cors import CORSMiddleware
 
 app = FastAPI()
 app.include_router(authentication.router)
@@ -13,9 +14,13 @@ app.include_router(categories.router)
 app.include_router(directors.router)
 app.include_router(actors.router)
 
-
-
 models.Base.metadata.create_all(engine)
-"""
-    ---> You NEED TO DECLARE THE TYPE IN THE FUNCTIONS <---
-"""
+
+origins = ['http://localhost:3000']
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)

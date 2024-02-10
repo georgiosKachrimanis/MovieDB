@@ -27,11 +27,11 @@ class CategoryBase(BaseModel):
 class MovieBase(BaseModel):
     title: str
     released_date: datetime
-    categories: List[int]
+    categories: List[int] = []
     director_id: Optional[int] = None
     actors: Optional[List[int]] = []
     plot: str
-    poster_url: str
+    poster_url: Optional[str] = None
     imdb_rate: float
 
 
