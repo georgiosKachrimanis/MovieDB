@@ -1,7 +1,7 @@
 from fastapi import HTTPException, status
 from sqlalchemy.orm import Session
 from db.models import DbDirector
-from schemas.mov_dir_actors_schemas import Director
+from schemas.mov_dir_actors_schemas import Director, DirectorUpdate
 
 
 # Create Director
@@ -36,7 +36,7 @@ def get_all_directors(
 def update_director(
     db: Session,
     director: Director,
-    request: Director,
+    request: DirectorUpdate,
 ):
     from db.db_movies import get_movie
 

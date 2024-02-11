@@ -384,19 +384,34 @@ def add_actor_in_movie(
 def get_movie_director(movie: MovieDisplayOne = Depends(get_movie_by_id)):
     return DirectorDisplay.model_validate(movie.director)
 
-
-@router.patch(
+# TODO: Need to fix the issues of out of bounds
+@router.put(
     "/{movie_id}/director/{director_id}",
-    response_model=DirectorDisplay,
+    response_model=Director,
 )
 def update_movie_director(
     director_id: int,
-    director: Director = Depends(get_movie_director),
     movie: MovieDisplayOne = Depends(get_movie_by_id),
     db: Session = Depends(get_db),
     token: str = Depends(oauth2.oauth2_schema),
 ):
-    pass
+    oauth2.admin_authentication(
+        token=token,
+        exception_text=AUTHENTICATION_TEXT,
+    )
+
+    from db import db_directors
+
+    director = db_directors.get_director(director_id=director_id, db=db)
+    request = DirectorUpdate(
+        director_name=director.director_name,
+        movies=[movie.id],
+    )
+    return db_directors.update_director(
+        db=db,
+        director=director,
+        request=request,
+    )
 
 
 @router.post("/auto_add_movies")
