@@ -151,5 +151,158 @@
     "plot": "A surreal journey into the depths of imagination.",
     "poster_url": "https://example.com/through_the_looking_glass_poster.jpg",
     "imdb_rate": 7.9
+  },
+  {
+    "title": "Rise of the Phoenix",
+    "released_date": "2024-02-09T13:05:23.240Z",
+    "categories": [
+      3,
+      12
+    ],
+    "director_id": 4,
+    "actors": [
+      5,
+      17,
+      28
+    ],
+    "plot": "A story of redemption and rebirth.",
+    "poster_url": "https://example.com/phoenix_rising_poster.jpg",
+    "imdb_rate": 8.4
+  },
+  {
+    "title": "The Haunting of Hill Manor",
+    "released_date": "2024-02-09T13:05:23.240Z",
+    "categories": [
+      5,
+      18
+    ],
+    "director_id": 8,
+    "actors": [
+      2,
+      11,
+      29
+    ],
+    "plot": "An eerie tale of a haunted mansion.",
+    "poster_url": "https://example.com/haunting_of_hill_manor_poster.jpg",
+    "imdb_rate": 7.7
+  },
+  {
+    "title": "Sunset Boulevard",
+    "released_date": "2024-02-09T13:05:23.240Z",
+    "categories": [
+      9,
+      22
+    ],
+    "director_id": 2,
+    "actors": [
+      7,
+      15,
+      26
+    ],
+    "plot": "A glimpse into the dark side of Hollywood.",
+    "poster_url": "https://example.com/sunset_boulevard_poster.jpg",
+    "imdb_rate": 8.6
+  },
+  {
+    "title": "The Edge of Madness",
+    "released_date": "2024-02-09T13:05:23.240Z",
+    "categories": [
+      2,
+      10
+    ],
+    "director_id": 10,
+    "actors": [
+      8,
+      12,
+      30
+    ],
+    "plot": "Exploring the thin line between sanity and insanity.",
+    "poster_url": "https://example.com/edge_of_madness_poster.jpg",
+    "imdb_rate": 7.3
+  },
+  {
+    "title": "Lost in the Echoes",
+    "released_date": "2024-02-09T13:05:23.240Z",
+    "categories": [
+      6,
+      15
+    ],
+    "director_id": 5,
+    "actors": [
+      4,
+      13,
+      22
+    ],
+    "plot": "A journey to reclaim lost memories.",
+    "poster_url": "https://example.com/lost_in_the_echoes_poster.jpg",
+    "imdb_rate": 8.2
+  },
+  {
+    "title": "Shadow of the Past",
+    "released_date": "2024-02-09T13:05:23.240Z",
+    "categories": [
+      1,
+      8
+    ],
+    "director_id": 9,
+    "actors": [
+      6,
+      14,
+      23
+    ],
+    "plot": "Confronting the ghosts of one's history.",
+    "poster_url": "https://example.com/shadow_of_the_past_poster.jpg",
+    "imdb_rate": 7.4
+  },
+  {
+    "title": "Whispers in the Dark",
+    "released_date": "2024-02-09T13:05:23.240Z",
+    "categories": [
+      4,
+      11
+    ],
+    "director_id": 7,
+    "actors": [
+      9,
+      16,
+      27
+    ],
+    "plot": "Listening to the voices that haunt the night.",
+    "poster_url": "https://example.com/whispers_in_the_dark_poster.jpg",
+    "imdb_rate": 8.5
+  },
+  {
+    "title": "Island of Dreams",
+    "released_date": "2024-02-09T13:05:23.240Z",
+    "categories": [
+      7,
+      20
+    ],
+    "director_id": 1,
+    "actors": [
+      3,
+      18,
+      25
+    ],
+    "plot": "Discovering paradise comes at a cost.",
+    "poster_url": "https://example.com/island_of_dreams_poster.jpg",
+    "imdb_rate": 7.1
+  },
+  {
+    "title": "Echoes of Destiny",
+    "released_date": "2024-02-09T13:05:23.240Z",
+    "categories": [
+      5,
+      13
+    ],
+    "director_id": 6,
+    "actors": [
+      10,
+      19,
+      30
+    ],
+    "plot": "The echoes of the past shape the course of fate.",
+    "poster_url": "https://example.com/echoes_of_destiny_poster.jpg",
+    "imdb_rate": 7.9
   }
 ]

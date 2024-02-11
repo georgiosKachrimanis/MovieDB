@@ -1,19 +1,12 @@
 from typing import List
-from fastapi import (
-    APIRouter,
-    Depends,
-    HTTPException,
-    status,
-)
+
+from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
+
 from auth import oauth2
 from db import db_directors
 from db.database import get_db
-from schemas.mov_dir_actors_schemas import (
-    Director,
-    DirectorDisplay,
-    DirectorFullUpdate,
-)
+from schemas.mov_dir_actors_schemas import Director, DirectorDisplay, DirectorUpdate
 
 router = APIRouter(
     prefix="/directors",
@@ -83,7 +76,7 @@ def get_all_directors(db: Session = Depends(get_db)):
     response_model=DirectorDisplay,
 )
 def update_director(
-    request: DirectorFullUpdate,
+    request: DirectorUpdate,
     director: Director = Depends(get_director_by_id),
     db: Session = Depends(get_db),
     token: str = Depends(oauth2.oauth2_schema),

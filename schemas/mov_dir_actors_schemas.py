@@ -57,13 +57,12 @@ class Director(BaseModel):
     director_name: str
 
 
-class DirectorFullUpdate(Director):
+class DirectorUpdate(Director):
     movies: List[int] = []
 
 
-class DirectorMovieUpdate(BaseModel):
-    id: int
-    movie_id: int
+class DirectorPatchUpdate(BaseModel):
+    None
 
 
 class MovieShortDisplay(BaseModel):
@@ -87,6 +86,7 @@ class DirectorDisplay(Director):
 
 # Movie inside ActorDisplay
 class Actor(BaseModel):
+    id: int
     actor_name: str
 
 

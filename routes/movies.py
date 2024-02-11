@@ -30,8 +30,13 @@ from schemas.mov_dir_actors_schemas import (
     MoviePatchUpdate,
     MovieUpdate,
     Category,
+    Actor,
     ActorDisplay,
     ActorPatch,
+    Director,
+    DirectorDisplay,
+    DirectorUpdate,
+    DirectorPatchUpdate,
 )
 from schemas.users_reviews_schemas import (
     CreateReview,
@@ -315,20 +320,27 @@ def get_movie_categories(
     return movie.categories
 
 
-# =================================== Movie And Actors ========================
+# =========================== Movie And Actors ========================
 
 
 # Return Movie Actors
-@router.get("/{movie_id}/actors")
+@router.get(
+    "/{movie_id}/actors",
+    response_model=List[Actor],
+)
 def get_movie_actors(
     db: Session = Depends(get_db),
     movie: MovieDisplayOne = Depends(get_movie_by_id),
 ):
-    return movie.actors
+
+    return [ActorDisplay.model_validate(actor) for actor in movie.actors]
 
 
 # Return Specific Movie Actor
-@router.get("/{movie_id}/actors/{actor_id}")
+@router.get(
+    "/{movie_id}/actors/{actor_id}",
+    response_model=Actor,
+)
 def get_specific_movie_actor(
     movie: MovieDisplayOne = Depends(get_movie_by_id),
     actor: ActorDisplay = Depends(get_actor_by_id),
@@ -346,6 +358,7 @@ def get_specific_movie_actor(
 # Add actor in the movie
 @router.patch(
     "/{movie_id}/actors/{actor_id}",
+    response_model=ActorDisplay,
     status_code=status.HTTP_201_CREATED,
 )
 def add_actor_in_movie(
@@ -361,6 +374,29 @@ def add_actor_in_movie(
         db=db,
         token=token,
     )
+
+
+# ============================ Movie and Director =====================
+@router.get(
+    "/{movie_id}/director",
+    response_model=DirectorDisplay,
+)
+def get_movie_director(movie: MovieDisplayOne = Depends(get_movie_by_id)):
+    return DirectorDisplay.model_validate(movie.director)
+
+
+@router.patch(
+    "/{movie_id}/director/{director_id}",
+    response_model=DirectorDisplay,
+)
+def update_movie_director(
+    director_id: int,
+    director: Director = Depends(get_movie_director),
+    movie: MovieDisplayOne = Depends(get_movie_by_id),
+    db: Session = Depends(get_db),
+    token: str = Depends(oauth2.oauth2_schema),
+):
+    pass
 
 
 @router.post("/auto_add_movies")
