@@ -1,13 +1,10 @@
 from sqlalchemy import func
-from sqlalchemy.orm import Session, joinedload
-from sqlalchemy.sql.functions import coalesce
-from db.models import (
-    DbCategory,
-    DbDirector,
-    DbMovie,
-    DbReview,
-    DbActor
+from sqlalchemy.orm import (
+    Session,
+    joinedload,
 )
+from sqlalchemy.sql.functions import coalesce
+from db.models import DbCategory, DbDirector, DbMovie, DbReview, DbActor
 from routes.directors import get_director_by_id
 from schemas.mov_dir_actors_schemas import (
     MovieBase,
@@ -108,21 +105,20 @@ def patch_movie(
     movie: MovieBase,
     request: MoviePatchUpdate,
 ):
-
-    if request.title:
-
+    if getattr(request, 'title', None) is not None:
         movie.title = request.title
-    if request.plot:
+    if getattr(request, 'plot', None) is not None:
         movie.plot = request.plot
-    if request.poster_url:
+    if getattr(request, 'poster_url', None) is not None:
         movie.poster_url = request.poster_url
-    if request.categories:
-        categories = (
-            db.query(DbCategory).filter(DbCategory.id.in_(request.categories)).all()
-        )
+    if getattr(request, 'categories', None) is not None:
+        categories = db.query(DbCategory).filter(DbCategory.id.in_(request.categories)).all()
         movie.categories = categories
-    if request.director_id:
-        movie.director_id = check_director(request.director_id, db=db)
+    if getattr(request, 'director_id', None) is not None:
+        movie.director_id = check_director(director_id=request.director_id, db=db,)
+    if getattr(request, 'actors', None) is not None:
+        actors = db.query(DbActor).filter(DbActor.id.in_(request.actors)).all()
+        movie.actors = actors
     db.commit()
     db.refresh(movie)
     return movie
@@ -134,14 +130,19 @@ def update_movie(
     request: MovieUpdate,
 ):
 
-    categories = [category.id for category in movie.categories]
     check_director(request.director_id, db=db)
+
+    if "categories" in request.__dict__:
+        categories = db.query(DbCategory).filter(DbCategory.id.in_(request.categories)).all()
+        movie.categories = categories
+    if "actors" in request.__dict__:
+        actors = db.query(DbActor).filter(DbActor.id.in_(request.actors)).all()
+        movie.actors = actors
+
     for key, value in request.__dict__.items():
-        if key == "categories":
-            categories = db.query(DbCategory).filter(DbCategory.id.in_(value)).all()
-        else:
+        if key not in ["categories", "actors"]:
             setattr(movie, key, value)
-    movie.categories = categories
+
     db.commit()
     db.refresh(movie)
     return movie

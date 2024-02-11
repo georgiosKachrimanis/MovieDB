@@ -11,11 +11,12 @@ from auth import authentication
 from db import models
 from db.database import engine
 from db.seed_db import create_tables_and_seed
+from db.database import get_db
 
 app = FastAPI(
     title="MoviesDB API",
     description="This is an movie DB API from the 40+ of the group!",
-    version="1.3.2",
+    version="1.4.0",
 )
 
 app.include_router(movies.router)
@@ -36,7 +37,6 @@ models.Base.metadata.create_all(engine)
 
 # Auto creating the Movie Categories
 create_tables_and_seed()
-
 
 """
     ---> You NEED TO DECLARE THE TYPE IN THE FUNCTIONS <---

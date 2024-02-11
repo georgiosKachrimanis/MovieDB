@@ -123,3 +123,18 @@ def delete_director(
         )
     else:
         return db_directors.delete_director(db, director.id)
+
+
+@router.post("/auto_add_directors", status_code=status.HTTP_201_CREATED)
+def auto_add_directors(db: Session = Depends(get_db)):
+    """
+    THIS IS ONLY TO BE USED FOR TESTING PURPOSES
+    """
+    import json
+
+    with open("routes/example_directors.json", "r") as file:
+        directors = json.load(file)
+
+    for director in directors:
+        db_directors.create_director(db=db, request=Director(**director))
+    return {"message": "Directors added successfully"}

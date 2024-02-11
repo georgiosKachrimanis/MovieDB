@@ -1,6 +1,13 @@
 from sqlalchemy.orm import Session
-from schemas.mov_dir_actors_schemas import Actor
-from db.models import DbActor
+from schemas.mov_dir_actors_schemas import (
+    Actor,
+    ActorFullUpdate,
+    ActorPatch,
+)
+from db.models import (
+    DbActor,
+    DbMovie,
+)
 
 
 def create_actor(
@@ -27,14 +34,46 @@ def get_all_actors(db: Session):
 
 def update_actor(
     db: Session,
-    actor_id: int,
-    request: Actor,
+    actor: Actor,
+    request: ActorFullUpdate,
 ):
-    actor = db.query(DbActor).filter(DbActor.id == actor_id).first()
-    if actor:
+
+    actor.actor_name = request.actor_name
+
+    if request.movies is not None:
+        current_movie_ids = {movie.id for movie in actor.movies}
+        if request.movies == []:
+            actor.movies.clear()
+        else:
+            new_movies = db.query(DbMovie).filter(DbMovie.id.in_(request.movies)).all()
+            for new_movie in new_movies:
+                if new_movie.id not in current_movie_ids:
+                    actor.movies.append(new_movie)
+
+    db.commit()
+    db.refresh(actor)
+    return actor
+
+
+def patch_actor(
+    db: Session,
+    actor: Actor,
+    request: ActorPatch,
+):
+    if getattr(request, 'actor_name', None) is not None:
         actor.actor_name = request.actor_name
-        db.commit()
-        db.refresh(actor)
+    if getattr(request, 'movies', None) is not None:
+        current_movie_ids = {movie.id for movie in actor.movies}
+        if request.movies == []:
+            actor.movies.clear()
+        else:
+            new_movies = db.query(DbMovie).filter(DbMovie.id.in_(request.movies)).all()
+            for new_movie in new_movies:
+                if new_movie.id not in current_movie_ids:
+                    actor.movies.append(new_movie)
+
+    db.commit()
+    db.refresh(actor)
     return actor
 
 

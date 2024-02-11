@@ -66,7 +66,7 @@ class DirectorMovieUpdate(BaseModel):
     movie_id: int
 
 
-class MovieDirectorDisplay(BaseModel):
+class MovieShortDisplay(BaseModel):
     id: int
     title: str
 
@@ -76,7 +76,7 @@ class MovieDirectorDisplay(BaseModel):
 
 class DirectorDisplay(Director):
     id: int
-    movies: List[MovieDirectorDisplay] = []
+    movies: List[MovieShortDisplay] = []
 
     class Config:
         from_attributes = True
@@ -90,9 +90,18 @@ class Actor(BaseModel):
     actor_name: str
 
 
+class ActorFullUpdate(Actor):
+    movies: List[int] = []
+
+
+class ActorPatch(BaseModel):
+    actor_name: Optional[str] = None
+    movies: Optional[List[int]] = None
+
+
 class ActorDisplay(Actor):
     id: int
-    movies: List[MovieDirectorDisplay] = []
+    movies: List[MovieShortDisplay] = []
 
     class Config:
         from_attributes = True
@@ -163,5 +172,5 @@ class MovieUpdate(BaseModel):
     plot: str
     poster_url: str
     imdb_rate: float
-    actors: List[int]
     director_id: Optional[int]
+    actors: Optional[List[int]]

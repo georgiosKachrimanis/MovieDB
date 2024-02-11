@@ -158,3 +158,25 @@ def delete_review(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="Not Author of review, you are not allowed to change it!",
         )
+
+
+@router.post("/auto_add_reviews")
+def auto_add_reviews(db: Session = Depends(get_db)):
+    import random
+    import json
+
+    """
+    THIS IS ONLY TO BE USED FOR TESTING PURPOSES
+    """
+
+    with open("routes/example_reviews.json", "r") as file:
+        reviews = json.load(file)
+
+    for review_data in reviews:
+        user_id = random.randint(1, 5)
+        db_reviews.create_review(
+            db=db,
+            request=CreateReview(**review_data),
+            user_id=user_id,
+        )
+    return {"message": "Reviews added successfully"}

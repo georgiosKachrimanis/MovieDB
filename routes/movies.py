@@ -22,6 +22,7 @@ from routes.reviews import (
 from routes.categories import (
     get_categories,
 )
+from routes.actors import get_actor_by_id, patch_actor
 from schemas.mov_dir_actors_schemas import (
     MovieBase,
     MovieDisplayOne,
@@ -29,6 +30,8 @@ from schemas.mov_dir_actors_schemas import (
     MoviePatchUpdate,
     MovieUpdate,
     Category,
+    ActorDisplay,
+    ActorPatch,
 )
 from schemas.users_reviews_schemas import (
     CreateReview,
@@ -310,3 +313,65 @@ def get_movie_categories(
     categories: List[Category] = Depends(get_categories),
 ):
     return movie.categories
+
+
+# =================================== Movie And Actors ========================
+
+
+# Return Movie Actors
+@router.get("/{movie_id}/actors")
+def get_movie_actors(
+    db: Session = Depends(get_db),
+    movie: MovieDisplayOne = Depends(get_movie_by_id),
+):
+    return movie.actors
+
+
+# Return Specific Movie Actor
+@router.get("/{movie_id}/actors/{actor_id}")
+def get_specific_movie_actor(
+    movie: MovieDisplayOne = Depends(get_movie_by_id),
+    actor: ActorDisplay = Depends(get_actor_by_id),
+):
+    for movie_actor in movie.actors:
+        if movie_actor.id == actor.id:
+            return actor
+
+    raise HTTPException(
+        status_code=404,
+        detail=f"Actor: {actor.actor_name} ID: {actor.id} not in the movie.",
+    )
+
+
+# Add actor in the movie
+@router.patch(
+    "/{movie_id}/actors/{actor_id}",
+    status_code=status.HTTP_201_CREATED,
+)
+def add_actor_in_movie(
+    actor_id: int,
+    movie: MovieDisplayOne = Depends(get_movie_by_id),
+    db: Session = Depends(get_db),
+    token: str = Depends(oauth2.oauth2_schema),
+):
+
+    return patch_actor(
+        request=ActorPatch(movies=[movie.id]),
+        actor=get_actor_by_id(actor_id=actor_id, db=db),
+        db=db,
+        token=token,
+    )
+
+
+@router.post("/auto_add_movies")
+def auto_add_movies(db: Session = Depends(get_db)):
+    """
+    THIS IS ONLY TO BE USED FOR TESTING PURPOSES
+    """
+    import json
+
+    with open("routes/example_movies.json", "r") as file:
+        movies = json.load(file)
+    for movie in movies:
+        db_movies.create_movie(db=db, request=MovieBase(**movie))
+    return {"message": "Directors added successfully"}
