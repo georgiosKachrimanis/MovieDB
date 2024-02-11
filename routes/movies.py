@@ -370,7 +370,7 @@ def auto_add_movies(db: Session = Depends(get_db)):
     """
     import json
 
-    with open("routes/example_movies.json", "r") as file:
+    with open("example_files/example_movies.json", "r") as file:
         movies = json.load(file)
     for movie in movies:
         db_movies.create_movie(db=db, request=MovieBase(**movie))

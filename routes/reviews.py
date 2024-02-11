@@ -169,7 +169,7 @@ def auto_add_reviews(db: Session = Depends(get_db)):
     THIS IS ONLY TO BE USED FOR TESTING PURPOSES
     """
 
-    with open("routes/example_reviews.json", "r") as file:
+    with open("example_files/example_reviews.json", "r") as file:
         reviews = json.load(file)
 
     for review_data in reviews:

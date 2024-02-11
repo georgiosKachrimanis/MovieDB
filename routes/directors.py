@@ -132,7 +132,7 @@ def auto_add_directors(db: Session = Depends(get_db)):
     """
     import json
 
-    with open("routes/example_directors.json", "r") as file:
+    with open("example_files/example_directors.json", "r") as file:
         directors = json.load(file)
 
     for director in directors:

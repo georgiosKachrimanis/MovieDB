@@ -146,7 +146,7 @@ def auto_add_actors(db: Session = Depends(get_db)):
     """
     import json
 
-    with open("routes/example_actors.json", "r") as file:
+    with open("example_files/example_actors.json", "r") as file:
         actors = json.load(file)
 
     for actor in actors:
