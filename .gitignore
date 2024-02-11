@@ -5,3 +5,4 @@ routes/__pycache__/
 movieApp.db
 db/__pycache__
 __pycache__/
+.env

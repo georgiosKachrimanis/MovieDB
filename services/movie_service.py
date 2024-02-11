@@ -1,9 +1,13 @@
+import os
 import httpx
+from dotenv import load_dotenv
+
 async def get_movie_extra_data(imdb_id: str):
+        load_dotenv()
         url = "https://movie-database-alternative.p.rapidapi.com/"
-        querystring = {"r":"json","i":imdb_id}
+        querystring = {"r": "json", "i": imdb_id}
         headers = {
-            "X-RapidAPI-Key": "54a0803868msh446ebfe6adda6f5p1ab66djsn0d1863f22e5e",
+            "X-RapidAPI-Key": os.getenv('RAPIDAPI_KEY'),
             "X-RapidAPI-Host": "movie-database-alternative.p.rapidapi.com"
         }
 
@@ -20,6 +24,3 @@ async def get_movie_extra_data(imdb_id: str):
             return extra_data
         else:
             return "No results found."
-
-
-    

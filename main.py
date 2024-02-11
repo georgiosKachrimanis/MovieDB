@@ -4,6 +4,7 @@ from auth import authentication
 from db import models
 from db.database import engine
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
 
 app = FastAPI()
 app.include_router(authentication.router)
@@ -24,3 +25,5 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+app.mount('/assets/posters', StaticFiles(directory='assets/posters'),name='assets-posters')
