@@ -92,7 +92,7 @@ def get_all_reviews(db: Session = Depends(get_db)):
 # Read review By Id
 @router.get(
     "/{review_id}",
-    response_model=List[ReviewDisplayOne],
+    response_model=ReviewDisplayOne,
 )
 def get_review(
     review_id: int,

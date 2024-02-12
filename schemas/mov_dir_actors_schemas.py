@@ -86,7 +86,6 @@ class DirectorDisplay(Director):
 
 # Movie inside ActorDisplay
 class Actor(BaseModel):
-    id: int
     actor_name: str
 
 
@@ -116,7 +115,7 @@ class MovieBase(BaseModel):
     actors: Optional[List[int]] = []
     plot: str
     poster_url: Optional[str]
-    imdb_rate: Optional[float]
+    imdb_id: Optional[str]
 
 
 class MovieDisplayAll(BaseModel):
@@ -127,7 +126,7 @@ class MovieDisplayAll(BaseModel):
     plot: str
     poster_url: Optional[str] = None
     average_movie_rate: Optional[float] = None
-    imdb_rate: Optional[float]
+    imdb_id: Optional[str]
     reviews_count: Optional[int] = None
     director: Optional[Director]
 
@@ -143,7 +142,7 @@ class MovieDisplayOne(BaseModel):
     plot: str
     poster_url: Optional[str] = None
     average_movie_rate: Optional[float] = None
-    imdb_rate: Optional[float]
+    imdb_id: Optional[str]
     reviews: List[Review] = []
     actors: Optional[List[Actor]]
     director: Optional[DirectorDisplay]
@@ -159,7 +158,7 @@ class MoviePatchUpdate(BaseModel):
     categories: Optional[List[int]] = None
     plot: Optional[str] = None
     poster_url: Optional[str] = None
-    imdb_rate: Optional[float] = None
+    imdb_id: Optional[str] = None
     director_id: Optional[int] = None
     actors: Optional[List[int]] = None
 
@@ -171,6 +170,6 @@ class MovieUpdate(BaseModel):
     categories: List[int]
     plot: str
     poster_url: str
-    imdb_rate: float
+    imdb_id: str
     director_id: Optional[int]
     actors: Optional[List[int]]

@@ -104,6 +104,21 @@ def get_movies_by_category(
     return movies
 
 
+@router.get(
+    "/{category_id}/movies/top10",
+    response_model=List[MovieDisplayOne],
+)
+def get_top10_movies_by_category(movies=Depends(get_movies_by_category)):
+    sorted_movies = sorted(
+        movies,
+        key=lambda x: x.average_movie_rate,
+        reverse=True,
+    )
+
+    top_10_movies = sorted_movies[:10]
+    return top_10_movies
+
+
 # Update Category
 @router.put(
     "/{category_id}",

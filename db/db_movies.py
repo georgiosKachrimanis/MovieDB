@@ -38,7 +38,7 @@ def create_movie(
         categories=categories,
         plot=request.plot,
         poster_url=request.poster_url,
-        imdb_rate=request.imdb_rate,
+        imdb_id=request.imdb_id,
         actors=db.query(DbActor).filter(DbActor.id.in_(request.actors)).all(),
         director_id=check_director(
             director_id=request.director_id,

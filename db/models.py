@@ -1,17 +1,9 @@
 from datetime import datetime
-from sqlalchemy import (
-    Column,
-    ForeignKey,
-    Integer,
-    Table,
-    Text,
-)
+
+from sqlalchemy import Column, ForeignKey, Integer, Table, Text
 from sqlalchemy.orm import relationship
-from sqlalchemy.sql.sqltypes import (
-    DateTime,
-    Float,
-    String,
-)
+from sqlalchemy.sql.sqltypes import DateTime, Float, String
+
 from db.database import Base
 
 
@@ -78,7 +70,7 @@ class DbMovie(Base):
         Float,
         default=0.0,
     )
-    imdb_rate = Column(Float)
+    imdb_id = Column(String)
 
 
 class DbActor(Base):
@@ -215,5 +207,5 @@ movie_categories = Table(
 #         Integer,
 #         ForeignKey("actors.id"),
 #     ),
-    
+
 # )

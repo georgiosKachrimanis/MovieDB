@@ -12,9 +12,12 @@ from schemas.users_reviews_schemas import (
     UserUpdate,
     UserTypeDisplay,
     UserTypeUpdate,
+    ReviewDisplayOne,
 )
+from db import models
 from sqlalchemy.orm import Session
 from db.database import get_db
+from db.db_reviews import get_all_reviews_by_user
 from db import db_users
 from auth import oauth2
 
@@ -155,3 +158,13 @@ def delete_user(
     if payload.get("user_type") == "admin" and user:
         db_users.delete_user(db=db, id=user_id)
         return {"message": f"User with id:{user_id}  was deleted successfully"}
+
+
+# TODO: FIX THIS METHOD
+@router.get(
+    "/{user_id}/reviews",
+    response_model=ReviewDisplayOne,
+)
+def get_all_user_reviews(user_id=int, db: Session = Depends(get_db)):
+
+    return get_all_reviews_by_user(db=db, user_id=user_id)

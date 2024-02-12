@@ -1,4 +1,5 @@
 from sqlalchemy.orm.session import Session
+from fastapi import HTTPException
 from db.models import DbReview
 from schemas.users_reviews_schemas import (
     CreateReview,
@@ -47,3 +48,12 @@ def delete_review(db: Session, review_id: int):
     db.delete(db_review)
     db.commit()
     return "Review deleted successfully"
+
+
+def get_all_reviews_by_user(db: Session, user_id: int, skip: int = 0):
+    user_reviews = db.query(DbReview).filter(DbReview.user_id == user_id).all()
+
+    if not user_reviews:
+        raise HTTPException(status_code=404, detail="No reviews found for this user")
+
+    return user_reviews

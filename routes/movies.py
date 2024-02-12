@@ -36,7 +36,6 @@ from schemas.mov_dir_actors_schemas import (
     Director,
     DirectorDisplay,
     DirectorUpdate,
-    DirectorPatchUpdate,
 )
 from schemas.users_reviews_schemas import (
     CreateReview,
@@ -91,6 +90,17 @@ def get_movies(db: Session = Depends(get_db)):
     return movies
 
 
+@router.get(
+    "/top10",
+    response_model=Optional[List[MovieDisplayAll]],
+)
+def get_top_ten_movies(movies=Depends(get_movies)):
+    sorted_movies = sorted(movies, key=lambda x: x.average_movie_rate, reverse=True)
+
+    top_10_movies = sorted_movies[:10]
+    return top_10_movies
+
+
 # Get Movie By Id
 @router.get(
     "/{movie_id}",
@@ -121,6 +131,10 @@ def post_review_for_movie(
     db: Session = Depends(get_db),
     token: str = Depends(oauth2.oauth2_schema),
 ):
+    oauth2.admin_authentication(
+        token=token,
+        exception_text=AUTHENTICATION_TEXT,
+    )
 
     new_review = CreateReview(
         review_content=review_request.review_content,
@@ -145,6 +159,10 @@ def update_review_for_movie(
     db: Session = Depends(get_db),
     token: str = Depends(oauth2.oauth2_schema),
 ):
+    oauth2.admin_authentication(
+        token=token,
+        exception_text=AUTHENTICATION_TEXT,
+    )
     checked_review = get_review_for_movie(movie=movie, review=review, db=db)
 
     if not checked_review:
@@ -384,6 +402,7 @@ def add_actor_in_movie(
 def get_movie_director(movie: MovieDisplayOne = Depends(get_movie_by_id)):
     return DirectorDisplay.model_validate(movie.director)
 
+
 # TODO: Need to fix the issues of out of bounds
 @router.put(
     "/{movie_id}/director/{director_id}",
@@ -425,4 +444,4 @@ def auto_add_movies(db: Session = Depends(get_db)):
         movies = json.load(file)
     for movie in movies:
         db_movies.create_movie(db=db, request=MovieBase(**movie))
-    return {"message": "Directors added successfully"}
+    return {"message": "Movies added successfully"}

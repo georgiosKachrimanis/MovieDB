@@ -14,7 +14,7 @@
     ],
     "plot": "A thrilling journey through the fabric of time.",
     "poster_url": "https://example.com/mystery_of_time_poster.jpg",
-    "imdb_rate": 7.8
+    "imdb_id": "tt0000001"
   },
   {
     "title": "In the Shadows",
@@ -31,7 +31,7 @@
     ],
     "plot": "A tale of secrets lurking in the darkness.",
     "poster_url": "https://example.com/in_the_shadows_poster.jpg",
-    "imdb_rate": 6.9
+    "imdb_id": "tt0000002"
   },
   {
     "title": "City of Dreams",
@@ -48,7 +48,7 @@
     ],
     "plot": "Exploring the ambitions and struggles in a bustling metropolis.",
     "poster_url": "https://example.com/city_of_dreams_poster.jpg",
-    "imdb_rate": 8.1
+    "imdb_id": "tt0000003"
   },
   {
     "title": "Echoes of Yesterday",
@@ -65,7 +65,7 @@
     ],
     "plot": "Confronting the echoes of the past to find redemption.",
     "poster_url": "https://example.com/echoes_of_yesterday_poster.jpg",
-    "imdb_rate": 7.5
+    "imdb_id": "tt0000004"
   },
   {
     "title": "Beyond the Stars",
@@ -82,7 +82,7 @@
     ],
     "plot": "A cosmic journey of discovery and adventure.",
     "poster_url": "https://example.com/beyond_the_stars_poster.jpg",
-    "imdb_rate": 8.3
+    "imdb_id": "tt0000005"
   },
   {
     "title": "Under the Surface",
@@ -99,7 +99,7 @@
     ],
     "plot": "Unveiling the hidden truths beneath the calm exterior.",
     "poster_url": "https://example.com/under_the_surface_poster.jpg",
-    "imdb_rate": 7.2
+    "imdb_id": "tt0000006"
   },
   {
     "title": "Lost in Translation",
@@ -116,7 +116,7 @@
     ],
     "plot": "Navigating the complexities of language and culture.",
     "poster_url": "https://example.com/lost_in_translation_poster.jpg",
-    "imdb_rate": 7.6
+    "imdb_id": "tt0000007"
   },
   {
     "title": "The Forgotten Kingdom",
@@ -133,7 +133,7 @@
     ],
     "plot": "Rediscovering a lost realm and its secrets.",
     "poster_url": "https://example.com/forgotten_kingdom_poster.jpg",
-    "imdb_rate": 8.0
+    "imdb_id": "tt0000008"
   },
   {
     "title": "Through the Looking Glass",
@@ -150,7 +150,7 @@
     ],
     "plot": "A surreal journey into the depths of imagination.",
     "poster_url": "https://example.com/through_the_looking_glass_poster.jpg",
-    "imdb_rate": 7.9
+    "imdb_id": "tt0000009"
   },
   {
     "title": "Rise of the Phoenix",
@@ -167,7 +167,7 @@
     ],
     "plot": "A story of redemption and rebirth.",
     "poster_url": "https://example.com/phoenix_rising_poster.jpg",
-    "imdb_rate": 8.4
+    "imdb_id": "tt0000010"
   },
   {
     "title": "The Haunting of Hill Manor",
@@ -184,7 +184,7 @@
     ],
     "plot": "An eerie tale of a haunted mansion.",
     "poster_url": "https://example.com/haunting_of_hill_manor_poster.jpg",
-    "imdb_rate": 7.7
+    "imdb_id": "tt0000011"
   },
   {
     "title": "Sunset Boulevard",
@@ -201,7 +201,7 @@
     ],
     "plot": "A glimpse into the dark side of Hollywood.",
     "poster_url": "https://example.com/sunset_boulevard_poster.jpg",
-    "imdb_rate": 8.6
+    "imdb_id": "tt0000012"
   },
   {
     "title": "The Edge of Madness",
@@ -218,7 +218,7 @@
     ],
     "plot": "Exploring the thin line between sanity and insanity.",
     "poster_url": "https://example.com/edge_of_madness_poster.jpg",
-    "imdb_rate": 7.3
+    "imdb_id": "tt0000013"
   },
   {
     "title": "Lost in the Echoes",
@@ -235,7 +235,7 @@
     ],
     "plot": "A journey to reclaim lost memories.",
     "poster_url": "https://example.com/lost_in_the_echoes_poster.jpg",
-    "imdb_rate": 8.2
+    "imdb_id": "tt0000014"
   },
   {
     "title": "Shadow of the Past",
@@ -252,7 +252,7 @@
     ],
     "plot": "Confronting the ghosts of one's history.",
     "poster_url": "https://example.com/shadow_of_the_past_poster.jpg",
-    "imdb_rate": 7.4
+    "imdb_id": "tt0000015"
   },
   {
     "title": "Whispers in the Dark",
@@ -269,7 +269,7 @@
     ],
     "plot": "Listening to the voices that haunt the night.",
     "poster_url": "https://example.com/whispers_in_the_dark_poster.jpg",
-    "imdb_rate": 8.5
+    "imdb_id": "tt0000016"
   },
   {
     "title": "Island of Dreams",
@@ -286,7 +286,7 @@
     ],
     "plot": "Discovering paradise comes at a cost.",
     "poster_url": "https://example.com/island_of_dreams_poster.jpg",
-    "imdb_rate": 7.1
+    "imdb_id": "tt0000017"
   },
   {
     "title": "Echoes of Destiny",
@@ -303,6 +303,326 @@
     ],
     "plot": "The echoes of the past shape the course of fate.",
     "poster_url": "https://example.com/echoes_of_destiny_poster.jpg",
-    "imdb_rate": 7.9
+    "imdb_id": "tt0000018"
+  },
+  {
+    "title": "The Last Whisper",
+    "released_date": "2024-02-09T13:05:23.240Z",
+    "categories": [
+      1,
+      7
+    ],
+    "director_id": 4,
+    "actors": [
+      1,
+      23
+    ],
+    "plot": "A final message changes the course of an investigation.",
+    "poster_url": "https://example.com/last_whisper_poster.jpg",
+    "imdb_id": "tt5394151"
+  },
+  {
+    "title": "Ghosts of the Sea",
+    "released_date": "2024-02-09T13:05:23.240Z",
+    "categories": [
+      3,
+      14
+    ],
+    "director_id": 2,
+    "actors": [
+      5,
+      20
+    ],
+    "plot": "Mariners encounter mysteries in the heart of the ocean.",
+    "poster_url": "https://example.com/ghosts_sea_poster.jpg",
+    "imdb_id": "tt2440466"
+  },
+  {
+    "title": "Dawn of the Eclipse",
+    "released_date": "2024-02-09T13:05:23.240Z",
+    "categories": [
+      5,
+      19
+    ],
+    "director_id": 7,
+    "actors": [
+      7,
+      28
+    ],
+    "plot": "A cosmic event foretells a shift in the world's fate.",
+    "poster_url": "https://example.com/dawn_eclipse_poster.jpg",
+    "imdb_id": "tt9322711"
+  },
+  {
+    "title": "The Silent Forest",
+    "released_date": "2024-02-09T13:05:23.240Z",
+    "categories": [
+      2,
+      13
+    ],
+    "director_id": 5,
+    "actors": [
+      2,
+      15
+    ],
+    "plot": "An ancient secret lies hidden within a timeless woodland.",
+    "poster_url": "https://example.com/silent_forest_poster.jpg",
+    "imdb_id": "tt8218529"
+  },
+  {
+    "title": "Desert Shadows",
+    "released_date": "2024-02-09T13:05:23.240Z",
+    "categories": [
+      11,
+      22
+    ],
+    "director_id": 3,
+    "actors": [
+      12,
+      29
+    ],
+    "plot": "Survivors in a post-apocalyptic wasteland face their past.",
+    "poster_url": "https://example.com/desert_shadows_poster.jpg",
+    "imdb_id": "tt4300637"
+  },
+  {
+    "title": "Frozen Memories",
+    "released_date": "2024-02-09T13:05:23.240Z",
+    "categories": [
+      8,
+      21
+    ],
+    "director_id": 8,
+    "actors": [
+      3,
+      18
+    ],
+    "plot": "A journey to uncover the truth behind a frozen wasteland.",
+    "poster_url": "https://example.com/frozen_memories_poster.jpg",
+    "imdb_id": "tt1598116"
+  },
+  {
+    "title": "Echoes of the Storm",
+    "released_date": "2024-02-09T13:05:23.240Z",
+    "categories": [
+      6,
+      17
+    ],
+    "director_id": 1,
+    "actors": [
+      4,
+      22
+    ],
+    "plot": "A town rebuilds after a devastating hurricane reveals secrets.",
+    "poster_url": "https://example.com/echoes_storm_poster.jpg",
+    "imdb_id": "tt6564445"
+  },
+  {
+    "title": "Guardians of the Light",
+    "released_date": "2024-02-09T13:05:23.240Z",
+    "categories": [
+      9,
+      16
+    ],
+    "director_id": 9,
+    "actors": [
+      6,
+      24
+    ],
+    "plot": "A group of heroes protects the last source of magic.",
+    "poster_url": "https://example.com/guardians_light_poster.jpg",
+    "imdb_id": "tt9009863"
+  },
+  {
+    "title": "The Forgotten Path",
+    "released_date": "2024-02-09T13:05:23.240Z",
+    "categories": [
+      4,
+      12
+    ],
+    "director_id": 6,
+    "actors": [
+      8,
+      27
+    ],
+    "plot": "Adventurers discover a trail leading to a lost civilization.",
+    "poster_url": "https://example.com/forgotten_path_poster.jpg",
+    "imdb_id": "tt6469414"
+  },
+  {
+    "title": "Shadows in the Mist",
+    "released_date": "2024-02-09T13:05:23.240Z",
+    "categories": [
+      10,
+      20
+    ],
+    "director_id": 10,
+    "actors": [
+      9,
+      30
+    ],
+    "plot": "A mysterious fog brings unspoken fear to a small village.",
+    "poster_url": "https://example.com/shadows_mist_poster.jpg",
+    "imdb_id": "tt1525993"
+  },
+  {
+    "title": "Whispers of the Past",
+    "released_date": "2024-02-09T13:05:23.240Z",
+    "categories": [
+      7,
+      18
+    ],
+    "director_id": 4,
+    "actors": [
+      10,
+      26
+    ],
+    "plot": "An ancient artifact unveils the history of a forgotten era.",
+    "poster_url": "https://example.com/whispers_past_poster.jpg",
+    "imdb_id": "tt9144247"
+  },
+  {
+    "title": "Crimson Tide",
+    "released_date": "2024-02-09T13:05:23.240Z",
+    "categories": [
+      3,
+      15
+    ],
+    "director_id": 2,
+    "actors": [
+      11,
+      25
+    ],
+    "plot": "Pirates vie for a treasure that could change the world.",
+    "poster_url": "https://example.com/crimson_tide_poster.jpg",
+    "imdb_id": "tt1598117"
+  },
+  {
+    "title": "Beyond the Horizon",
+    "released_date": "2024-02-09T13:05:23.240Z",
+    "categories": [
+      5,
+      14
+    ],
+    "director_id": 7,
+    "actors": [
+      13,
+      28
+    ],
+    "plot": "Explorers seek a land beyond the edges of the known world.",
+    "poster_url": "https://example.com/beyond_horizon_poster.jpg",
+    "imdb_id": "tt2440467"
+  },
+  {
+    "title": "Nightfall",
+    "released_date": "2024-02-09T13:05:23.240Z",
+    "categories": [
+      1,
+      11
+    ],
+    "director_id": 3,
+    "actors": [
+      14,
+      21
+    ],
+    "plot": "With darkness comes terror that preys on a sleepy town.",
+    "poster_url": "https://example.com/nightfall_poster.jpg",
+    "imdb_id": "tt9322712"
+  },
+  {
+    "title": "Aurora's Veil",
+    "released_date": "2024-02-09T13:05:23.240Z",
+    "categories": [
+      2,
+      19
+    ],
+    "director_id": 5,
+    "actors": [
+      15,
+      23
+    ],
+    "plot": "A cosmic phenomenon unveils the universe's mysteries.",
+    "poster_url": "https://example.com/auroras_veil_poster.jpg",
+    "imdb_id": "tt8218530"
+  },
+  {
+    "title": "The Rift",
+    "released_date": "2024-02-09T13:05:23.240Z",
+    "categories": [
+      8,
+      22
+    ],
+    "director_id": 8,
+    "actors": [
+      16,
+      29
+    ],
+    "plot": "A tear in reality leads to an alternate universe clash.",
+    "poster_url": "https://example.com/the_rift_poster.jpg",
+    "imdb_id": "tt4300638"
+  },
+  {
+    "title": "Silent Echo",
+    "released_date": "2024-02-09T13:05:23.240Z",
+    "categories": [
+      17,
+      21
+    ],
+    "director_id": 1,
+    "actors": [
+      17,
+      19
+    ],
+    "plot": "A soundless cry for help brings a detective to a mystery.",
+    "poster_url": "https://example.com/silent_echo_poster.jpg",
+    "imdb_id": "tt1598118"
+  },
+  {
+    "title": "Veil of Shadows",
+    "released_date": "2024-02-09T13:05:23.240Z",
+    "categories": [
+      6,
+      16
+    ],
+    "director_id": 9,
+    "actors": [
+      18,
+      20
+    ],
+    "plot": "A group uncovers hidden truths in a shadowy world.",
+    "poster_url": "https://example.com/veil_shadows_poster.jpg",
+    "imdb_id": "tt6564446"
+  },
+  {
+    "title": "Labyrinth of Solitude",
+    "released_date": "2024-02-09T13:05:23.240Z",
+    "categories": [
+      9,
+      13
+    ],
+    "director_id": 6,
+    "actors": [
+      22,
+      24
+    ],
+    "plot": "A man's search for solitude leads him to life's truths.",
+    "poster_url": "https://example.com/labyrinth_solitude_poster.jpg",
+    "imdb_id": "tt9009864"
+  },
+  {
+    "title": "The Last of Us",
+    "released_date": "2024-02-09T13:05:23.240Z",
+    "categories": [
+      4,
+      10
+    ],
+    "director_id": 10,
+    "actors": [
+      25,
+      27
+    ],
+    "plot": "Survivors of a pandemic find hope in a desolate world.",
+    "poster_url": "https://example.com/last_of_us_poster.jpg",
+    "imdb_id": "tt6469415"
   }
 ]
