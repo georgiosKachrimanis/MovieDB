@@ -13,11 +13,13 @@ from schemas.users_reviews_schemas import (
     UserTypeDisplay,
     UserTypeUpdate,
     ReviewDisplayOne,
+    MovieReviewModel,
+    UserReviewModel,
 )
 from db import models
 from sqlalchemy.orm import Session
 from db.database import get_db
-from db.db_reviews import get_all_reviews_by_user
+from routes.reviews import get_all_reviews
 from db import db_users
 from auth import oauth2
 
@@ -160,11 +162,16 @@ def delete_user(
         return {"message": f"User with id:{user_id}  was deleted successfully"}
 
 
-# TODO: FIX THIS METHOD
-@router.get(
-    "/{user_id}/reviews",
-    response_model=ReviewDisplayOne,
-)
+
+@router.get("/{user_id}/reviews")
 def get_all_user_reviews(user_id=int, db: Session = Depends(get_db)):
 
-    return get_all_reviews_by_user(db=db, user_id=user_id)
+    db_reviews = get_all_reviews(db=db)
+    user_reviews = []
+    for review in db_reviews:
+        print(f"review_user_id:{review.user_id} and user_id {user_id}")
+        if review.user_id == int(user_id):
+            print("HI")
+            user_reviews.append(review)
+
+    return user_reviews
