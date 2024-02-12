@@ -63,15 +63,13 @@ def get_all_movies(db: Session, skip: int = 0, limit: int = 100):
 
 
 # Get Movie By Id
-def get_movie(db: Session, movie_id: int, user_id):
+def get_movie(db: Session, movie_id: int):
     movie = db.query(Movie).filter(Movie.id == movie_id).first()
     movie.average_movie_rate = (
         db.query(func.avg(Review.movie_rate))
         .filter(Review.movie_id == movie.id)
         .scalar()
     )
-    patch_movie(db, movie, movies_schemas.MoviePatchUpdate(number_of_request=movie.number_of_request + 1))
-    create_request_log(db , movie_id, user_id)
     return movie
 
 
@@ -161,7 +159,6 @@ def get_movie_extra(db: Session, movie_id):
         imdb_id = movie.imdb_id
         result = get_movie_extra_data(imdb_id)
         return result
-
 
 # Movie request loggers
 def create_request_log(

@@ -6,7 +6,7 @@ from schemas import movies_schemas,reviews_schemas
 from db import db_movies, db_reviews
 from auth import oauth2
 import os
-from db.db_movies import update_movie_poster_url
+from db.db_movies import update_movie_poster_url,create_request_log
 from routes import reviews
 from services.movie_service import get_movie_extra_data
 
@@ -52,7 +52,9 @@ def read_movie_by_id(
     payload = oauth2.decode_access_token(token=token)
     user_id = payload.get("user_id")
     try:
-        movie = db_movies.get_movie(db, movie_id, user_id)
+        movie = db_movies.get_movie(db, movie_id)
+        db_movies.patch_movie(db, movie, movies_schemas.MoviePatchUpdate(number_of_request=movie.number_of_request + 1))
+        create_request_log(db , movie_id, user_id)
         if movie is None:
             raise HTTPException(
                 status_code=404, detail="Movie with Id :{movie_id} not found"

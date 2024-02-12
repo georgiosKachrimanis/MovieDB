@@ -32,7 +32,6 @@ def create_review(
     db: Session = Depends(get_db),
     token: str = Depends(oauth2.oauth2_schema),
 ):
-    user_id = oauth2.decode_access_token(token=token).get("user_id")
     movie = db.query(Movie).filter(Movie.id == request.movie_id).first()
     if movie is not None:
         new_review = db_reviews.create_review(db=db, request=request)
