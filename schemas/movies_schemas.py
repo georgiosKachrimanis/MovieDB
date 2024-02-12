@@ -37,13 +37,14 @@ class MovieBase(BaseModel):
 
 class MovieDisplayOne(BaseModel):
     id: int
-    title: str
-    released_date: datetime
+    title: Optional[str]
+    released_date: Optional[datetime]
     categories: List[CategoryBase]
-    plot: str
-    poster_url: str
+    plot: Optional[str]
+    poster_url: Optional[str]
     average_movie_rate: Optional[float] = None
     imdb_id: Optional[str] = None
+    number_of_request: Optional[int] = None  
     reviews: List[Review] = []
     director: Optional[Director]
     actors: Optional[List[Actor]]
@@ -53,14 +54,15 @@ class MovieDisplayOne(BaseModel):
 
 class MovieDisplayAll(BaseModel):
     id: int
-    title: str
+    title: Optional[str]
     released_date: datetime
-    plot: str
-    poster_url: str
+    plot: Optional[str]
+    poster_url: Optional[str]
     average_movie_rate: Optional[float] = None
+    number_of_request: Optional[int] = None  
     imdb_id: Optional[str] = None
-    review_count: int
-    director_name: str
+    review_count: Optional[int]
+    director_name: Optional[str]
     class Config:
         from_attributes = True
 
@@ -80,3 +82,18 @@ class MovieExtraData(BaseModel):
     imdbVotes: int
     Language: str
     Country: str
+
+class MoviePatchUpdate(BaseModel):
+    title: Optional[str] = None
+    released_date: Optional[datetime] = None
+    categories: Optional[List[int]] = None
+    plot: Optional[str] = None
+    imdb_id: Optional[str] = None
+    director_id: Optional[int] = None
+    actors: Optional[List[int]] = None 
+    number_of_request: Optional[int] = None   
+
+class RequestBase():
+    movie_id : int
+    user_id :int
+    request_time : datetime

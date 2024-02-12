@@ -10,9 +10,10 @@ from db.db_movies import update_movie_poster_url
 from routes import reviews
 from services.movie_service import get_movie_extra_data
 
+
 router = APIRouter(prefix="/movie", tags=["Movie Endpoints"])
 
-
+AUTHENTICATION_TEXT = "You are not authorized to add, edit or delete a movie!"
 # CRUD Operations for Movie
 # Create Movie
 @router.post("/", response_model=movies_schemas.MovieDisplayOne)
@@ -43,9 +44,15 @@ def read_all_movies(db: Session = Depends(get_db)):
 
 # Get Movie By Id
 @router.get("/{movie_id}", response_model=movies_schemas.MovieDisplayOne)
-def read_movie_by_id(movie_id: int, db: Session = Depends(get_db)):
+def read_movie_by_id(
+    movie_id: int, 
+    db: Session = Depends(get_db),
+    token: str = Depends(oauth2.oauth2_schema),
+    ):
+    payload = oauth2.decode_access_token(token=token)
+    user_id = payload.get("user_id")
     try:
-        movie = db_movies.get_movie(db, movie_id)
+        movie = db_movies.get_movie(db, movie_id, user_id)
         if movie is None:
             raise HTTPException(
                 status_code=404, detail="Movie with Id :{movie_id} not found"
@@ -76,6 +83,36 @@ def update_movie(
             detail="You are not authorized to create a movie",
         )
 
+@router.patch(
+    "/{movie_id}",
+    response_model=Optional[movies_schemas.MovieDisplayOne],
+)
+def patch_movie(
+    movie_id: int,
+    movie_updates: Optional[movies_schemas.MoviePatchUpdate],
+    db: Session = Depends(get_db),
+    token: str = Depends(oauth2.oauth2_schema),
+):
+
+    oauth2.admin_authentication(
+        token=token,
+        exception_text=AUTHENTICATION_TEXT,
+    )
+
+    movie = db_movies.get_movie(db, movie_id)
+
+    if movie is None:
+        raise HTTPException(
+            status_code=404, detail="Movie with Id :{movie_id} not found"
+        )
+    else:
+        updated_movie = db_movies.patch_movie(
+            db=db,
+            movie=movie,
+            request=movie_updates,
+        )
+
+    return updated_movie
 
 @router.delete("/{movie_id}")
 def delete_movie(
