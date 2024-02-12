@@ -1,3 +1,4 @@
+import os
 from typing import (
     List,
     Optional,
@@ -7,6 +8,8 @@ from fastapi import (
     Depends,
     HTTPException,
     status,
+    UploadFile,
+    File,
 )
 from sqlalchemy.orm import Session
 from auth import oauth2
@@ -29,6 +32,7 @@ from schemas.mov_dir_actors_schemas import (
     MovieDisplayAll,
     MoviePatchUpdate,
     MovieUpdate,
+    MovieExtraData,
     Category,
     Actor,
     ActorDisplay,
@@ -95,7 +99,11 @@ def get_movies(db: Session = Depends(get_db)):
     response_model=Optional[List[MovieDisplayAll]],
 )
 def get_top_ten_movies(movies=Depends(get_movies)):
-    sorted_movies = sorted(movies, key=lambda x: x.average_movie_rate, reverse=True)
+    sorted_movies = sorted(
+        movies,
+        key=lambda x: x.average_movie_rate,
+        reverse=True,
+    )
 
     top_10_movies = sorted_movies[:10]
     return top_10_movies
@@ -118,6 +126,53 @@ def get_movie_by_id(
         )
 
     return movie
+
+
+# Upload Movie Poster Image
+@router.post("/upload_poster/{movie_id}")
+async def upload_file(
+    movie_id: int,
+    upload_file: UploadFile = File(...),
+    db: Session = Depends(get_db),
+    token: str = Depends(oauth2.oauth2_schema),
+):
+    file_extension = os.path.splitext(upload_file.filename)[-1]
+    if file_extension not in [".jpg", ".png"]:
+        return "Invalid file type. Please upload a jpg or png file."
+
+    movie = db_movies.get_movie(db, movie_id)
+    title = movie.title.replace(" ", "_")
+    new_filename = f"{movie_id}_{title}{file_extension}"
+
+    contents = await upload_file.read()
+
+    # Check if the directory exists and if not, create it
+    directory = "assets/posters"
+    if not os.path.exists(directory):
+        os.makedirs(directory)
+
+    with open(f"{directory}/{new_filename}", "wb") as f:
+        f.write(contents)
+
+    file_path = os.path.abspath(f"{directory}/{new_filename}")
+
+    result = update_movie_poster_url(db, movie, file_path)
+    if result is True:
+        return f"File uploaded successfully. The file path is: {file_path} "
+    else:
+        return "File uploaded successfully. But the file path could not be updated in the database."
+
+
+# Get Extra Data for a Movie by IMDB Id
+@router.get(
+    "/{movie_id}/extra_data",
+    response_model=MovieExtraData,
+)
+async def get_movie_extra(
+    movie_id: int,
+    db: Session = Depends(get_db),
+):
+    return await db_movies.get_movie_extra(db=db, movie_id=movie_id)
 
 
 @router.post(

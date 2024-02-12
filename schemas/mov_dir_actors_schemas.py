@@ -173,3 +173,10 @@ class MovieUpdate(BaseModel):
     imdb_id: str
     director_id: Optional[int]
     actors: Optional[List[int]]
+
+
+class MovieExtraData(BaseModel):
+    imdbRating: float
+    imdbVotes: int
+    Language: str
+    Country: str

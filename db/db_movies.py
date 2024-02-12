@@ -6,6 +6,7 @@ from sqlalchemy.orm import (
 from sqlalchemy.sql.functions import coalesce
 from db.models import DbCategory, DbDirector, DbMovie, DbReview, DbActor
 from routes.directors import get_director_by_id
+from services.movie_service import get_movie_extra_data
 from schemas.mov_dir_actors_schemas import (
     MovieBase,
     MoviePatchUpdate,
@@ -105,18 +106,23 @@ def patch_movie(
     movie: MovieBase,
     request: MoviePatchUpdate,
 ):
-    if getattr(request, 'title', None) is not None:
+    if getattr(request, "title", None) is not None:
         movie.title = request.title
-    if getattr(request, 'plot', None) is not None:
+    if getattr(request, "plot", None) is not None:
         movie.plot = request.plot
-    if getattr(request, 'poster_url', None) is not None:
+    if getattr(request, "poster_url", None) is not None:
         movie.poster_url = request.poster_url
-    if getattr(request, 'categories', None) is not None:
-        categories = db.query(DbCategory).filter(DbCategory.id.in_(request.categories)).all()
+    if getattr(request, "categories", None) is not None:
+        categories = (
+            db.query(DbCategory).filter(DbCategory.id.in_(request.categories)).all()
+        )
         movie.categories = categories
-    if getattr(request, 'director_id', None) is not None:
-        movie.director_id = check_director(director_id=request.director_id, db=db,)
-    if getattr(request, 'actors', None) is not None:
+    if getattr(request, "director_id", None) is not None:
+        movie.director_id = check_director(
+            director_id=request.director_id,
+            db=db,
+        )
+    if getattr(request, "actors", None) is not None:
         actors = db.query(DbActor).filter(DbActor.id.in_(request.actors)).all()
         movie.actors = actors
     db.commit()
@@ -133,7 +139,9 @@ def update_movie(
     check_director(request.director_id, db=db)
 
     if "categories" in request.__dict__:
-        categories = db.query(DbCategory).filter(DbCategory.id.in_(request.categories)).all()
+        categories = (
+            db.query(DbCategory).filter(DbCategory.id.in_(request.categories)).all()
+        )
         movie.categories = categories
     if "actors" in request.__dict__:
         actors = db.query(DbActor).filter(DbActor.id.in_(request.actors)).all()
@@ -191,3 +199,14 @@ def calculate_average(
         .scalar()
     )
     return average_rate
+
+
+def get_movie_extra(
+    db: Session,
+    movie_id: int,
+):
+    movie = get_movie(db, movie_id)
+    if movie.imdb_id is None:
+        return "No imdb_id stored in the DB for this movie."
+    else:
+        return get_movie_extra_data(movie.imdb_id)
