@@ -6,40 +6,44 @@ from typing import (
 from fastapi import (
     APIRouter,
     Depends,
-    HTTPException,
-    status,
-    UploadFile,
     File,
+    HTTPException,
+    UploadFile,
+    status,
 )
 from sqlalchemy.orm import Session
 from auth import oauth2
 from db import db_movies
 from db.database import get_db
+from routes.actors import (
+    get_actor_by_id,
+    patch_actor,
+)
+from routes.categories import get_categories
 from routes.reviews import (
-    create_review,
     all_reviews_for_movie,
+    create_review,
+    delete_review,
     get_review,
     update_review,
-    delete_review,
 )
-from routes.categories import (
-    get_categories,
-)
-from routes.actors import get_actor_by_id, patch_actor
 from schemas.mov_dir_actors_schemas import (
-    MovieBase,
-    MovieDisplayOne,
-    MovieDisplayAll,
-    MoviePatchUpdate,
-    MovieUpdate,
-    MovieExtraData,
-    Category,
     Actor,
     ActorDisplay,
     ActorPatch,
+    Category,
     Director,
     DirectorDisplay,
     DirectorUpdate,
+    MovieBase,
+    MovieDisplayAll,
+    MovieDisplayOne,
+    MovieExtraData,
+    MoviePatchUpdate,
+    MovieStats,
+    MovieSingleRequest,
+    MovieTotalRequests,
+    MovieUpdate,
 )
 from schemas.users_reviews_schemas import (
     CreateReview,
@@ -117,8 +121,24 @@ def get_top_ten_movies(movies=Depends(get_movies)):
 def get_movie_by_id(
     movie_id: int,
     db: Session = Depends(get_db),
+    token: Optional[str] = Depends(oauth2.oauth2_schema),
 ):
-    movie = db_movies.get_movie(db, movie_id)
+
+    if token:
+        payload = oauth2.decode_access_token(token=token)
+        user_id = int(payload.get("user_id"))
+        movie = db_movies.get_movie(
+            db=db,
+            movie_id=movie_id,
+            user_id=user_id,
+        )
+    else:
+        movie = db_movies.get_movie(
+            db=db,
+            movie_id=movie_id,
+            user_id=0,
+        )
+
     if movie is None:
         raise HTTPException(
             status_code=404,
@@ -324,10 +344,10 @@ def delete_movie(
     if reviews:
         raise HTTPException(
             status_code=409,
-            detail=f"Cannot delete movie with Id: {movie_id}, it has review/s",
+            detail=f"Cannot delete movie with ID: {movie_id}, it has review/s",
         )
 
-    if not db_movies.delete_movie(db, movie_id):
+    if not db_movies.delete_movie(db=db, movie_id=movie_id):
         raise HTTPException(
             status_code=404, detail=f"Movie with Id :{movie_id} not found"
         )
@@ -444,20 +464,6 @@ def update_movie_director(
     )
 
 
-@router.post("/auto_add_movies")
-def auto_add_movies(db: Session = Depends(get_db)):
-    """
-    THIS IS ONLY TO BE USED FOR TESTING PURPOSES
-    """
-    import json
-
-    with open("example_files/example_movies.json", "r") as file:
-        movies = json.load(file)
-    for movie in movies:
-        db_movies.create_movie(db=db, request=MovieBase(**movie))
-    return {"message": "Movies added successfully"}
-
-
 # ==================== Movies - Posters and Extra =============================
 
 
@@ -505,3 +511,31 @@ async def get_movie_extra(
     movie: MovieBase = Depends(get_movie_by_id),
 ):
     return await db_movies.get_movie_extra(movie=movie)
+
+
+@router.get("/{movie_id}/statistics", response_model=MovieStats)
+def get_total_movie_requests(
+    movie: MovieDisplayOne = Depends(get_movie_by_id),
+    db: Session = Depends(get_db),
+    token: str = Depends(oauth2.oauth2_schema),
+):
+    oauth2.admin_authentication(
+        token=token,
+        exception_text=AUTHENTICATION_TEXT,
+    )
+
+    return movie
+
+
+@router.post("/auto_add_movies")
+def auto_add_movies(db: Session = Depends(get_db)):
+    """
+    THIS IS ONLY TO BE USED FOR TESTING PURPOSES
+    """
+    import json
+
+    with open("example_files/example_movies.json", "r") as file:
+        movies = json.load(file)
+    for movie in movies:
+        db_movies.create_movie(db=db, request=MovieBase(**movie))
+    return {"message": "Movies added successfully"}

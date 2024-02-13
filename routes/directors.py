@@ -1,12 +1,19 @@
 from typing import List
-
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import (
+    APIRouter,
+    Depends,
+    HTTPException,
+    status,
+)
 from sqlalchemy.orm import Session
-
 from auth import oauth2
 from db import db_directors
 from db.database import get_db
-from schemas.mov_dir_actors_schemas import Director, DirectorDisplay, DirectorUpdate
+from schemas.mov_dir_actors_schemas import (
+    Director,
+    DirectorDisplay,
+    DirectorUpdate,
+)
 
 router = APIRouter(
     prefix="/directors",

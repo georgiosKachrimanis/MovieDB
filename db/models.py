@@ -1,9 +1,17 @@
 from datetime import datetime
-
-from sqlalchemy import Column, ForeignKey, Integer, Table, Text
+from sqlalchemy import (
+    Column,
+    ForeignKey,
+    Integer,
+    Table,
+    Text,
+)
 from sqlalchemy.orm import relationship
-from sqlalchemy.sql.sqltypes import DateTime, Float, String
-
+from sqlalchemy.sql.sqltypes import (
+    DateTime,
+    Float,
+    String,
+)
 from db.database import Base
 
 
@@ -29,6 +37,10 @@ class DbUser(Base):
     # One <--> Many relationship
     reviews = relationship(
         "DbReview",
+        back_populates="user",
+    )
+    requests = relationship(
+        "DbMovieRequest",
         back_populates="user",
     )
 
@@ -71,6 +83,14 @@ class DbMovie(Base):
         default=0.0,
     )
     imdb_id = Column(String)
+    requests_count = Column(
+        Integer,
+        default=0,
+    )
+    requests = relationship(
+        "DbMovieRequest",
+        back_populates="movies",
+    )  # One-to-many relationship
 
 
 class DbActor(Base):
@@ -177,6 +197,32 @@ class DbCategory(Base):
     )  # Many-to-many relationship
 
 
+class DbMovieRequest(Base):
+    __tablename__ = "requests"
+    id = Column(
+        Integer,
+        primary_key=True,
+        index=True,
+    )
+    movie_id = Column(
+        Integer,
+        ForeignKey("movies.id"),
+    )
+    request_time = Column(DateTime)
+    movies = relationship(
+        "DbMovie",
+        back_populates="requests",
+    )
+    user_id = Column(
+        Integer,
+        ForeignKey("users.id"),
+    )
+    user = relationship(
+        "DbUser",
+        back_populates="requests",
+    )
+
+
 """Special many <--> many relations tables"""
 movie_categories = Table(
     "movie_categories",
@@ -192,20 +238,3 @@ movie_categories = Table(
         ForeignKey("categories.id"),
     ),
 )
-
-
-# movie_actors = Table(
-#     "movie_actors",
-#     Base.metadata,
-#     Column(
-#         "movie_id",
-#         Integer,
-#         ForeignKey("movies.id"),
-#     ),
-#     Column(
-#         "actor_id",
-#         Integer,
-#         ForeignKey("actors.id"),
-#     ),
-
-# )

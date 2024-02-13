@@ -171,3 +171,24 @@ class MovieExtraData(BaseModel):
     imdbVotes: int
     Language: str
     Country: str
+
+
+class MovieStats(BaseModel):
+    id: int
+    title: str
+    requests_count: Optional[int]
+
+    class Config:
+        from_attributes = True
+
+
+class MovieSingleRequest(BaseModel):
+    movie_id: int
+    user_id: int
+    request_time: datetime
+
+
+class MovieTotalRequests(BaseModel):
+    movie_id: int
+    total_requests: Optional[int] = None
+    last_request: Optional[datetime] = None
