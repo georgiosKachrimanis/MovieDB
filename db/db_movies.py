@@ -1,7 +1,7 @@
 from typing import List
 from sqlalchemy.orm import Session
 from db.models import Movie, Review, Category, Actor, Director
-from sqlalchemy import func
+from sqlalchemy import func,and_
 from schemas import movies_schemas
 from services.movie_service import get_movie_extra_data
 from db.db_directors import get_director
@@ -19,7 +19,11 @@ def check_director(
         db=db,
     ).id
 
-
+def check_movie(db,movie_id: int,) -> bool:
+    movie = db.query(Movie).filter(Movie.id == movie_id).first()
+    if movie:
+        return True
+    return False
 
 # Create Movie
 def create_movie(db: Session, movie: movies_schemas.MovieBase):
@@ -164,14 +168,32 @@ def get_movie_extra(db: Session, movie_id):
 def create_request_log(
         db: Session, 
         movie_id: int,
-        user_id
         ):
     request = MovieRequest(
         movie_id=movie_id,
-        user_id = int(user_id),
         request_time=datetime.now(),
     )
     db.add(request)
     db.commit()
     db.refresh(request)
     return request
+
+# Get Movie Request Count
+def get_movie_request_count(db: Session, start_date: datetime = None, end_date: datetime = None):
+    all_movies = db.query(Movie).all()
+    movie_request_count = []
+    for movie in all_movies:
+        query = db.query(MovieRequest).filter(MovieRequest.movie_id == movie.id)
+        if start_date:
+            query = query.filter(MovieRequest.request_time >= start_date)
+        if end_date:
+            query = query.filter(MovieRequest.request_time <= end_date)
+        request_count = query.count()
+        movie_request_count.append(
+            {
+                "movie_id": movie.id,
+                "movie_title": movie.title,
+                "request_count": request_count,
+            }
+        )
+    return movie_request_count

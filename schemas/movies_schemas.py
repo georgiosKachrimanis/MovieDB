@@ -95,5 +95,11 @@ class MoviePatchUpdate(BaseModel):
 
 class RequestBase():
     movie_id : int
-    user_id :int
     request_time : datetime
+
+class MovieRequestCount(BaseModel):
+    movie_id: int
+    movie_title: str
+    request_count: int
+    class Config:
+        from_attributes = True    
