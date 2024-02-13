@@ -95,6 +95,11 @@ def get_movie(
         )
 
     if movie:
+        movie.reviews_count = (
+            db.query(func.count(DbReview.id))
+            .filter(DbReview.movie_id == movie.id)
+            .scalar()
+        )
         movie.average_movie_rate = calculate_average(db=db, movie=movie)
 
     return movie
@@ -122,6 +127,8 @@ def patch_movie(
             director_id=request.director_id,
             db=db,
         )
+    if getattr(request, "imdb_id", None) is not None:
+        movie.imdb_id = request.imdb_id
     if getattr(request, "actors", None) is not None:
         actors = db.query(DbActor).filter(DbActor.id.in_(request.actors)).all()
         movie.actors = actors
@@ -201,11 +208,18 @@ def calculate_average(
     return average_rate
 
 
+def update_movie_poster_url(db: Session, movie: DbMovie, file_path: str):
+    if movie:
+        movie.poster_url = file_path
+        db.commit()
+        db.refresh(movie)
+        return movie
+
+
 def get_movie_extra(
-    db: Session,
-    movie_id: int,
+    movie: DbMovie,
 ):
-    movie = get_movie(db, movie_id)
+    print(movie.title)
     if movie.imdb_id is None:
         return "No imdb_id stored in the DB for this movie."
     else:

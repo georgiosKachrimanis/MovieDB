@@ -121,31 +121,22 @@ class MovieBase(BaseModel):
 class MovieDisplayAll(BaseModel):
     id: int
     title: str
-    released_date: datetime
-    categories: List[Category]
-    plot: str
-    poster_url: Optional[str] = None
-    average_movie_rate: Optional[float] = None
-    imdb_id: Optional[str]
-    reviews_count: Optional[int] = None
     director: Optional[Director]
+    actors: Optional[List[Actor]]
+    plot: str
+    released_date: datetime
+    imdb_id: Optional[str]
+    categories: List[Category]
+    poster_url: Optional[str] = None
+    reviews_count: Optional[int] = None
+    average_movie_rate: Optional[float] = None
 
     class Config:
         from_attributes = True
 
 
-class MovieDisplayOne(BaseModel):
-    id: int
-    title: str
-    released_date: datetime
-    categories: List[Category]
-    plot: str
-    poster_url: Optional[str] = None
-    average_movie_rate: Optional[float] = None
-    imdb_id: Optional[str]
+class MovieDisplayOne(MovieDisplayAll):
     reviews: List[Review] = []
-    actors: Optional[List[Actor]]
-    director: Optional[DirectorDisplay]
 
     class Config:
         from_attributes = True

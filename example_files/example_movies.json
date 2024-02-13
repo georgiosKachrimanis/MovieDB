@@ -624,5 +624,336 @@
     "plot": "Survivors of a pandemic find hope in a desolate world.",
     "poster_url": "https://example.com/last_of_us_poster.jpg",
     "imdb_id": "tt6469415"
+  },
+  {
+    "title": "Stars Beyond Reach",
+    "released_date": "2024-02-12T12:48:33.767638",
+    "categories": [
+      6,
+      16
+    ],
+    "director_id": 9,
+    "actors": [
+      8,
+      13
+    ],
+    "plot": "A confrontation with the echoes of history and their impact on the present.",
+    "poster_url": "https://example.com/poster_tt5394151.jpg",
+    "imdb_id": "tt5394151"
+  },
+  {
+    "title": "Eclipse of Destiny",
+    "released_date": "2024-02-12T12:48:33.767690",
+    "categories": [
+      9,
+      17
+    ],
+    "director_id": 7,
+    "actors": [
+      8,
+      11,
+      29
+    ],
+    "plot": "A journey to uncover ancient secrets buried beneath the sands of time.",
+    "poster_url": "https://example.com/poster_tt2440466.jpg",
+    "imdb_id": "tt2440466"
+  },
+  {
+    "title": "Echoes of the Void",
+    "released_date": "2024-02-12T12:48:33.767717",
+    "categories": [
+      1,
+      13
+    ],
+    "director_id": 3,
+    "actors": [
+      11,
+      28,
+      29
+    ],
+    "plot": "A tale of survival and discovery in the heart of a mysterious desert.",
+    "poster_url": "https://example.com/poster_tt9322711.jpg",
+    "imdb_id": "tt9322711"
+  },
+  {
+    "title": "Mysteries of the Unknown",
+    "released_date": "2024-02-12T12:48:33.767742",
+    "categories": [
+      10,
+      12
+    ],
+    "director_id": 4,
+    "actors": [
+      7,
+      16
+    ],
+    "plot": "A battle between ancient deities for the fate of the world.",
+    "poster_url": "https://example.com/poster_tt8218529.jpg",
+    "imdb_id": "tt8218529"
+  },
+  {
+    "title": "Ghosts of the Sea",
+    "released_date": "2024-02-12T12:48:33.767766",
+    "categories": [
+      1,
+      16
+    ],
+    "director_id": 2,
+    "actors": [
+      4,
+      20,
+      24
+    ],
+    "plot": "An investigation into strange phenomena at the edge of the universe.",
+    "poster_url": "https://example.com/poster_tt4300637.jpg",
+    "imdb_id": "tt4300637"
+  },
+  {
+    "title": "Whispering Sands",
+    "released_date": "2024-02-12T12:48:33.767792",
+    "categories": [
+      1,
+      9
+    ],
+    "director_id": 5,
+    "actors": [
+      12,
+      15,
+      19
+    ],
+    "plot": "An expedition to explore the deepest, darkest reaches of the ocean.",
+    "poster_url": "https://example.com/poster_tt6520143.jpg",
+    "imdb_id": "tt6520143"
+  },
+  {
+    "title": "Flames of Rebellion",
+    "released_date": "2024-02-12T12:48:33.767821",
+    "categories": [
+      19,
+      22
+    ],
+    "director_id": 8,
+    "actors": [
+      17,
+      27
+    ],
+    "plot": "A mission to safeguard the continuum of history from unseen threats.",
+    "poster_url": "https://example.com/poster_tt3618959.jpg",
+    "imdb_id": "tt3618959"
+  },
+  {
+    "title": "Twilight of the Gods",
+    "released_date": "2024-02-12T12:48:33.767863",
+    "categories": [
+      6,
+      8
+    ],
+    "director_id": 7,
+    "actors": [
+      6,
+      25
+    ],
+    "plot": "A journey through war-torn lands in search of glory and honor.",
+    "poster_url": "https://example.com/poster_tt7078838.jpg",
+    "imdb_id": "tt7078838"
+  },
+  {
+    "title": "Riders of the Storm",
+    "released_date": "2024-02-12T12:48:33.767893",
+    "categories": [
+      15,
+      16
+    ],
+    "director_id": 10,
+    "actors": [
+      15,
+      16,
+      20
+    ],
+    "plot": "A race against time to piece together fragments of a lost civilization.",
+    "poster_url": "https://example.com/poster_tt2753608.jpg",
+    "imdb_id": "tt2753608"
+  },
+  {
+    "title": "Voices in the Mist",
+    "released_date": "2024-02-12T12:48:33.767918",
+    "categories": [
+      18,
+      22
+    ],
+    "director_id": 9,
+    "actors": [
+      3,
+      30
+    ],
+    "plot": "A rebellion against a corrupt regime, fueled by the fire of resistance.",
+    "poster_url": "https://example.com/poster_tt1614189.jpg",
+    "imdb_id": "tt1614189"
+  },
+  {
+    "title": "Fragments of Hope",
+    "released_date": "2024-02-12T12:48:33.767942",
+    "categories": [
+      3,
+      20
+    ],
+    "director_id": 3,
+    "actors": [
+      4,
+      11,
+      28
+    ],
+    "plot": "A story of courage and adventure amidst a raging natural disaster.",
+    "poster_url": "https://example.com/poster_tt7333021.jpg",
+    "imdb_id": "tt7333021"
+  },
+  {
+    "title": "Shadows of Tomorrow",
+    "released_date": "2024-02-12T12:48:33.767968",
+    "categories": [
+      9,
+      17
+    ],
+    "director_id": 5,
+    "actors": [
+      2,
+      5,
+      17
+    ],
+    "plot": "A fight for liberation against the chains of tyranny.",
+    "poster_url": "https://example.com/poster_tt6647167.jpg",
+    "imdb_id": "tt6647167"
+  },
+  {
+    "title": "Chains of Freedom",
+    "released_date": "2024-02-12T12:48:33.767994",
+    "categories": [
+      2,
+      21
+    ],
+    "director_id": 4,
+    "actors": [
+      20,
+      25
+    ],
+    "plot": "An adventure into realms where the unknown reigns supreme.",
+    "poster_url": "https://example.com/poster_tt7136589.jpg",
+    "imdb_id": "tt7136589"
+  },
+  {
+    "title": "Guardians of Time",
+    "released_date": "2024-02-12T12:48:33.768017",
+    "categories": [
+      8,
+      17
+    ],
+    "director_id": 8,
+    "actors": [
+      12,
+      18,
+      20
+    ],
+    "plot": "A search for truth hidden within the silence of a fog-shrouded village.",
+    "poster_url": "https://example.com/poster_tt2186917.jpg",
+    "imdb_id": "tt2186917"
+  },
+  {
+    "title": "Shades of Glory",
+    "released_date": "2024-02-12T12:48:33.768041",
+    "categories": [
+      15
+    ],
+    "director_id": 10,
+    "actors": [
+      4,
+      5,
+      7
+    ],
+    "plot": "A struggle to uphold a legacy in a world of forgotten dreams.",
+    "poster_url": "https://example.com/poster_tt1598116.jpg",
+    "imdb_id": "tt1598116"
+  },
+  {
+    "title": "Secrets of the Deep",
+    "released_date": "2024-02-12T12:48:33.768067",
+    "categories": [
+      19,
+      20
+    ],
+    "director_id": 6,
+    "actors": [
+      6,
+      17,
+      22
+    ],
+    "plot": "A saga of destiny and the powerful forces that shape it.",
+    "poster_url": "https://example.com/poster_tt6564445.jpg",
+    "imdb_id": "tt6564445"
+  },
+  {
+    "title": "Paths of Valor",
+    "released_date": "2024-02-12T12:48:33.768091",
+    "categories": [
+      1,
+      11
+    ],
+    "director_id": 7,
+    "actors": [
+      6,
+      7,
+      23
+    ],
+    "plot": "A quest to prevent a dark prophecy from coming to fruition.",
+    "poster_url": "https://example.com/poster_tt9009863.jpg",
+    "imdb_id": "tt9009863"
+  },
+  {
+    "title": "Winds of Fate",
+    "released_date": "2024-02-12T12:48:33.768116",
+    "categories": [
+      3,
+      9
+    ],
+    "director_id": 7,
+    "actors": [
+      4,
+      7,
+      9
+    ],
+    "plot": "A trek across dangerous lands in pursuit of heroic deeds.",
+    "poster_url": "https://example.com/poster_tt6469414.jpg",
+    "imdb_id": "tt6469414"
+  },
+  {
+    "title": "Spirits of the Past",
+    "released_date": "2024-02-12T12:48:33.768141",
+    "categories": [
+      17,
+      20
+    ],
+    "director_id": 9,
+    "actors": [
+      10,
+      26
+    ],
+    "plot": "A voyage to the farthest reaches of space, where mysteries abound.",
+    "poster_url": "https://example.com/poster_tt1525993.jpg",
+    "imdb_id": "tt1525993"
+  },
+  {
+    "title": "Legacy of Dreams",
+    "released_date": "2024-02-12T12:48:33.768163",
+    "categories": [
+      1,
+      4
+    ],
+    "director_id": 2,
+    "actors": [
+      1,
+      14
+    ],
+    "plot": "An exploration of haunted seas and the spirits that dwell within.",
+    "poster_url": "https://example.com/poster_tt9144247.jpg",
+    "imdb_id": "tt9144247"
   }
 ]
