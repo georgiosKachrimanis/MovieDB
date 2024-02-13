@@ -5,7 +5,14 @@ from sqlalchemy.orm import (
     joinedload,
 )
 from sqlalchemy.sql.functions import coalesce
-from db.models import DbCategory, DbDirector, DbMovie, DbReview, DbActor, DbMovieRequest
+from db.models import (
+    DbCategory,
+    DbDirector,
+    DbMovie,
+    DbReview,
+    DbActor,
+    DbMovieRequest,
+)
 from routes.directors import get_director_by_id
 from services.movie_service import get_movie_extra_data
 from schemas.mov_dir_actors_schemas import (
@@ -57,8 +64,14 @@ def get_all_movies(
 ):
     movies = db.query(DbMovie).all()
     for movie in movies:
-        movie.average_movie_rate = calculate_average(db=db, movie=movie)
-        movie.reviews_count = calculate_reviews(db=db, movie=movie)
+        movie.average_movie_rate = calculate_average(
+            db=db,
+            movie=movie,
+        )
+        movie.reviews_count = calculate_reviews(
+            db=db,
+            movie=movie,
+        )
         movie.director_name = (
             db.query(DbDirector.director_name)
             .filter(DbDirector.id == movie.director_id)
@@ -89,10 +102,20 @@ def get_movie(
         )
 
     if movie:
-        movie.reviews_count = calculate_reviews(db=db, movie=movie,)
-        movie.average_movie_rate = calculate_average(db=db, movie=movie,)
+        movie.reviews_count = calculate_reviews(
+            db=db,
+            movie=movie,
+        )
+        movie.average_movie_rate = calculate_average(
+            db=db,
+            movie=movie,
+        )
         movie.requests_count += 1
-        create_request_log(db=db, movie_id=movie.id, user_id=user_id,)
+        create_request_log(
+            db=db,
+            movie_id=movie.id,
+            user_id=user_id,
+        )
     db.commit()
     db.refresh(movie)
     return movie
@@ -111,7 +134,10 @@ def patch_movie(
     if getattr(request, "poster_url", None) is not None:
         movie.poster_url = request.poster_url
     if getattr(request, "categories", None) is not None:
-        movie.categories = get_movie_categories(db=db, request=request)
+        movie.categories = get_movie_categories(
+            db=db,
+            request=request,
+        )
     if getattr(request, "director_id", None) is not None:
         movie.director_id = check_director(
             director_id=request.director_id,
@@ -133,10 +159,16 @@ def update_movie(
     request: MovieUpdate,
 ):
 
-    check_director(request.director_id, db=db)
+    check_director(
+        request.director_id,
+        db=db,
+    )
 
     if "categories" in request.__dict__:
-        categories = get_movie_categories(db=db, request=request)
+        categories = get_movie_categories(
+            db=db,
+            request=request,
+        )
         movie.categories = categories
     if "actors" in request.__dict__:
         actors = db.query(DbActor).filter(DbActor.id.in_(request.actors)).all()
@@ -206,7 +238,11 @@ def calculate_reviews(
     return review_count
 
 
-def update_movie_poster_url(db: Session, movie: DbMovie, file_path: str):
+def update_movie_poster_url(
+    db: Session,
+    movie: DbMovie,
+    file_path: str,
+):
     if movie:
         movie.poster_url = file_path
         db.commit()
@@ -214,7 +250,10 @@ def update_movie_poster_url(db: Session, movie: DbMovie, file_path: str):
         return movie
 
 
-def get_movie_categories(db: Session, request: MovieBase):
+def get_movie_categories(
+    db: Session,
+    request: MovieBase,
+):
     return db.query(DbCategory).filter(DbCategory.id.in_(request.categories)).all()
 
 
@@ -228,6 +267,7 @@ def create_request_log(
         user_id=int(user_id),
         request_time=datetime.now(),
     )
+    
     db.add(request)
     db.commit()
     db.refresh(request)

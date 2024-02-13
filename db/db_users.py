@@ -6,11 +6,18 @@ from schemas.users_reviews_schemas import (
     UserUpdate,
     UserTypeUpdate,
 )
-from db.models import DbUser, DbReview
+from db.models import (
+    DbUser,
+    DbReview,
+)
 from db.hash import Hash
 
 
-def create_user(db: Session, request: UserBase):
+# TODO: check if i am passing user/reviews objects and not just ids
+def create_user(
+    db: Session,
+    request: UserBase,
+):
     new_user = DbUser(
         username=request.username,
         email=request.email,
@@ -34,7 +41,11 @@ def get_all_users(db: Session):
     return users
 
 
-def get_user(db: Session, id: int = None, email: str = None):
+def get_user(
+    db: Session,
+    id: int = None,
+    email: str = None,
+):
     if id is not None:
         return db.query(DbUser).filter(DbUser.id == id).first()
     elif email is not None:
@@ -43,7 +54,11 @@ def get_user(db: Session, id: int = None, email: str = None):
         return None
 
 
-def update_user(db: Session, id: int, request: UserUpdate):
+def update_user(
+    db: Session,
+    id: int,
+    request: UserUpdate,
+):
     user = db.query(DbUser).filter(DbUser.id == id).first()
     if user is None:
         return None
@@ -55,7 +70,11 @@ def update_user(db: Session, id: int, request: UserUpdate):
         return user
 
 
-def update_user_type(db: Session, id: int, request: UserTypeUpdate):
+def update_user_type(
+    db: Session,
+    id: int,
+    request: UserTypeUpdate,
+):
     user = db.query(DbUser).filter(DbUser.id == id).first()
     if user is None:
         return None

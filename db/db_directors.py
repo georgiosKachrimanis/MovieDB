@@ -22,7 +22,10 @@ def create_director(
 
 
 # Get director By Id
-def get_director(db: Session, director_id: int):
+def get_director(
+    db: Session,
+    director_id: int,
+):
     return db.query(DbDirector).filter(DbDirector.id == director_id).first()
 
 
@@ -46,7 +49,9 @@ def update_director(
     director.director_name = request.director_name
     if request.movies:
         for new_movie in request.movies:
-            director.movies.append(get_movie(movie_id=new_movie, db=db))
+            director.movies.append(
+                get_movie(movie_id=new_movie, db=db),
+            )
     elif request.movies == []:
         director.movies = []
     db.commit()
@@ -54,12 +59,16 @@ def update_director(
     return director
 
 
+# TODO: Update functionality to pass Director object
 # Delete Director
 def delete_director(
     db: Session,
     director_id: int,
 ):
-    director = get_director(db, director_id)
+    director = get_director(
+        db=db,
+        director_id=director_id,
+    )
     if director:
         db.delete(director)
         db.commit()
@@ -72,7 +81,10 @@ def delete_director(
 
 
 # Check if director is in any movie
-def check_director_in_movie(db: Session, director_id: int) -> bool:
+def check_director_in_movie(
+    db: Session,
+    director_id: int,
+):
     return (
         db.query(DbDirector).filter(DbDirector.id == director_id).first().movies != []
     )

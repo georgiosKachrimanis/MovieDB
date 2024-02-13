@@ -1,5 +1,9 @@
 from sqlalchemy.orm import Session
-from .database import engine, SessionLocal, Base
+from .database import (
+    engine,
+    SessionLocal,
+    Base,
+)
 from .models import DbCategory
 from schemas.mov_dir_actors_schemas import MovieCategoryType
 

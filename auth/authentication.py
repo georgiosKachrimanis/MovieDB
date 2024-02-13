@@ -1,4 +1,9 @@
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import (
+    APIRouter,
+    Depends,
+    HTTPException,
+    status,
+)
 from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy.orm.session import Session
 from db.database import get_db
@@ -52,7 +57,8 @@ def get_token(
         plain_password=request.password,
     ):
         raise HTTPException(
-            status_code=status.HTTP_418_IM_A_TEAPOT, detail="Wrong credentials"
+            status_code=status.HTTP_418_IM_A_TEAPOT,
+            detail="Wrong credentials",
         )
 
     access_token = oauth2.create_access_token(

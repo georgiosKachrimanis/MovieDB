@@ -87,7 +87,7 @@ def delete_actor(
         db.commit()
     return actor
 
-
+# TODO: Check if we need this functionality
 # def check_actors_in_movie(db: Session, actor_id: int) -> bool:
 #     query = select(movie_actors).where(movie_actors.c.actor_id == actor_id)
 #     result = db.execute(query).first()
