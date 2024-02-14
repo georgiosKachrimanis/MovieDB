@@ -22,6 +22,31 @@ class Category(BaseModel):
     category_name: str
 
 
+class TestCategory(str, Enum):
+    action = "Action"
+    adventure = "Adventure"
+    animation = "Animation"
+    biography = "Biography"
+    comedy = "Comedy"
+    crime = "Crime"
+    documentary = "Documentary"
+    drama = "Drama"
+    family = "Family"
+    fantasy = "Fantasy"
+    film_noir = "Film Noir"
+    history = "History"
+    horror = "Horror"
+    musical = "Musical"
+    mystery = "Mystery"
+    romance = "Romance"
+    sci_fi = "Science Fiction"
+    sport = "Sport"
+    superhero = "Superhero"
+    thriller = "Thriller"
+    war = "War"
+    western = "Western"
+
+
 # Class to be used for the creation and management of Movie Category table
 class MovieCategoryType(Enum):
     action = (1, "Action")
@@ -59,10 +84,6 @@ class Director(BaseModel):
 
 class DirectorUpdate(Director):
     movies: List[int] = []
-
-
-class DirectorPatchUpdate(BaseModel):
-    None
 
 
 class MovieShortDisplay(BaseModel):

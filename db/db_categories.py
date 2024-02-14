@@ -1,5 +1,6 @@
-from db.models import DbCategory
 from sqlalchemy.orm import Session
+
+from db.models import DbCategory
 from schemas.mov_dir_actors_schemas import CategoryName
 
 
@@ -21,11 +22,18 @@ def get_all_categories(db: Session):
 
 
 # Get Category By Id
-def get_category(
+def get_category_with_id(
     db: Session,
     category_id: int,
 ):
     return db.query(DbCategory).filter(DbCategory.id == category_id).first()
+
+
+def get_category_with_name(
+    db: Session,
+    category_name: str,
+):
+    return db.query(DbCategory).filter(DbCategory.category_name == category_name).first().id
 
 
 # Update Category
@@ -34,7 +42,7 @@ def update_category(
     category_id: int,
     request: CategoryName,
 ):
-    category = get_category(db, category_id)
+    category = get_category_with_id(db, category_id)
     if category:
         category.category_name = request.category_name
         db.commit()
@@ -47,7 +55,7 @@ def delete_category(
     db: Session,
     category_id: int,
 ):
-    category = get_category(db, category_id)
+    category = get_category_with_id(db, category_id)
     if category:
         db.delete(category)
         db.commit()

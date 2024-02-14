@@ -110,7 +110,9 @@ def get_movie(
             db=db,
             movie=movie,
         )
+
         movie.requests_count += 1
+
         create_request_log(
             db=db,
             movie_id=movie.id,
@@ -267,7 +269,7 @@ def create_request_log(
         user_id=int(user_id),
         request_time=datetime.now(),
     )
-    
+
     db.add(request)
     db.commit()
     db.refresh(request)
@@ -277,7 +279,6 @@ def create_request_log(
 def get_movie_extra(
     movie: DbMovie,
 ):
-    print(movie.title)
     if movie.imdb_id is None:
         return "No imdb_id stored in the DB for this movie."
     else:

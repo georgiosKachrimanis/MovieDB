@@ -1,21 +1,12 @@
-from fastapi import (
-    HTTPException,
-    Depends,
-    APIRouter,
-)
-from db.database import get_db
-from sqlalchemy.orm import Session
-from db import (
-    db_categories,
-    db_movies,
-)
 from typing import List
-from schemas.mov_dir_actors_schemas import (
-    Category,
-    CategoryName,
-    MovieDisplayOne,
-)
+
+from fastapi import APIRouter, Depends, HTTPException
+from sqlalchemy.orm import Session
+
 from auth import oauth2
+from db import db_categories, db_movies
+from db.database import get_db
+from schemas.mov_dir_actors_schemas import Category, CategoryName, MovieDisplayOne
 
 router = APIRouter(
     prefix="/categories",
@@ -62,7 +53,7 @@ def get_category_by_id(
     category_id: int,
     db: Session = Depends(get_db),
 ):
-    category = db_categories.get_category(
+    category = db_categories.get_category_with_id(
         db,
         category_id,
     )
@@ -133,7 +124,7 @@ def update_category(
 
     oauth2.admin_authentication(token=token)
 
-    category = db_categories.get_category(
+    category = db_categories.get_category_with_id(
         db=db,
         category_id=category_id,
     )
@@ -160,7 +151,7 @@ def delete_category(
 
     oauth2.admin_authentication(token=token)
 
-    category = db_categories.get_category(db, category_id)
+    category = db_categories.get_category_with_id(db, category_id)
     if category is None:
         raise HTTPException(status_code=404, detail="Category not found")
 

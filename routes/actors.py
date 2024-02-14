@@ -1,21 +1,17 @@
-from fastapi import (
-    HTTPException,
-    Depends,
-    APIRouter,
-    status,
-)
-from db.database import get_db
-from sqlalchemy.orm import Session
-from db import db_actors
 from typing import List
+
+from fastapi import APIRouter, Depends, HTTPException, status
+from sqlalchemy.orm import Session
+
+from auth import oauth2
+from db import db_actors
+from db.database import get_db
 from schemas.mov_dir_actors_schemas import (
     Actor,
-    ActorFullUpdate,
     ActorDisplay,
+    ActorFullUpdate,
     ActorPatch,
 )
-from auth import oauth2
-
 
 router = APIRouter(
     prefix="/actors",
@@ -39,7 +35,7 @@ def create_actor(
 ):
     oauth2.admin_authentication(
         token=token,
-        exception_text=AUTHENTICATION_TEXT,
+        detail=AUTHENTICATION_TEXT,
     )
     return db_actors.create_actor(
         db=db,
@@ -86,7 +82,7 @@ def update_actor(
 ):
     oauth2.admin_authentication(
         token=token,
-        exception_text=AUTHENTICATION_TEXT,
+        detail=AUTHENTICATION_TEXT,
     )
 
     return db_actors.update_actor(
@@ -108,7 +104,7 @@ def patch_actor(
 ):
     oauth2.admin_authentication(
         token=token,
-        exception_text=AUTHENTICATION_TEXT,
+        detail=AUTHENTICATION_TEXT,
     )
 
     return db_actors.patch_actor(
@@ -130,7 +126,7 @@ def delete_actor(
 ):
     oauth2.admin_authentication(
         token=token,
-        exception_text=AUTHENTICATION_TEXT,
+        detail=AUTHENTICATION_TEXT,
     )
 
     return db_actors.delete_actor(db=db, actor_id=actor.id)

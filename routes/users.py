@@ -1,28 +1,27 @@
-from fastapi import (
-    APIRouter,
-    Depends,
-    Response,
-    status,
-    HTTPException,
-)
 from typing import List
+
+from fastapi import APIRouter, Depends, HTTPException, Response, status
+from sqlalchemy.orm import Session
+
+from auth import oauth2
+from db import db_users
+from db.database import get_db
+from routes.reviews import get_all_reviews
 from schemas.users_reviews_schemas import (
     UserBase,
     UserDisplay,
-    UserUpdate,
     UserTypeDisplay,
     UserTypeUpdate,
+    UserUpdate,
 )
-from sqlalchemy.orm import Session
-from db.database import get_db
-from routes.reviews import get_all_reviews
-from db import db_users
-from auth import oauth2
 
 router = APIRouter(
     prefix="/users",
     tags=["Users Endpoints"],
 )
+
+
+AUTHENTICATION_TEXT = "You are not authorized to interact with the user(s)!"
 
 
 def check_user(
@@ -42,6 +41,71 @@ def check_user(
     return user
 
 
+# ======================= GET Functions ====================
+# Get all the users(Only Admins)
+@router.get(
+    "/",
+    response_model=List[UserDisplay],
+)
+def get_users(
+    db: Session = Depends(get_db),
+    token: str = Depends(oauth2.oauth2_schema),
+):
+
+    oauth2.admin_authentication(
+        token=token,
+        detail=AUTHENTICATION_TEXT,
+    )
+    users = db_users.get_all_users(db=db)
+    if users is None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Users table is empty!",
+        )
+
+    return users
+
+
+# Get User Information (Only User)
+@router.get(
+    "/{user_id}",
+    response_model=UserDisplay,
+)
+def get_user(
+    # response: Response,
+    user_id: int,
+    db: Session = Depends(get_db),
+    token: str = Depends(oauth2.oauth2_schema),
+):
+
+    payload = oauth2.decode_access_token(token=token)
+    user = check_user(db=db, user_id=user_id)
+
+    if payload.get("user_id") == user.id:
+        return user
+    else:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail=AUTHENTICATION_TEXT,
+        )
+
+
+@router.get("/{user_id}/reviews")
+def get_all_user_reviews(
+    user_id=int,
+    db: Session = Depends(get_db),
+):
+
+    db_reviews = get_all_reviews(db=db)
+    user_reviews = []
+    for review in db_reviews:
+        if review.user_id == int(user_id):
+            user_reviews.append(review)
+
+    return user_reviews
+
+
+# =========================== POST Functions ========================
 @router.post(
     "/",
     status_code=status.HTTP_201_CREATED,
@@ -70,50 +134,7 @@ def create_user(
     return new_user
 
 
-# Get all the users(Only Admins)
-@router.get(
-    "/",
-    response_model=List[UserDisplay],
-)
-def get_users(
-    db: Session = Depends(get_db),
-    token: str = Depends(oauth2.oauth2_schema),
-):
-
-    payload = oauth2.decode_access_token(token=token)
-    users = db_users.get_all_users(db=db)
-    if users is None:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="Users table is empty!",
-        )
-    elif payload.get("user_type") == "admin":
-        return users
-    else:
-        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED)
-
-
-# Get User Information (Only User)
-@router.get(
-    "/{user_id}",
-    response_model=UserDisplay,
-)
-def get_user(
-    response: Response,
-    user_id: int,
-    db: Session = Depends(get_db),
-    token: str = Depends(oauth2.oauth2_schema),
-):
-
-    payload = oauth2.decode_access_token(token=token)
-    user = check_user(db=db, user_id=user_id)
-
-    if payload.get("user_id") == user.id:
-        return user
-    else:
-        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED)
-
-
+# =============================== PUT Functions ==========================
 # Update User Information (Only User)
 @router.put(
     "/",
@@ -132,14 +153,18 @@ def update_user(
     if payload.get("user_id") == user.id:
         db_users.update_user(
             db=db,
-            id=user_id,
+            user=user,
             request=request,
         )
         return user
     else:
-        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED)
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail=AUTHENTICATION_TEXT,
+        )
 
 
+# ============================ PATCH Functions ===========================
 # Update User Type Information (Admin User)
 @router.patch(
     "/{user_id}",
@@ -152,23 +177,25 @@ def update_user_type(
     token: str = Depends(oauth2.oauth2_schema),
 ):
 
-    payload = oauth2.decode_access_token(token=token)
     user = check_user(
         db=db,
         user_id=user_id,
     )
 
-    if payload.get("user_type") == "admin":
-        db_users.update_user_type(
+    oauth2.admin_authentication(
+        token=token,
+        detail=AUTHENTICATION_TEXT,
+    )
+    db_users.update_user_type(
             db=db,
-            id=user_id,
+            user=user,
             request=request,
         )
-        return user
-    else:
-        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED)
+
+    return user
 
 
+# ============================ DELETE Functions ===========================
 # Delete User (Only Admins)
 @router.delete(
     "/{user_id}",
@@ -188,23 +215,6 @@ def delete_user(
     if payload.get("user_type") == "admin" and user:
         db_users.delete_user(
             db=db,
-            id=user_id,
+            user=user,
         )
         return {"message": f"User with id:{user_id} was deleted successfully"}
-
-
-@router.get("/{user_id}/reviews")
-def get_all_user_reviews(
-    user_id=int,
-    db: Session = Depends(get_db),
-):
-
-    db_reviews = get_all_reviews(db=db)
-    user_reviews = []
-    for review in db_reviews:
-        print(f"review_user_id:{review.user_id} and user_id {user_id}")
-        if review.user_id == int(user_id):
-            print("HI")
-            user_reviews.append(review)
-
-    return user_reviews

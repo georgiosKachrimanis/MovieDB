@@ -1,19 +1,12 @@
 from typing import List
-from fastapi import (
-    APIRouter,
-    Depends,
-    HTTPException,
-    status,
-)
+
+from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
+
 from auth import oauth2
 from db import db_directors
 from db.database import get_db
-from schemas.mov_dir_actors_schemas import (
-    Director,
-    DirectorDisplay,
-    DirectorUpdate,
-)
+from schemas.mov_dir_actors_schemas import Director, DirectorDisplay, DirectorUpdate
 
 router = APIRouter(
     prefix="/directors",
@@ -37,7 +30,7 @@ def create_director(
 ):
     oauth2.admin_authentication(
         token=token,
-        exception_text=AUTHENTICATION_TEXT,
+        detail=AUTHENTICATION_TEXT,
     )
 
     return db_directors.create_director(
@@ -90,7 +83,7 @@ def update_director(
 ):
     oauth2.admin_authentication(
         token=token,
-        exception_text=AUTHENTICATION_TEXT,
+        detail=AUTHENTICATION_TEXT,
     )
 
     return db_directors.update_director(
@@ -112,7 +105,7 @@ def delete_director(
 ):
     oauth2.admin_authentication(
         token=token,
-        exception_text=AUTHENTICATION_TEXT,
+        detail=AUTHENTICATION_TEXT,
     )
 
     movies = db_directors.check_director_in_movie(db, director.id)

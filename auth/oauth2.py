@@ -1,14 +1,9 @@
-from fastapi.security import OAuth2PasswordBearer
-from fastapi import HTTPException
+from datetime import datetime, timedelta
 from typing import Optional
-from datetime import (
-    datetime,
-    timedelta,
-)
-from jose import (
-    jwt,
-    ExpiredSignatureError,
-)
+
+from fastapi import HTTPException
+from fastapi.security import OAuth2PasswordBearer
+from jose import ExpiredSignatureError, jwt
 
 SECRET_KEY = "ee86333ec6dba1dc30160f672544010416321d64252950a0f253d13c02118909"
 ALGORITHM = "HS256"
@@ -62,10 +57,15 @@ def decode_access_token(token: str):
 # Authenticating Admin User!
 def admin_authentication(
     token: str,
-    exception_text: str,
+    detail: str,
 ):
+    if token is None:
+        raise HTTPException(
+            status_code=401,
+            detail="Only authenticated users allowed.",
+        )
     if decode_access_token(token=token).get("user_type") != "admin":
         raise HTTPException(
-            status_code=403,
-            detail=exception_text,
+            status_code=401,
+            detail=detail,
         )

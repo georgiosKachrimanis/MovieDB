@@ -1,16 +1,10 @@
 from sqlalchemy import func
-from sqlalchemy.orm.session import Session
 from sqlalchemy.orm import joinedload
-from schemas.users_reviews_schemas import (
-    UserBase,
-    UserUpdate,
-    UserTypeUpdate,
-)
-from db.models import (
-    DbUser,
-    DbReview,
-)
+from sqlalchemy.orm.session import Session
+
 from db.hash import Hash
+from db.models import DbReview, DbUser
+from schemas.users_reviews_schemas import UserBase, UserTypeUpdate, UserUpdate
 
 
 # TODO: check if i am passing user/reviews objects and not just ids
@@ -56,10 +50,10 @@ def get_user(
 
 def update_user(
     db: Session,
-    id: int,
+    user: DbUser,
     request: UserUpdate,
 ):
-    user = db.query(DbUser).filter(DbUser.id == id).first()
+
     if user is None:
         return None
     else:
@@ -72,20 +66,18 @@ def update_user(
 
 def update_user_type(
     db: Session,
-    id: int,
+    user: DbUser,
     request: UserTypeUpdate,
 ):
-    user = db.query(DbUser).filter(DbUser.id == id).first()
-    if user is None:
-        return None
-    else:
-        user.user_type = request.user_type  # request.user_type
-        db.commit()
-        return user
+    if user:
+        user.user_type = request.user_type
+
+    db.commit()
+    db.refresh(user)
+    return user
 
 
-def delete_user(db: Session, id: int):
-    user = db.query(DbUser).filter(DbUser.id == id).first()
+def delete_user(db: Session, user: DbUser):
     db.delete(user)
     db.commit()
     return user
