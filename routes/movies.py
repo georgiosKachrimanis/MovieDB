@@ -61,16 +61,21 @@ AUTHENTICATION_TEXT = "You are not authorized to add, edit or delete a movie!"
 )
 def get_movies(
     db: Session = Depends(get_db),
+    actor_id: int = None,
+    director_id: int = None,
     category: TestCategory = None,
     top_movies: int = None,
-    director_id: int = None,
-    actor_id: int = None,
 ):
     movies = db_movies.get_all_movies(db=db)
     if not movies:
         raise HTTPException(
             status_code=404,
             detail="The movies list is empty!",
+        )
+    if actor_id:
+        movies = get_movies_by_actor(
+            movies=movies,
+            actor_id=actor_id,
         )
 
     if category:
@@ -80,21 +85,18 @@ def get_movies(
             movies=movies,
         )
 
-    if top_movies:
-        movies = sorted(
-            movies,
-            key=lambda x: x.average_movie_rate if x.average_movie_rate else 0,
-            reverse=True,
-        )[:top_movies]
-
     if director_id:
         movies = get_movies_by_director(
             movies=movies,
             director_id=director_id,
         )
 
-    if actor_id:
-        movies = get_movies_by_actor(movies=movies, actor_id=actor_id)
+    if top_movies:
+        movies = sorted(
+            movies,
+            key=lambda x: x.average_movie_rate if x.average_movie_rate else 0,
+            reverse=True,
+        )[:top_movies]
 
     return movies
 
