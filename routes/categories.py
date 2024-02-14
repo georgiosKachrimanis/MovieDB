@@ -1,17 +1,26 @@
 from typing import List
-
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import (
+    APIRouter,
+    Depends,
+    HTTPException,
+)
 from sqlalchemy.orm import Session
-
 from auth import oauth2
 from db import db_categories, db_movies
 from db.database import get_db
-from schemas.mov_dir_actors_schemas import Category, CategoryName, MovieDisplayOne
+from schemas.mov_dir_actors_schemas import (
+    Category,
+    CategoryName,
+    MovieDisplayOne,
+)
 
 router = APIRouter(
     prefix="/categories",
     tags=["Categories Endpoints"],
 )
+
+
+AUTH_EXCEPTION = "You aren't authorized to add, edit or delete categories"
 
 
 # CRUD Operations for Category
@@ -27,7 +36,7 @@ def create_category(
     token: str = Depends(oauth2.oauth2_schema),
 ):
 
-    oauth2.admin_authentication(token=token)
+    oauth2.admin_authentication(token=token, detail=AUTH_EXCEPTION)
 
     return db_categories.add_category(
         db,
@@ -65,49 +74,36 @@ def get_category_by_id(
     return category
 
 
-@router.get(
-    "/{category_id}/movies",
-    response_model=List[MovieDisplayOne],
-)
-def get_movies_by_category(
-    category: int,
-    db: Session = Depends(get_db),
-):
-    category_check = get_category_by_id(
-        category_id=category,
-        db=db,
-    )
-    if not category_check:
-        raise HTTPException(
-            status_code=404,
-            detail=f"Category {category} not found",
-        )
-    movies = db_movies.get_movies_by_category(
-        category=category_check,
-        db=db,
-    )
-    if not movies:
-        raise HTTPException(
-            status_code=404,
-            detail=f"No movies in category {category_check.category_name}",
-        )
+# @router.get(
+#     "/{category_id}/movies",
+#     response_model=List[MovieDisplayOne],
+# )
+# def get_movies_by_category(
+#     category: int,
+#     db: Session = Depends(get_db),
+# ):
+#     category_check = get_category_by_id(
+#         category_id=category,
+#         db=db,
+#     )
+#     if not category_check:
+#         raise HTTPException(
+#             status_code=404,
+#             detail=f"Category {category} not found",
+#         )
+#     movies = db_movies.get_movies_by_category(
+#         category=category_check,
+#         db=db,
+#     )
+#     if not movies:
+#         raise HTTPException(
+#             status_code=404,
+#             detail=f"No movies in category {category_check.category_name}",
+#         )
 
-    return movies
+#     return movies
 
 
-@router.get(
-    "/{category_id}/movies/top10",
-    response_model=List[MovieDisplayOne],
-)
-def get_top10_movies_by_category(movies=Depends(get_movies_by_category)):
-    sorted_movies = sorted(
-        movies,
-        key=lambda x: x.average_movie_rate,
-        reverse=True,
-    )
-
-    top_10_movies = sorted_movies[:10]
-    return top_10_movies
 
 
 # Update Category

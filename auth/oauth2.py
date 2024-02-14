@@ -35,6 +35,11 @@ def create_access_token(
 
 
 def decode_access_token(token: str):
+    if not token:  # Check if token is empty or None
+        raise HTTPException(
+            status_code=401,
+            detail="Only authenticated users allowed.",
+        )
     try:
         payload = jwt.decode(
             token=token,
@@ -42,6 +47,7 @@ def decode_access_token(token: str):
             algorithms=[ALGORITHM],
         )
         return payload  # or return specific user data as needed
+
     except ExpiredSignatureError:
         raise HTTPException(
             status_code=401,

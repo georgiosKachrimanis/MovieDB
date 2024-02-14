@@ -118,8 +118,8 @@ def get_movie(
             movie_id=movie.id,
             user_id=user_id,
         )
-    db.commit()
-    db.refresh(movie)
+        db.commit()
+        db.refresh(movie)
     return movie
 
 

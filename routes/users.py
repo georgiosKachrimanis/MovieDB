@@ -1,8 +1,12 @@
 from typing import List
-
-from fastapi import APIRouter, Depends, HTTPException, Response, status
+from fastapi import (
+    APIRouter,
+    Depends,
+    HTTPException,
+    status,
+    Response,
+)
 from sqlalchemy.orm import Session
-
 from auth import oauth2
 from db import db_users
 from db.database import get_db
@@ -72,7 +76,7 @@ def get_users(
     response_model=UserDisplay,
 )
 def get_user(
-    # response: Response,
+    response: Response,
     user_id: int,
     db: Session = Depends(get_db),
     token: str = Depends(oauth2.oauth2_schema),
@@ -187,10 +191,10 @@ def update_user_type(
         detail=AUTHENTICATION_TEXT,
     )
     db_users.update_user_type(
-            db=db,
-            user=user,
-            request=request,
-        )
+        db=db,
+        user=user,
+        request=request,
+    )
 
     return user
 
