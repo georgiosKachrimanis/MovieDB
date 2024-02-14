@@ -11,8 +11,10 @@ from sqlalchemy.orm import Session
 from db.database import get_db
 from db import db_users
 from auth import oauth2
+from routes.reviews import get_all_reviews
 
 router = APIRouter(prefix="/users", tags=["Users Endpoints"])
+
 
 #  Check if a user exists in the database by ID or email.
 def check_user(db: Session, user_id: int):
@@ -25,12 +27,13 @@ def check_user(db: Session, user_id: int):
 
     return user
 
+
 # Create User
 @router.post("/", response_model=users_schemas.UserDisplayOne)
 def create_user(request: users_schemas.UserBase, db: Session = Depends(get_db)):
     if db_users.get_user(db=db, email=request.email) is not None:
         raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
+            status_code=status.HTTP_409_CONFLICT,
             detail=f"User with email: {request.email} already exists!",
         )
     elif request.user_type not in ["user", "admin"]:
@@ -43,40 +46,59 @@ def create_user(request: users_schemas.UserBase, db: Session = Depends(get_db)):
         return new_user
 
 
-# Get all the users(Only Admins)
+# Get all the users
 @router.get("/", response_model=List[users_schemas.UserDisplayAll])
-def read_all_users(
+def get_all_users(
     db: Session = Depends(get_db),
     token: str = Depends(oauth2.oauth2_schema),
 ):
-
-    payload = oauth2.decode_access_token(token=token)
-    users = db_users.get_all_users(db=db)
-    if users is None:
+    try:
+        payload = oauth2.decode_access_token(token=token)
+    except Exception as e:
         raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="Users table is empty!",
-        )
-    elif payload.get("user_type") == "admin":
-        return users
+            status_code=401,
+            detail="You need to log in to view this information!",
+        ) from e
     else:
-        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED)
+        users = db_users.get_all_users(db=db)
+        if users is None:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="Users table is empty!",
+            )
+        elif payload.get("user_type") == "admin":
+            return users
+        else:
+            raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="You are not authorized to view this information!",
+        )
 
 
-# Get User Information (Only User)
+# Get User Information by ID
 @router.get("/{user_id}", response_model=users_schemas.UserDisplayOne)
-def read_user_by_id(
+def get_user_by_id(
     response: Response,
     user_id: int,
     db: Session = Depends(get_db),
     token: str = Depends(oauth2.oauth2_schema),
 ):
-    payload = oauth2.decode_access_token(token=token)
-    user = check_user(db=db, user_id=user_id)
-    if payload.get("user_id") == user.id:
-        return user
+    try:
+        payload = oauth2.decode_access_token(token=token)
+    except Exception as e:
+        raise HTTPException(
+            status_code=401,
+            detail="You need to log in to view this information!",
+        ) from e
     else:
-        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED)
+        user = check_user(db=db, user_id=user_id)
+        if payload.get("user_id") == user.id:
+            return user
+        else:
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="You are not authorized to view this information!",
+            )
 
 
 # Update User Information (Only User)
@@ -87,18 +109,28 @@ def update_user(
     db: Session = Depends(get_db),
     token: str = Depends(oauth2.oauth2_schema),
 ):
-    payload = oauth2.decode_access_token(token=token)
-    user = check_user(db=db, user_id=user_id)
-    if payload.get("user_id") == user.id:
-        if not user:
-            raise HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND,
-                detail=f"User with ID: {user_id} not found",
-            )
-        db_users.update_user(db=db,user_id=user_id, request=request)
-        return user
+    try:
+        payload = oauth2.decode_access_token(token=token)
+    except Exception as e:
+        raise HTTPException(
+            status_code=401,
+            detail="You need to log in to create a user!",
+        ) from e
     else:
-        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED)
+        user = check_user(db=db, user_id=user_id)
+        if payload.get("user_id") == user.id:
+            if not user:
+                raise HTTPException(
+                    status_code=status.HTTP_404_NOT_FOUND,
+                    detail=f"User with ID: {user_id} not found",
+                )
+            db_users.update_user(db=db, user_id=user_id, request=request)
+            return user
+        else:
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="You are not authorized to view this information!",
+            )
 
 
 # Update User Type Information (Admin User)
@@ -109,15 +141,23 @@ def update_user_type(
     db: Session = Depends(get_db),
     token: str = Depends(oauth2.oauth2_schema),
 ):
-
-    payload = oauth2.decode_access_token(token=token)
-    user = check_user(db=db, user_id=user_id)
-
-    if payload.get("user_type") == "admin":
-        db_users.update_user_type(db=db, id=user_id, request=request)
-        return user
+    try:
+        payload = oauth2.decode_access_token(token=token)
+    except Exception as e:
+        raise HTTPException(
+            status_code=401,
+            detail="You need to log in to update !",
+        ) from e
     else:
-        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED)
+        user = check_user(db=db, user_id=user_id)
+        if payload.get("user_type") == "admin":
+            db_users.update_user_type(db=db, id=user_id, request=request)
+            return user
+        else:
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="You are not authorized to update this information!",
+            )
 
 
 # Delete User (Only Admins)
@@ -127,10 +167,21 @@ def delete_user(
     db: Session = Depends(get_db),
     token: str = Depends(oauth2.oauth2_schema),
 ):
-    payload = oauth2.decode_access_token(token=token)
-    user = check_user(db=db, user_id=user_id)
-    if payload.get("user_type") == "admin" and user:
-        db_users.delete_user(db=db, id=user_id)
-        return {"message": f"User with id:{user_id}  was deleted successfully"}
+    try:
+        payload = oauth2.decode_access_token(token=token)
+    except Exception as e:
+        raise HTTPException(
+            status_code=401,
+            detail="You need to log in to update !",
+        ) from e
     else:
-        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED)
+        user = check_user(db=db, user_id=user_id)
+        if payload.get("user_type") == "admin" and user:
+            db_users.delete_user(db=db, id=user_id)
+            return {"message": f"User with id:{user_id}  was deleted successfully"}
+        else:
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="You are not authorized to delete this information!",
+            )
+

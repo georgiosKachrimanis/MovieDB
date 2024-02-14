@@ -75,3 +75,4 @@ def update_user_type(db: Session, id: int, request: users_schemas.UserTypeUpdate
         user.user_type = request.user_type  # request.user_type
         db.commit()
         return user
+       

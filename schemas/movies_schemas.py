@@ -86,15 +86,22 @@ class MovieExtraData(BaseModel):
 class MoviePatchUpdate(BaseModel):
     title: Optional[str] = None
     released_date: Optional[datetime] = None
-    categories: Optional[List[int]] = None
     plot: Optional[str] = None
     imdb_id: Optional[str] = None
     director_id: Optional[int] = None
-    actors: Optional[List[int]] = None 
-    number_of_request: Optional[int] = None   
+    poster_url: Optional[str] = None  
+    number_of_request: Optional[int] = None
+
+class MovieDisplayBase(BaseModel):
+    id: int
+    title: Optional[str]
+    class Config:
+        from_attributes = True
+
 
 class RequestBase():
     movie_id : int
+    user_id : int
     request_time : datetime
 
 class MovieRequestCount(BaseModel):

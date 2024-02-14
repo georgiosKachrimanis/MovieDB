@@ -12,18 +12,6 @@ router = APIRouter(prefix="/reviews", tags=["Review Endpoints"])
 
 
 # CRUD Operations for Review
-def get_review_from_db(
-    review_id,
-    db: Session = Depends(get_db),
-):
-    review = db_reviews.get_review(review_id=review_id, db=db)
-    if review is None:
-        raise HTTPException(
-            status_code=404,
-            detail=f"Review with id: {review_id} not found ",
-        )
-    return review
-
 
 # Create Review
 @router.post("/", response_model=reviews_schemas.ReviewDisplayOne)
@@ -32,20 +20,30 @@ def create_review(
     db: Session = Depends(get_db),
     token: str = Depends(oauth2.oauth2_schema),
 ):
-    movie = db.query(Movie).filter(Movie.id == request.movie_id).first()
-    if movie is not None:
-        new_review = db_reviews.create_review(db=db, request=request)
-    else:
+    
+    try:
+        payload = oauth2.decode_access_token(token=token)
+    except Exception as e:
         raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="Movie not found!",
+            status_code=401,
+            detail="You need to log in to create a review!",
+        ) from e
+    else:
+        movie = db_movies.get_movie(db=db, movie_id=request.movie_id)
+        if movie is not None:
+            user_id = payload.get("user_id")
+            new_review = db_reviews.create_review(db=db, request=request, user_id=user_id)
+        else:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="Movie not found!",
         )
     return new_review
 
 
-# Read All Review With User
+# Read All Reviews
 @router.get("/", response_model=List[reviews_schemas.ReviewDisplayAll])
-def read_all_reviews(db: Session = Depends(get_db)):
+def get_all_reviews(db: Session = Depends(get_db)):
     reviews = db_reviews.get_all_reviews(db)
     if reviews is None:
         raise HTTPException(
@@ -54,32 +52,68 @@ def read_all_reviews(db: Session = Depends(get_db)):
         )
     return reviews
 
+# Get all reviews for a user
+@router.get("/{user_id}/reviews",response_model=List[reviews_schemas.ReviewDisplayAll])
+def get_all_user_reviews(user_id=int, db: Session = Depends(get_db)):
+    db_reviews = get_all_reviews(db=db)
+    user_reviews = []
+    for review in db_reviews:
+        if review.user_id == int(user_id):
+            user_reviews.append(review)
+    return user_reviews
+
 
 # Get By Id
 @router.get("/{review_id}", response_model=reviews_schemas.ReviewDisplayOne)
-def read_review_by_id(
+def get_review_by_id(
     review_id: int,
     db: Session = Depends(get_db),
 ):
-    return get_review_from_db(review_id=review_id, db=db)
+    return db_reviews.get_review_from_db(review_id=review_id, db=db)
 
+
+# Patch (Update Partially) Review
+@router.patch("/{review_id}",response_model=reviews_schemas.ReviewDisplayOne)
+def patch_review(
+    review_id: int,
+    request: reviews_schemas.ReviewUpdate,
+    db: Session = Depends(get_db),
+    token: str = Depends(oauth2.oauth2_schema),
+):
+    payload = oauth2.decode_access_token(token=token)
+    review = db_reviews.get_review_from_db(review_id=review_id, db=db)
+
+    if (
+        review.user_id == payload.get("user_id")
+        or payload.get("user_type") == "admin"
+    ):
+        if review is not None:
+            return db_reviews.patch_review(
+                db=db, review_id=review_id, review_data=request
+            )
+        return review
+    else:
+        raise HTTPException(
+            status_code=status.HTTP_418_IM_A_TEAPOT,
+            detail="Not your review, you can not change it!",
+        )
 
 # Update Review
 @router.put(
-    "/{review_id}",
-)  # response_model=ReviewBase)
+    "/{review_id}",response_model=reviews_schemas.ReviewDisplayOne
+)  
 def update_review(
     review_id: int,
     request: reviews_schemas.ReviewUpdate,
     db: Session = Depends(get_db),
     token: str = Depends(oauth2.oauth2_schema),
 ):
-    user_payload = oauth2.decode_access_token(token=token)
-    review = get_review_from_db(review_id=review_id, db=db)
+    payload = oauth2.decode_access_token(token=token)
+    review = db_reviews.get_review_from_db(review_id=review_id, db=db)
 
     if (
-        review.user_id == user_payload.get("user_id")
-        or user_payload.get("user_type") == "admin"
+        review.user_id == payload.get("user_id")
+        or payload.get("user_type") == "admin"
     ):
         if review is not None:
             return db_reviews.update_review(
@@ -101,7 +135,7 @@ def delete_review(
     token: str = Depends(oauth2.oauth2_schema),
 ):
     user_payload = oauth2.decode_access_token(token=token)
-    review = get_review_from_db(review_id=review_id, db=db)
+    review = db_reviews.get_review_from_db(review_id=review_id, db=db)
 
     if (
         review.user_id == user_payload.get("user_id")
@@ -118,3 +152,27 @@ def delete_review(
             status_code=status.HTTP_418_IM_A_TEAPOT,
             detail="Not your review, you can not delete it!",
         )
+
+
+
+
+@router.post("/auto_add_reviews")
+def auto_add_reviews(db: Session = Depends(get_db)):
+    import random
+    import json
+
+    """
+    THIS IS ONLY TO BE USED FOR TESTING PURPOSES
+    """
+
+    with open("sampleData/example_reviews.json", "r") as file:
+        reviews = json.load(file)
+
+    for review_data in reviews:
+        user_id = random.randint(1, 5)
+        db_reviews.create_review(
+            db=db,
+            request=reviews_schemas.ReviewBase(**review_data),
+            user_id=user_id,
+        )
+    return {"message": "Reviews added successfully"}

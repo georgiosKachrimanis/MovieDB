@@ -1,7 +1,8 @@
 from typing import List
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, joinedload
 from db.models import Movie, Review, Category, Actor, Director
-from sqlalchemy import func,and_
+from sqlalchemy import func, and_
+from sqlalchemy.sql.functions import coalesce
 from schemas import movies_schemas
 from services.movie_service import get_movie_extra_data
 from db.db_directors import get_director
@@ -9,7 +10,7 @@ from datetime import datetime
 from db.models import MovieRequest
 
 
-
+# Check if director exists
 def check_director(
     director_id: int,
     db: Session,
@@ -19,11 +20,42 @@ def check_director(
         db=db,
     ).id
 
-def check_movie(db,movie_id: int,) -> bool:
+
+# Check if movie exists
+def check_movie(
+    db,
+    movie_id: int,
+) -> bool:
     movie = db.query(Movie).filter(Movie.id == movie_id).first()
     if movie:
         return True
     return False
+
+
+# Calculate Average Movie Rate
+def calculate_average(
+    movie: Movie,
+    db: Session,
+):
+    average_rate = (
+        db.query(coalesce(func.avg(Review.movie_rate), 0))
+        .filter(Review.movie_id == movie.id)
+        .scalar()
+    )
+    return average_rate
+
+
+# Get Movies By Category
+def get_movies_by_category(
+    category: int,
+    db: Session,
+):
+    movies = (
+        db.query(Movie).join(Movie.categories).filter(Category.id == category.id).all()
+    )
+
+    return movies
+
 
 # Create Movie
 def create_movie(db: Session, movie: movies_schemas.MovieBase):
@@ -66,14 +98,32 @@ def get_all_movies(db: Session, skip: int = 0, limit: int = 100):
     return movies
 
 
-# Get Movie By Id
-def get_movie(db: Session, movie_id: int):
-    movie = db.query(Movie).filter(Movie.id == movie_id).first()
-    movie.average_movie_rate = (
-        db.query(func.avg(Review.movie_rate))
-        .filter(Review.movie_id == movie.id)
-        .scalar()
-    )
+def get_movie(
+    db: Session,
+    movie_id: int = None,
+    movie_title: str = None,
+):
+    if movie_id is not None:
+        movie = (
+            db.query(Movie)
+            .options(joinedload(Movie.categories))
+            .filter(Movie.id == movie_id)
+            .first()
+        )
+    elif movie_title is not None:
+        movie = (
+            db.query(Movie)
+            .options(joinedload(Movie.categories))
+            .filter(Movie.title == movie_title)
+            .first()
+        )
+
+    if movie:
+        movie.reviews_count = (
+            db.query(func.count(Review.id)).filter(Review.movie_id == movie.id).scalar()
+        )
+        movie.average_movie_rate = calculate_average(db=db, movie=movie)
+
     return movie
 
 
@@ -81,23 +131,18 @@ def get_movie(db: Session, movie_id: int):
 def update_movie(db: Session, movie_id: int, request: movies_schemas.MovieUpdate):
     movie = get_movie(db, movie_id)
     if movie:
-        categories = [category.id for category in movie.categories]
-        actors = [actor.id for actor in movie.actors]
         for key, value in request.__dict__.items():
             if key == "categories":
-                categories = db.query(Category).filter(Category.id.in_(value)).all()
-            else:
-                setattr(movie, key, value)
-        for key, value in request.__dict__.items():
-            if key == "actors":
+                db.query(Category).filter(Category.id.in_(value)).all()
+            elif key == "actors":
                 actors = db.query(Actor).filter(Actor.id.in_(value)).all()
+                movie.actors = actors
             else:
                 setattr(movie, key, value)
-        movie.actors = actors
         db.commit()
         db.refresh(movie)
         return movie
-    return None
+
 
 # Patch (update partially) movie
 def patch_movie(
@@ -105,27 +150,34 @@ def patch_movie(
     movie: movies_schemas.MovieBase,
     request: movies_schemas.MoviePatchUpdate,
 ):
-    if getattr(request, 'title', None) is not None:
+    if getattr(request, "title", None) is not None:
         movie.title = request.title
-    if getattr(request, 'plot', None) is not None:
+    if getattr(request, "plot", None) is not None:
         movie.plot = request.plot
-    if getattr(request, 'poster_url', None) is not None:
+    if getattr(request, "poster_url", None) is not None:
         movie.poster_url = request.poster_url
-    if getattr(request, 'categories', None) is not None:
-        categories = db.query(Category).filter(Category.id.in_(request.categories)).all()
+    if getattr(request, "categories", None) is not None:
+        categories = (
+            db.query(Category).filter(Category.id.in_(request.categories)).all()
+        )
         movie.categories = categories
-    if getattr(request, 'director_id', None) is not None:
-        movie.director_id = check_director(director_id=request.director_id, db=db,)
-    if getattr(request, 'actors', None) is not None:
+    if getattr(request, "director_id", None) is not None:
+        movie.director_id = check_director(
+            director_id=request.director_id,
+            db=db,
+        )
+    if getattr(request, "imdb_id", None) is not None:
+        movie.imdb_id = request.imdb_id
+    if getattr(request, "actors", None) is not None:
         actors = db.query(Actor).filter(Actor.id.in_(request.actors)).all()
         movie.actors = actors
-    if getattr(request, 'imdb_id', None) is not None:
-        movie.imdb_id = request.imdb_id
-    if getattr(request, 'number_of_request', None) is not None:
-        movie.number_of_request = request.number_of_request
+    if getattr(request, "number_of_request", None) is not None:
+        movie.number_of_request = request.number_of_request    
     db.commit()
     db.refresh(movie)
     return movie
+
+    
 
 # Delete Movie
 def delete_movie(db: Session, movie_id: int) -> bool:
@@ -142,10 +194,7 @@ def check_movie_in_reviews(db: Session, movie_id: int):
     return db.query(Movie).filter(Movie.id == movie_id).first().reviews != []
 
 
-from sqlalchemy.orm import Session
-from .models import Movie
-
-
+# Update Movie Poster URL
 def update_movie_poster_url(db: Session, movie, file_path: str):
     if movie:
         movie.poster_url = file_path
@@ -155,22 +204,26 @@ def update_movie_poster_url(db: Session, movie, file_path: str):
 
 
 # Get Movie Extra Data
-def get_movie_extra(db: Session, movie_id):
-    movie = get_movie(db, movie_id)
-    if movie.imdb_id is None:
-        return "No imdb_id found for this movie."
-    else:
-        imdb_id = movie.imdb_id
-        result = get_movie_extra_data(imdb_id)
-        return result
+async def get_movie_extra(db: Session, movie_id):
+    if check_movie(db, movie_id) is True:
+        movie = db.query(Movie).filter(Movie.id == movie_id).first()
+        if movie.imdb_id is None:
+            return "No imdb_id found for this movie."
+        else:
+            imdb_id = movie.imdb_id
+            result = await get_movie_extra_data(imdb_id)
+            return result
+
 
 # Movie request loggers
 def create_request_log(
-        db: Session, 
-        movie_id: int,
-        ):
+    db: Session,
+    movie_id: int,
+    user_id: int,
+):
     request = MovieRequest(
         movie_id=movie_id,
+        user_id=user_id,
         request_time=datetime.now(),
     )
     db.add(request)
@@ -178,8 +231,11 @@ def create_request_log(
     db.refresh(request)
     return request
 
+
 # Get Movie Request Count
-def get_movie_request_count(db: Session, start_date: datetime = None, end_date: datetime = None):
+def get_movie_request_count(
+    db: Session, start_date: datetime = None, end_date: datetime = None
+):
     all_movies = db.query(Movie).all()
     movie_request_count = []
     for movie in all_movies:
@@ -189,7 +245,8 @@ def get_movie_request_count(db: Session, start_date: datetime = None, end_date: 
         if end_date:
             query = query.filter(MovieRequest.request_time <= end_date)
         request_count = query.count()
-        movie_request_count.append(
+        if request_count > 0:
+            movie_request_count.append(
             {
                 "movie_id": movie.id,
                 "movie_title": movie.title,
@@ -197,3 +254,22 @@ def get_movie_request_count(db: Session, start_date: datetime = None, end_date: 
             }
         )
     return movie_request_count
+
+
+# Get Top 10 Movies
+get_top10_movies = (
+    lambda db: db.query(Movie).order_by(Movie.number_of_request.desc()).limit(10).all()
+)
+
+# Patch Movie Director
+def patch_movie_director(
+    db: Session,
+    movie: Movie,
+    director_id: int,
+):
+    if director_id is not None:
+        movie.director_id = director_id
+        db.commit()
+        db.refresh(movie)
+        return movie
+    return movie

@@ -25,6 +25,7 @@ class User(Base):
   created_at = Column(DateTime, default=datetime.utcnow)
   password = Column(String)
   reviews = relationship("Review", back_populates="user") # One-to-many relationship
+  requests = relationship("MovieRequest", back_populates="user") # One-to-many relationship
 
 class Review(Base):
   __tablename__ = 'reviews'
@@ -50,10 +51,10 @@ class Movie(Base):
     director = relationship("Director", back_populates="movies") # One-to-many relationship
     plot = Column(String)
     poster_url = Column(String)
-    average_movie_rate = Column(Float, default=0.0)
+    # average_movie_rate = Column(Float, default=0.0)
     imdb_id = Column(String)
     number_of_request = Column(Integer, default=0)
-    requests = relationship("MovieRequest", back_populates="movie") # One-to-many relationship
+    requests = relationship("MovieRequest", back_populates="movies") # One-to-many relationship
 
 class Category(Base):
   __tablename__ = 'categories'
@@ -74,8 +75,10 @@ class Director(Base):
       movies = relationship("Movie", back_populates="director") # One-to-many relationship
 
 class MovieRequest(Base):
-  __tablename__ = 'requests'
-  id = Column(Integer, primary_key=True, index=True)
-  movie_id = Column(Integer, ForeignKey('movies.id'))
-  request_time = Column(DateTime)
-  movie = relationship("Movie", back_populates="requests") # One-to-many relationship
+      __tablename__ = 'requests'
+      id = Column(Integer, primary_key=True, index=True)
+      movie_id = Column(Integer, ForeignKey('movies.id'))
+      user_id = Column(Integer, ForeignKey('users.id'))
+      request_time = Column(DateTime)
+      movies = relationship("Movie", back_populates="requests") # One-to-many relationship
+      user = relationship("User",back_populates="requests")

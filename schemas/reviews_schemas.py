@@ -35,7 +35,6 @@ class ReviewDisplayOne(BaseModel):
 
 class ReviewBase(BaseModel):
     review_content: str
-    user_id: int
     movie_id: int
     movie_rate: Optional[float] = None
 

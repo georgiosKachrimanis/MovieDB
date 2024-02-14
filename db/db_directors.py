@@ -42,5 +42,5 @@ def delete_director(db: Session, director_id: int):
         )
 
 # Check if director is in any movie
-def check_director_in_movie(db: Session, director_id: int) -> bool:
-    return db.query(Director).filter(Director.id == director_id).first().movies != []
+def check_director_in_movies(db: Session, director_id: int) -> bool:
+    return db.query(Director).filter(Director.id == director_id).first().movies == []

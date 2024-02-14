@@ -5,12 +5,14 @@ from db.models import movie_categories
 from sqlalchemy import select
 
 # Create Category
-def create_category(db: Session, category_name: str):
-    category = Category(category_name=category_name)
+def create_category(db: Session, category: categories_schemas.CategoryBase):
+    category = Category(category_name=category.category_name)
     db.add(category)
     db.commit()
     db.refresh(category)
     return category
+
+
 
 # Get All Categories
 def get_all_categories(db: Session):
@@ -41,4 +43,4 @@ def delete_category(db: Session, category_id: int):
 
 # Check if director is in any movie
 def check_category_in_movie(db: Session, category_id: int) -> bool:
-    return db.query(Category).filter(Category.id == category_id).first().movies != []
+    return db.query(Category).filter(Category.id == category_id).first().movies == []

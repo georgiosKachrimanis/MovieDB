@@ -6,6 +6,7 @@ from db.database import engine
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 
+
 app = FastAPI()
 app.include_router(authentication.router)
 app.include_router(users.router)

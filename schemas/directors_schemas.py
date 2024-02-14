@@ -11,10 +11,19 @@ class Movie(BaseModel):
 class DirectorBase(BaseModel):
     director_name: str
 
+class DirectorUpdateMovie(BaseModel):
+    director_id: int
+
+
 class DirectorDisplay(BaseModel):
     id: int
     director_name: str
     movies: List[Movie] = []
+    class Config:
+        from_attributes = True
 
+class DirectorDisplayOne(BaseModel):
+    id: int
+    director_name: str
     class Config:
         from_attributes = True
