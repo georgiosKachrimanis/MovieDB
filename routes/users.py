@@ -18,6 +18,19 @@ router = APIRouter(prefix="/users", tags=["Users Endpoints"])
 
 #  Check if a user exists in the database by ID or email.
 def check_user(db: Session, user_id: int):
+    """
+    Checks if a user exists in the database by user ID.
+    
+    Parameters:
+    - db: Session - Dependency injection of the database session.
+    - user_id: int - The ID of the user to check.
+    
+    Returns:
+    - The user object if found.
+    
+    Raises:
+    - HTTPException: If no user is found with the given ID.
+    """
     user = db_users.get_user(db=db, id=user_id)
     if user is None:
         raise HTTPException(
@@ -31,6 +44,19 @@ def check_user(db: Session, user_id: int):
 # Create User
 @router.post("/", response_model=users_schemas.UserDisplayOne)
 def create_user(request: users_schemas.UserBase, db: Session = Depends(get_db)):
+    """
+    Creates a new user in the database.
+    
+    Parameters:
+    - request: users_schemas.UserBase - The user data to create.
+    - db: Session - Dependency injection of the database session.
+    
+    Returns:
+    - The created user's details as defined by the UserDisplayOne schema.
+    
+    Raises:
+    - HTTPException: If a user with the given email already exists or if the user type is invalid.
+    """
     if db_users.get_user(db=db, email=request.email) is not None:
         raise HTTPException(
             status_code=status.HTTP_409_CONFLICT,
@@ -52,6 +78,21 @@ def get_all_users(
     db: Session = Depends(get_db),
     token: str = Depends(oauth2.oauth2_schema),
 ):
+    """
+    Retrieves all users from the database.
+    
+    Requires admin authentication. This endpoint fetches and returns a list of all users.
+    
+    Parameters:
+    - db: Session - Dependency injection of the database session.
+    - token: str - The OAuth2 token for admin authentication.
+    
+    Returns:
+    - A list of all users in the database.
+    
+    Raises:
+    - HTTPException: If the user is not logged in or not authorized to view this information.
+    """
     try:
         payload = oauth2.decode_access_token(token=token)
     except Exception as e:
@@ -109,6 +150,23 @@ def update_user(
     db: Session = Depends(get_db),
     token: str = Depends(oauth2.oauth2_schema),
 ):
+    """
+    Updates user information for the logged-in user.
+    
+    Requires user authentication. This endpoint allows users to update their own information.
+    
+    Parameters:
+    - request: users_schemas.UserUpdate - The updated user data.
+    - user_id: int - The ID of the user to update.
+    - db: Session - Dependency injection of the database session.
+    - token: str - The OAuth2 token for user authentication.
+    
+    Returns:
+    - The updated user's details as defined by the UserDisplayOne schema.
+    
+    Raises:
+    - HTTPException: If the user is not logged in, not authorized to update the information, or the user does not exist.
+    """
     try:
         payload = oauth2.decode_access_token(token=token)
     except Exception as e:
@@ -141,6 +199,23 @@ def update_user_type(
     db: Session = Depends(get_db),
     token: str = Depends(oauth2.oauth2_schema),
 ):
+    """
+    Updates the user type of a specific user.
+    
+    Requires admin authentication. This endpoint allows admins to change the user type of other users.
+    
+    Parameters:
+    - request: users_schemas.UserTypeUpdate - The new user type data.
+    - user_id: int - The ID of the user whose type is to be updated.
+    - db: Session - Dependency injection of the database session.
+    - token: str - The OAuth2 token for admin authentication.
+    
+    Returns:
+    - The user's updated type details as defined by the UserTypeDisplay schema.
+    
+    Raises:
+    - HTTPException: If the admin is not logged in, not authorized to update the information, or the user does not exist.
+    """
     try:
         payload = oauth2.decode_access_token(token=token)
     except Exception as e:
@@ -167,6 +242,22 @@ def delete_user(
     db: Session = Depends(get_db),
     token: str = Depends(oauth2.oauth2_schema),
 ):
+    """
+    Deletes a user from the database.
+    
+    Requires admin authentication. This endpoint allows admins to delete users.
+    
+    Parameters:
+    - user_id: int - The ID of the user to delete.
+    - db: Session - Dependency injection of the database session.
+    - token: str - The OAuth2 token for admin authentication.
+    
+    Returns:
+    - A success message indicating the user was deleted successfully.
+    
+    Raises:
+    - HTTPException: If the admin is not logged in, not authorized to delete the user, or the user does not exist.
+    """
     try:
         payload = oauth2.decode_access_token(token=token)
     except Exception as e:
