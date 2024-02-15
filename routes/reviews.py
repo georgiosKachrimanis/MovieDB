@@ -4,7 +4,7 @@ from sqlalchemy.orm import Session
 from db.database import get_db
 from db import db_reviews, db_movies
 from auth import oauth2
-from typing import List
+from typing import List, Optional
 from db.models import Movie
 
 
@@ -41,33 +41,53 @@ def create_review(
     return new_review
 
 
-# Read All Reviews
+# Get All Reviews
 @router.get("/", response_model=List[reviews_schemas.ReviewDisplayAll])
-def get_all_reviews(db: Session = Depends(get_db)):
+def get_all_reviews(
+    db: Session = Depends(get_db),
+    user_id: Optional[int] = None,
+    movie_id: Optional[int] = None,
+    ):
     reviews = db_reviews.get_all_reviews(db)
     if reviews is None:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail="No reviews to show!",
         )
+    
+    if user_id:
+        user_reviews = []
+        for review in reviews:
+            if review.user_id == user_id:
+                user_reviews.append(review)
+        reviews = user_reviews
+    if movie_id:
+            movie_reviews = []
+            for review in reviews:
+                if review.movie_id == movie_id:
+                    movie_reviews.append(review)
+            reviews = movie_reviews
     return reviews
 
-# Get all reviews for a user
-@router.get("/{user_id}/reviews",response_model=List[reviews_schemas.ReviewDisplayAll])
-def get_all_user_reviews(user_id=int, db: Session = Depends(get_db)):
-    db_reviews = get_all_reviews(db=db)
-    user_reviews = []
-    for review in db_reviews:
-        if review.user_id == int(user_id):
-            user_reviews.append(review)
-    return user_reviews
 
 
-# Get By Id
+# # Get all reviews for a user
+# @router.get("/{user_id}/reviews",response_model=List[reviews_schemas.ReviewDisplayAll])
+# def get_all_user_reviews(user_id=int, db: Session = Depends(get_db)):
+#     db_reviews = get_all_reviews(db=db)
+#     user_reviews = []
+#     for review in db_reviews:
+#         if review.user_id == int(user_id):
+#             user_reviews.append(review)
+#     return user_reviews
+
+
+# Get Reviw By Id
 @router.get("/{review_id}", response_model=reviews_schemas.ReviewDisplayOne)
 def get_review_by_id(
     review_id: int,
     db: Session = Depends(get_db),
+
 ):
     return db_reviews.get_review_from_db(review_id=review_id, db=db)
 

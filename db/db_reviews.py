@@ -87,3 +87,21 @@ def all_reviews_for_movie(
             detail="No reviews to show!",
         )
     return movie_reviews
+
+# Returns all Reviews from a user
+def all_reviews_for_user(
+    user_id: int,
+    db: Session = Depends(get_db),
+):
+    reviews = get_all_reviews(db=db)
+    user_reviews = []
+    for review in reviews:
+        if review.user_id == user_id:
+            user_reviews.append(review)
+
+    if user_reviews == []:
+        raise HTTPException(
+            status_code=404,
+            detail="No reviews to show!",
+        )
+    return user_reviews

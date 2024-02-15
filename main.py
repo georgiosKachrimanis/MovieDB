@@ -8,13 +8,14 @@ from fastapi.staticfiles import StaticFiles
 
 
 app = FastAPI()
-app.include_router(authentication.router)
+
 app.include_router(users.router)
 app.include_router(movies.router)
 app.include_router(reviews.router)
 app.include_router(categories.router)
 app.include_router(directors.router)
 app.include_router(actors.router)
+app.include_router(authentication.router)
 
 models.Base.metadata.create_all(engine)
 
