@@ -28,6 +28,19 @@ def create_movie(
     db: Session = Depends(get_db),
     token: str = Depends(oauth2.oauth2_schema),
 ):
+    """
+    Creates a new movie in the database.
+    
+    Requires admin authentication. Accepts movie data conforming to the MovieBase schema and adds it to the database.
+    
+    Parameters:
+    - movie: movies_schemas.MovieBase - The movie data to create.
+    - db: Session - Dependency injection of the database session.
+    - token: str - The OAuth2 token for admin authentication.
+    
+    Returns:
+    - The created movie's details as defined by the MovieDisplayOne schema.
+    """
 
     if oauth2.admin_authentication(token=token):
         return db_movies.create_movie(db, movie)
@@ -36,6 +49,18 @@ def create_movie(
 # Get All Movies
 @router.get("/", response_model=List[movies_schemas.MovieDisplayAll])
 def get_all_movies(db: Session = Depends(get_db)):
+    """
+    Retrieves all movies from the database.
+    
+    Fetches and returns a list of all movies, each conforming to the MovieDisplayAll schema. If no movies are found,
+    a 404 HTTPException is raised indicating the movies list is empty.
+    
+    Parameters:
+    - db: Session - Dependency injection of the database session.
+    
+    Returns:
+    - A list of all movies in the database.
+    """
     movies = db_movies.get_all_movies(db=db)
     if not movies:
         raise HTTPException(
@@ -53,6 +78,15 @@ def get_all_movies(db: Session = Depends(get_db)):
 def get_top10_movies(
     db: Session = Depends(get_db),
 ):
+    """
+    Retrieves the top 10 movies based on a predefined criteria, such as rating.
+    
+    Parameters:
+    - db: Session - Dependency injection of the database session.
+    
+    Returns:
+    - An optional list of the top 10 movies conforming to the MovieDisplayAll schema. If the movies list is empty, a 404 error is returned.
+    """
     movies = db_movies.get_all_movies(db=db)
     if not movies:
         raise HTTPException(
@@ -70,6 +104,17 @@ def get_movies_request_count(
     end_date: datetime = Query("2024-02-14T00:00:00"),
     db: Session = Depends(get_db),
 ):
+    """
+    Retrieves the count of requests made for movies within a given date range.
+    
+    Parameters:
+    - start_date: datetime - The starting date of the range.
+    - end_date: datetime - The ending date of the range.
+    - db: Session - Dependency injection of the database session.
+    
+    Returns:
+    - A list of movie request counts, each conforming to the MovieRequestCount schema.
+    """
     return db_movies.get_movie_request_count(
         db=db, start_date=start_date, end_date=end_date
     )
@@ -82,6 +127,18 @@ def get_movie_by_id(
     db: Session = Depends(get_db),
     token: Optional[str] = Depends(oauth2.oauth2_schema),
 ):
+    """
+    Retrieves all reviews for a specific movie, optionally filtering for a specific review by ID.
+    
+    Parameters:
+    - movie: movies_schemas.MovieDisplayOne - The movie for which reviews are being requested, resolved by the Depends(get_movie_by_id) call.
+    - db: Session - Dependency injection of the database session.
+    - reviews: Optional[List[reviews_schemas.ReviewDisplayOne]] - A list of reviews for the movie, resolved by Depends(db_reviews.all_reviews_for_movie).
+    - review_id: Optional[int] - Optional review ID to filter the reviews list.
+    
+    Returns:
+    - An optional list of reviews for the specified movie. If a review_id is specified and no matching review is found, a 404 HTTPException is raised.
+    """
     if check_movie(db, movie_id):
         movie = db_movies.get_movie(db, movie_id)
         if token:
@@ -175,6 +232,7 @@ def get_all_reviews_for_movie(
     reviews: Optional[List[reviews_schemas.ReviewDisplayOne]] = Depends(db_reviews.all_reviews_for_movie),
     review_id: Optional[int]=None
 ):
+    
     if review_id:
         for review in reviews:
             if review.id == review_id:
@@ -214,6 +272,20 @@ def update_movie(
     db: Session = Depends(get_db),
     token: str = Depends(oauth2.oauth2_schema),
 ):
+    """
+    Updates a movie's details.
+    
+    Requires admin authentication. Allows updating details of a movie identified by its ID with new data provided in the MovieUpdate schema.
+    
+    Parameters:
+    - movie_id: int - The ID of the movie to update.
+    - movie: movies_schemas.MovieUpdate - The new data for the movie.
+    - db: Session - Dependency injection of the database session.
+    - token: str - The OAuth2 token for admin authentication.
+    
+    Returns:
+    - The updated movie's details, or an HTTPException if the movie is not found or the user is unauthorized.
+    """
     if oauth2.admin_authentication(token=token):
         if check_movie(db, movie_id):
             if movie is None:
@@ -391,6 +463,21 @@ async def upload_file(
     db: Session = Depends(get_db),
     token: str = Depends(oauth2.oauth2_schema),
 ):
+    """
+    Uploads a poster image for a movie.
+    
+    Requires admin authentication. Accepts an image file and associates it with the specified movie as its poster.
+    Validates the file type to ensure it's an acceptable image format.
+    
+    Parameters:
+    - movie_id: int - The ID of the movie to associate the uploaded file with.
+    - upload_file: UploadFile - The image file to upload.
+    - db: Session - Dependency injection of the database session.
+    - token: str - The OAuth2 token for admin authentication.
+    
+    Returns:
+    - A success message with the file path or an error message.
+    """
     file_extension = os.path.splitext(upload_file.filename)[-1]  # get file extension
     if file_extension not in [".jpg", ".png"]:
         return "Invalid file type. Please upload a jpg or png file."
@@ -424,6 +511,16 @@ async def get_movie_extra(
     movie_id: int,
     db: Session = Depends(get_db),
 ):
+    """
+    Fetches extra data for a movie by its ID, such as additional details from an external API like IMDb.
+    
+    Parameters:
+    - movie_id: int - The ID of the movie for which to fetch extra data.
+    - db: Session - Dependency injection of the database session.
+    
+    Returns:
+    - Extra data about the movie, conforming to the MovieExtraData schema. If the movie is not found, a 404 HTTPException is raised.
+    """
     if check_movie(db, movie_id) is False:
         raise HTTPException(
             status_code=404, detail=f"Movie with Id :{movie_id} not found"
