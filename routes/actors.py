@@ -33,6 +33,17 @@ def create_actor(
     db: Session = Depends(get_db),
     token: str = Depends(oauth2.oauth2_schema),
 ):
+    """
+    Creates a new actor in the database. Requires admin authentication.
+
+    Parameters:
+    - request (Actor): The actor data to create.
+    - db (Session): Database session for executing database operations.
+    - token (str): OAuth2 token to authenticate the request.
+
+    Returns:
+    - ActorDisplay: The created actor's information.
+    """
     oauth2.admin_authentication(
         token=token,
         detail=AUTHENTICATION_TEXT,
@@ -49,6 +60,15 @@ def create_actor(
     response_model=List[ActorDisplay],
 )
 def get_all_actors(db: Session = Depends(get_db)):
+    """
+    Retrieves all actors from the database.
+
+    Parameters:
+    - db (Session): Database session for executing database operations.
+
+    Returns:
+    - List[ActorDisplay]: A list of all actors.
+    """
     return db_actors.get_all_actors(db=db)
 
 
@@ -61,6 +81,19 @@ def get_actor_by_id(
     actor_id: int,
     db: Session = Depends(get_db),
 ):
+    """
+    Retrieves an actor by their ID.
+
+    Parameters:
+    - actor_id (int): The ID of the actor to retrieve.
+    - db (Session): Database session for executing database operations.
+
+    Raises:
+    - HTTPException: 404 Not Found if no actor with the specified ID exists.
+
+    Returns:
+    - ActorDisplay: The requested actor's information.
+    """
     actor = db_actors.get_actor(db, actor_id)
     if actor is None:
         raise HTTPException(
@@ -80,6 +113,18 @@ def update_actor(
     db: Session = Depends(get_db),
     token: str = Depends(oauth2.oauth2_schema),
 ):
+    """
+    Updates an existing actor in the database. Requires admin authentication.
+
+    Parameters:
+    - request (ActorFullUpdate): The updated data for the actor.
+    - actor (Actor): The current actor object from the database.
+    - db (Session): Database session for executing database operations.
+    - token (str): OAuth2 token to authenticate the request.
+
+    Returns:
+    - ActorDisplay: The updated actor's information.
+    """
     oauth2.admin_authentication(
         token=token,
         detail=AUTHENTICATION_TEXT,
@@ -102,6 +147,19 @@ def patch_actor(
     db: Session = Depends(get_db),
     token: str = Depends(oauth2.oauth2_schema),
 ):
+    """
+    Partially updates an actor's information in the database. 
+    Requires admin authentication.
+
+    Parameters:
+    - request (ActorPatch): The partial update data for the actor.
+    - actor (Actor): The current actor object from the database.
+    - db (Session): Database session for executing database operations.
+    - token (str): OAuth2 token to authenticate the request.
+
+    Returns:
+    - ActorDisplay: The partially updated actor's information.
+    """
     oauth2.admin_authentication(
         token=token,
         detail=AUTHENTICATION_TEXT,
@@ -124,6 +182,17 @@ def delete_actor(
     db: Session = Depends(get_db),
     token: str = Depends(oauth2.oauth2_schema),
 ):
+    """
+    Deletes an actor from the database. Requires admin authentication.
+
+    Parameters:
+    - actor (Actor): The actor object to delete.
+    - db (Session): Database session for executing database operations.
+    - token (str): OAuth2 token to authenticate the request.
+
+    Returns:
+    - A confirmation message indicating successful deletion.
+    """
     oauth2.admin_authentication(
         token=token,
         detail=AUTHENTICATION_TEXT,

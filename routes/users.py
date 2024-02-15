@@ -32,6 +32,19 @@ def check_user(
     db: Session,
     user_id: int,
 ):
+    """
+    Checks if a user exists in the database by their ID.
+
+    Parameters:
+    - db (Session): Database session for executing database operations.
+    - user_id (int): The ID of the user to check.
+
+    Raises:
+    - HTTPException: 404 Not Found if the user with the specified ID does not exist.
+
+    Returns:
+    - The user object if found.
+    """
 
     user = db_users.get_user(
         db=db,
@@ -55,6 +68,21 @@ def get_users(
     db: Session = Depends(get_db),
     token: str = Depends(oauth2.oauth2_schema),
 ):
+    """
+    Retrieves all users from the database. This endpoint is restricted
+    to admins only.
+
+    Parameters:
+    - db (Session): Database session for executing database operations.
+    - token (str): OAuth2 token to authenticate the request.
+
+    Raises:
+    - HTTPException: 404 Not Found if the users table is empty.
+    - HTTPException: 401 Unauthorized if the requester is not an admin.
+
+    Returns:
+    - List[UserDisplay]: A list of all users.
+    """
 
     oauth2.admin_authentication(
         token=token,
@@ -81,6 +109,23 @@ def get_user(
     db: Session = Depends(get_db),
     token: str = Depends(oauth2.oauth2_schema),
 ):
+    """
+    Retrieves information for a specific user. Users can only access their
+    own information.
+
+    Parameters:
+    - response (Response): The FastAPI response object.
+    - user_id (int): The ID of the user to retrieve.
+    - db (Session): Database session for executing database operations.
+    - token (str): OAuth2 token to authenticate the request.
+
+    Raises:
+    - HTTPException: 401 Unauthorized if the requester is not the user or
+        an admin.
+
+    Returns:
+    - UserDisplay: The requested user's information.
+    """
 
     payload = oauth2.decode_access_token(token=token)
     user = check_user(db=db, user_id=user_id)
@@ -99,6 +144,16 @@ def get_all_user_reviews(
     user_id=int,
     db: Session = Depends(get_db),
 ):
+    """
+    Retrieves all reviews made by a specific user.
+
+    Parameters:
+    - user_id (int): The ID of the user whose reviews are to be retrieved.
+    - db (Session): Database session for executing database operations.
+
+    Returns:
+    - A list of reviews made by the specified user.
+    """
 
     db_reviews = get_all_reviews(db=db)
     user_reviews = []
@@ -119,6 +174,19 @@ def create_user(
     request: UserBase,
     db: Session = Depends(get_db),
 ):
+    """
+    Creates a new user in the database.
+
+    Parameters:
+    - request (UserBase): The user information to create.
+    - db (Session): Database session for executing database operations.
+
+    Raises:
+    - HTTPException: 409 Conflict if a user with the same email already exists.
+
+    Returns:
+    - UserDisplay: The created user's information.
+    """
 
     if (
         db_users.get_user(
@@ -150,6 +218,22 @@ def update_user(
     db: Session = Depends(get_db),
     token: str = Depends(oauth2.oauth2_schema),
 ):
+    """
+    Updates information for a specific user. Users can only update
+    their own information.
+
+    Parameters:
+    - request (UserUpdate): The new information for the user.
+    - user_id (int): The ID of the user to update.
+    - db (Session): Database session for executing database operations.
+    - token (str): OAuth2 token to authenticate the request.
+
+    Raises:
+    - HTTPException: 401 Unauthorized if the requester is not the user.
+
+    Returns:
+    - UserDisplay: The updated user's information.
+    """
 
     payload = oauth2.decode_access_token(token=token)
     user = check_user(db=db, user_id=user_id)
@@ -180,6 +264,22 @@ def update_user_type(
     db: Session = Depends(get_db),
     token: str = Depends(oauth2.oauth2_schema),
 ):
+    """
+    Updates the type for a specific user. This endpoint is restricted
+    to admins only.
+
+    Parameters:
+    - request (UserTypeUpdate): The new type for the user.
+    - user_id (int): The ID of the user whose type is to be updated.
+    - db (Session): Database session for executing database operations.
+    - token (str): OAuth2 token to authenticate the request as an admin.
+
+    Raises:
+    - HTTPException: 401 Unauthorized if the requester is not an admin.
+
+    Returns:
+    - UserTypeDisplay: The user with updated type information.
+    """
 
     user = check_user(
         db=db,
@@ -210,6 +310,21 @@ def delete_user(
     db: Session = Depends(get_db),
     token: str = Depends(oauth2.oauth2_schema),
 ):
+    """
+    Deletes a specific user from the database. This endpoint is
+    restricted to admins only.
+
+    Parameters:
+    - user_id (int): The ID of the user to delete.
+    - db (Session): Database session for executing database operations.
+    - token (str): OAuth2 token to authenticate the request as an admin.
+
+    Raises:
+    - HTTPException: 401 Unauthorized if the requester is not an admin.
+
+    Returns:
+    - A success message indicating the user was deleted successfully.
+    """
 
     payload = oauth2.decode_access_token(token=token)
     user = check_user(
