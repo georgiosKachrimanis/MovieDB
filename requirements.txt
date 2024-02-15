@@ -1,0 +1,13 @@
+fastapi
+uvicorn
+pydantic
+sqlalchemy
+passlib
+bcrypt
+python-multipart
+python-jose
+# Also use this command for this pip install 'pydantic[email]'
+httpx
+requests
+aiofiles
+python-dotenv
