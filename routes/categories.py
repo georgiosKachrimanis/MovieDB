@@ -6,12 +6,11 @@ from fastapi import (
 )
 from sqlalchemy.orm import Session
 from auth import oauth2
-from db import db_categories, db_movies
+from db import db_categories
 from db.database import get_db
 from schemas.mov_dir_actors_schemas import (
     Category,
     CategoryName,
-    MovieDisplayOne,
 )
 
 router = APIRouter(
@@ -35,6 +34,17 @@ def create_category(
     db: Session = Depends(get_db),
     token: str = Depends(oauth2.oauth2_schema),
 ):
+    """
+    Creates a new category in the database. Requires admin authentication.
+
+    Parameters:
+    - category_name (str): The name of the category to create.
+    - db (Session): Database session for executing database operations.
+    - token (str): OAuth2 token to authenticate the request.
+
+    Returns:
+    - Category: The created category object.
+    """
 
     oauth2.admin_authentication(token=token, detail=AUTH_EXCEPTION)
 
@@ -50,6 +60,15 @@ def create_category(
     response_model=List[Category],
 )
 def get_categories(db: Session = Depends(get_db)):
+    """
+    Retrieves all categories from the database.
+
+    Parameters:
+    - db (Session): Database session for executing database operations.
+
+    Returns:
+    - List[Category]: A list of all category objects.
+    """
     return db_categories.get_all_categories(db=db)
 
 
@@ -62,6 +81,20 @@ def get_category_by_id(
     category_id: int,
     db: Session = Depends(get_db),
 ):
+    """
+    Retrieves a category by its ID.
+
+    Parameters:
+    - category_id (int): The ID of the category to retrieve.
+    - db (Session): Database session for executing database operations.
+
+    Raises:
+    - HTTPException: 404 Not Found if the category with the specified ID 
+        does not exist.
+
+    Returns:
+    - Category: The requested category object.
+    """
     category = db_categories.get_category_with_id(
         db,
         category_id,
@@ -72,38 +105,6 @@ def get_category_by_id(
             detail="Category not found",
         )
     return category
-
-
-# @router.get(
-#     "/{category_id}/movies",
-#     response_model=List[MovieDisplayOne],
-# )
-# def get_movies_by_category(
-#     category: int,
-#     db: Session = Depends(get_db),
-# ):
-#     category_check = get_category_by_id(
-#         category_id=category,
-#         db=db,
-#     )
-#     if not category_check:
-#         raise HTTPException(
-#             status_code=404,
-#             detail=f"Category {category} not found",
-#         )
-#     movies = db_movies.get_movies_by_category(
-#         category=category_check,
-#         db=db,
-#     )
-#     if not movies:
-#         raise HTTPException(
-#             status_code=404,
-#             detail=f"No movies in category {category_check.category_name}",
-#         )
-
-#     return movies
-
-
 
 
 # Update Category
@@ -117,7 +118,22 @@ def update_category(
     token: str = Depends(oauth2.oauth2_schema),
     db: Session = Depends(get_db),
 ):
+    """
+    Updates the name of an existing category. Requires admin authentication.
 
+    Parameters:
+    - category_id (int): The ID of the category to update.
+    - request (CategoryName): The new name for the category.
+    - token (str): OAuth2 token to authenticate the request.
+    - db (Session): Database session for executing database operations.
+
+    Raises:
+    - HTTPException: 404 Not Found if the category with the specified ID 
+        does not exist.
+
+    Returns:
+    - Category: The updated category object.
+    """
     oauth2.admin_authentication(token=token)
 
     category = db_categories.get_category_with_id(
@@ -144,6 +160,21 @@ def delete_category(
     db: Session = Depends(get_db),
     token: str = Depends(oauth2.oauth2_schema),
 ):
+    """
+    Deletes a category from the database. Requires admin authentication.
+
+    Parameters:
+    - category_id (int): The ID of the category to delete.
+    - db (Session): Database session for executing database operations.
+    - token (str): OAuth2 token to authenticate the request.
+
+    Raises:
+    - HTTPException: 404 Not Found if the category with the specified ID does
+    not exist.
+
+    Returns:
+    - A status code of 204 No Content on successful deletion.
+    """
 
     oauth2.admin_authentication(token=token)
 
