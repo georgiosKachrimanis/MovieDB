@@ -1,4 +1,7 @@
-from typing import List
+from typing import (
+    List,
+    Optional,
+)
 from fastapi import (
     APIRouter,
     Depends,
@@ -19,6 +22,7 @@ router = APIRouter(prefix="/reviews", tags=["Review Endpoints"])
 
 
 # Returns all Reviews from a movie
+#TODO: adjust this function as it is ony called by the movies.py
 def all_reviews_for_movie(
     movie_id: int,
     db: Session = Depends(get_db),
@@ -78,7 +82,11 @@ def create_review(
     "/",
     response_model=List[ReviewDisplayOne],
 )
-def get_all_reviews(db: Session = Depends(get_db)):
+def get_all_reviews(
+    db: Session = Depends(get_db),
+    user_id: Optional[int] = None,
+    movie_id: Optional[int] = None,
+):
 
     reviews = db_reviews.get_all_reviews(db)
     if reviews is None:
@@ -86,6 +94,31 @@ def get_all_reviews(db: Session = Depends(get_db)):
             status_code=status.HTTP_404_NOT_FOUND,
             detail="No reviews to show!",
         )
+
+    if user_id:
+        user_reviews = []
+        for review in reviews:
+            if review.user_id == int(user_id):
+                user_reviews.append(review)
+        if user_reviews == []:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail=f"No reviews for user with ID: {user_id}!",
+            )
+        else:
+            reviews = user_reviews
+    if movie_id:
+        movie_reviews = []
+        for review in reviews:
+            if review.movie_id == int(movie_id):
+                movie_reviews.append(review)
+            if movie_reviews == []:
+                raise HTTPException(
+                    status_code=status.HTTP_404_NOT_FOUND,
+                    detail=f"No reviews for movie with ID: {movie_id}!",
+                )
+        else:
+            reviews = movie_reviews
     return reviews
 
 

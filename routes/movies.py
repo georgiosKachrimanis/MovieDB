@@ -66,6 +66,24 @@ def get_movies(
     category: TestCategory = None,
     top_movies: int = None,
 ):
+    """
+    Retrieves a list of movies from the database. Can filter movies by actor ID, director ID, category, and limit the result to top N movies based on average movie rate.
+
+    Parameters:
+    - db (Session): Database session for executing database operations.
+    - actor_id (int, optional): Filter movies by actor ID.
+    - director_id (int, optional): Filter movies by director ID.
+    - category (Category, optional): Filter movies by category.
+    - top_movies (int, optional): Limit the result to top N movies.
+
+    Raises:
+    - HTTPException: 404 error if the movies list is empty or
+        specific filters yield no results.
+
+    Returns:
+    - Optional[List[MovieDisplayAll]]: List of movies matching
+        the criteria or None.
+    """
     movies = db_movies.get_all_movies(db=db)
     if not movies:
         raise HTTPException(
@@ -110,7 +128,22 @@ def get_movie_by_id(
     movie_id: int,
     db: Session = Depends(get_db),
     token: Optional[str] = Depends(oauth2.oauth2_schema),
-):
+):  
+    """
+    Retrieves a movie by its ID. Requires a valid token to retrieve
+    user-specific information if provided.
+
+    Parameters:
+    - movie_id (int): The ID of the movie to retrieve.
+    - db (Session): Database session for executing database operations.
+    - token (Optional[str]): The OAuth2 token for user authentication.
+
+    Raises:
+    - HTTPException: 404 error if the movie with the specified ID is not found.
+
+    Returns:
+    - Optional[MovieDisplayOne]: The movie matching the ID or None.
+    """
 
     if token:
         payload = oauth2.decode_access_token(token=token)
@@ -146,6 +179,20 @@ def get_movie_reviews(
     reviews: Optional[List[ReviewDisplayOne]] = Depends(all_reviews_for_movie),
     review_id: Optional[int] = None,
 ):
+    """
+    Retrieves reviews for a specific movie. Can filter the reviews by
+    a specific review ID.
+
+    Parameters:
+    - movie (MovieDisplayOne): The movie object obtained by `get_movie_by_id`.
+    - db (Session): Database session for executing database operations.
+    - reviews (Optional[List[ReviewDisplayOne]]): List of reviews for movie.
+    - review_id (Optional[int]): Filter reviews by review ID.
+
+    Returns:
+    - Optional[List[ReviewDisplayOne]]: List of reviews for the movie or a
+    specific review if review_id is provided.
+    """
     if review_id:
         reviews = get_movie_review(
             movie=movie,
@@ -165,6 +212,23 @@ def get_movie_actors(
     movie: MovieDisplayOne = Depends(get_movie_by_id),
     actor_id: Optional[int] = None,
 ):
+    """
+    Retrieves actors for a specific movie. Can filter actors by a
+    specific actor ID.
+
+    Parameters:
+    - db (Session): Database session for executing database operations.
+    - movie (MovieDisplayOne): The movie object obtained by `get_movie_by_id`.
+    - actor_id (Optional[int]): Filter actors by actor ID.
+
+    Raises:
+    - HTTPException: 404 error if the actor with the specified ID does not
+        belong to the movie.
+
+    Returns:
+    - List[ActorDisplay]: List of actors for the movie or a specific actor
+    if actor_id is provided.
+    """
     for movie_actor in movie.actors:
         if movie_actor.id == actor_id:
             return [movie_actor]
@@ -181,6 +245,15 @@ def get_movie_actors(
     response_model=DirectorDisplay,
 )
 def get_movie_director(movie: MovieDisplayOne = Depends(get_movie_by_id)):
+    """
+    Retrieves the director of a specific movie.
+
+    Parameters:
+    - movie (MovieDisplayOne): The movie object obtained by `get_movie_by_id`.
+
+    Returns:
+    - DirectorDisplay: The director of the movie.
+    """
     return DirectorDisplay.model_validate(movie.director)
 
 
@@ -192,6 +265,17 @@ def get_movie_director(movie: MovieDisplayOne = Depends(get_movie_by_id)):
 async def get_movie_extra(
     movie: MovieBase = Depends(get_movie_by_id),
 ):
+    """
+    Retrieves extra data for a movie by its IMDb ID. 
+    This is an asynchronous function.
+
+    Parameters:
+    - movie (MovieBase): The movie object obtained from `get_movie_by_id`.
+
+    Returns:
+    - MovieExtraData: Extra data about the movie.
+    """  
+
     return await db_movies.get_movie_extra(movie=movie)
 
 
@@ -207,30 +291,20 @@ def create_movie(
     token: str = Depends(oauth2.oauth2_schema),
 ):
     """
-    Create a new movie entry in the database.
-
-    This endpoint creates a new movie with the details provided in the
-    request body. It requires an authenticated admin user token to proceed.
-    If a movie with the same title already exists, it raises an
-    HTTP 409 Conflict exception.
+    Creates a new movie entry in the database. Requires an admin user token
+    for authentication.
 
     Parameters:
-    - movie (MovieBase):
-        The movie details to be created, excluding the id.
-    - db (Session):
-        The database session dependency to perform database operations.
-    - token (str):
-        The admin user's authentication token.
+    - movie (MovieBase): The movie details to create.
+    - db (Session): Database session for executing database operations.
+    - token (str): Admin user's authentication token.
 
     Raises:
-    - HTTPException:
-        409 Conflict if a movie with the same title already exists.
-    - HTTPException:
-        Various authentication related errors handled by the
-        `oauth2.admin_authentication` function.
+    - HTTPException: 409 Conflict if a movie with the same title already
+        exists.
 
     Returns:
-    - The created movie details as an instance of `MovieDisplayOne`.
+    - MovieDisplayOne: The created movie details.
     """
 
     oauth2.admin_authentication(
@@ -246,34 +320,6 @@ def create_movie(
     return db_movies.create_movie(db, movie)
 
 
-# @router.post(
-#     "/{movie_id}/reviews/",
-#     response_model=ReviewDisplayOne,
-#     status_code=status.HTTP_201_CREATED,
-# )
-# def post_review_for_movie(
-#     review_request: ReviewUpdate,
-#     movie: MovieBase = Depends(get_movie_by_id),
-#     db: Session = Depends(get_db),
-#     token: str = Depends(oauth2.oauth2_schema),
-# ):
-#     oauth2.admin_authentication(
-#         token=token,
-#         detail=AUTHENTICATION_TEXT,
-#     )
-
-#     new_review = CreateReview(
-#         review_content=review_request.review_content,
-#         user_rating=review_request.user_rating,
-#         movie_id=movie.id,
-#     )
-#     return create_review(
-#         request=new_review,
-#         db=db,
-#         token=token,
-#     )
-
-
 # Upload Movie Poster Image
 @router.post(
     "/{movie_id}/upload_poster",
@@ -284,7 +330,23 @@ async def upload_file(
     upload_file: UploadFile = File(...),
     db: Session = Depends(get_db),
     token: str = Depends(oauth2.oauth2_schema),
-):
+):  
+    """
+    Uploads a poster image file for a movie. Validates file type and
+    updates the movie's poster URL in the database.
+
+    Parameters:
+    - movie (MovieDisplayOne): The movie object to upload the poster for.
+    - upload_file (UploadFile): The poster image file.
+    - db (Session): Database session for executing database operations.
+    - token (str): Admin user's authentication token.
+
+    Raises:
+    - HTTPException: 400 error if the file type is not jpg or png.
+
+    Returns:
+    - MovieDisplayOne: The updated movie details with the new poster URL.
+    """
     file_extension = os.path.splitext(upload_file.filename)[-1]
     if file_extension not in [".jpg", ".png"]:
         raise HTTPException(
@@ -335,6 +397,22 @@ def update_movie_data(
     db: Session = Depends(get_db),
     token: str = Depends(oauth2.oauth2_schema),
 ):
+    """
+    Updates the details of an existing movie. Requires an admin user
+    token for authentication.
+
+    Parameters:
+    - movie_updates (MovieUpdate): The updated movie details.
+    - movie (MovieBase): The original movie object obtained `get_movie_by_id`.
+    - db (Session): Database session for executing database operations.
+    - token (str): Admin user's authentication token.
+
+    Raises:
+    - HTTPException: 404 error if the movie with the specified ID is not found.
+
+    Returns:
+    - MovieDisplayOne: The updated movie details.
+    """
 
     oauth2.admin_authentication(
         token=token,
@@ -355,68 +433,6 @@ def update_movie_data(
     return updated_movie
 
 
-# @router.put(
-#     "/{movie_id}/director/{director_id}",
-#     response_model=Director,
-# )
-# def update_movie_director(
-#     director_id: int,
-#     movie: MovieDisplayOne = Depends(get_movie_by_id),
-#     db: Session = Depends(get_db),
-#     token: str = Depends(oauth2.oauth2_schema),
-# ):
-#     oauth2.admin_authentication(
-#         token=token,
-#         detail=AUTHENTICATION_TEXT,
-#     )
-
-#     from db import db_directors
-
-#     director = db_directors.get_director(
-#         director_id=director_id,
-#         db=db,
-#     )
-#     request = DirectorUpdate(
-#         director_name=director.director_name,
-#         movies=[movie.id],
-#     )
-#     return db_directors.update_director(
-#         db=db,
-#         director=director,
-#         request=request,
-#     )
-
-
-# @router.put(
-#     "/{movie_id}/reviews/{review_id}",
-#     response_model=ReviewDisplayOne,
-# )
-# def update_review_for_movie(
-#     request: ReviewUpdate,
-#     review: ReviewDisplayOne = Depends(get_review),
-#     movie: MovieBase = Depends(get_movie_by_id),
-#     db: Session = Depends(get_db),
-#     token: str = Depends(oauth2.oauth2_schema),
-# ):
-#     oauth2.admin_authentication(
-#         token=token,
-#         detail=AUTHENTICATION_TEXT,
-#     )
-#     checked_review = get_review_for_movie(movie=movie, review=review, db=db)
-
-#     if not checked_review:
-#         raise HTTPException(
-#             status_code=409,
-#             detail=f"Review: {review.id}, doesn't belong to Movie: {movie.id}",
-#         )
-#     return update_review(
-#         review_id=review.id,
-#         db=db,
-#         token=token,
-#         request=request,
-#     )
-
-
 # ================================= PATCH Endpoints =========================
 @router.patch(
     "/{movie_id}",
@@ -428,7 +444,22 @@ def patch_movie(
     db: Session = Depends(get_db),
     token: str = Depends(oauth2.oauth2_schema),
 ):
+    """
+    Partially updates the details of an existing movie. Requires an admin
+    user token for authentication.
 
+    Parameters:
+    - movie_id (int): The ID of the movie to update.
+    - movie_updates (Optional[MoviePatchUpdate]): The updated movie details.
+    - db (Session): Database session for executing database operations.
+    - token (str): Admin user's authentication token.
+
+    Raises:
+    - HTTPException: 404 error if the movie with the specified ID is not found.
+
+    Returns:
+    - Optional[MovieDisplayOne]: The updated movie details or None.
+    """
     oauth2.admin_authentication(
         token=token,
         detail=AUTHENTICATION_TEXT,
@@ -450,52 +481,8 @@ def patch_movie(
     return updated_movie
 
 
-# # Add actor in the movie
-# @router.patch(
-#     "/{movie_id}/actors/{actor_id}",
-#     response_model=ActorDisplay,
-#     status_code=status.HTTP_201_CREATED,
-# )
-# def add_actor_in_movie(
-#     actor_id: int,
-#     movie: MovieDisplayOne = Depends(get_movie_by_id),
-#     db: Session = Depends(get_db),
-#     token: str = Depends(oauth2.oauth2_schema),
-# ):
-
-#     return patch_actor(
-#         request=ActorPatch(movies=[movie.id]),
-#         actor=get_actor_by_id(actor_id=actor_id, db=db),
-#         db=db,
-#         token=token,
-#     )
-
 
 # ================================= DELETE Endpoints ========================
-# @router.delete(
-#     "/{movie_id}/reviews/{review_id}",
-#     status_code=status.HTTP_204_NO_CONTENT,
-# )
-# def delete_review_for_movie(
-#     review: ReviewDisplayOne = Depends(get_review),
-#     movie: MovieBase = Depends(get_movie_by_id),
-#     db: Session = Depends(get_db),
-#     token: str = Depends(oauth2.oauth2_schema),
-# ):
-#     checked_review = get_review_for_movie(movie=movie, review=review, db=db)
-
-#     if not checked_review:
-#         raise HTTPException(
-#             status_code=409,
-#             detail=f"Review: {review.id}, doesn't belong to Movie: {movie.id}",
-#         )
-#     return delete_review(
-#         review_id=review.id,
-#         db=db,
-#         token=token,
-#     )
-
-
 @router.delete(
     "/{movie_id}",
     status_code=status.HTTP_204_NO_CONTENT,
@@ -505,6 +492,22 @@ def delete_movie(
     db: Session = Depends(get_db),
     token: str = Depends(oauth2.oauth2_schema),
 ):
+    """
+    Deletes a movie from the database. Requires an admin user token
+    for authentication.
+
+    Parameters:
+    - movie_id (int): The ID of the movie to delete.
+    - db (Session): Database session for executing database operations.
+    - token (str): Admin user's authentication token.
+
+    Raises:
+    - HTTPException: 409 error if the movie has associated reviews.
+    - HTTPException: 404 error if the movie with the specified ID is not found.
+
+    Returns:
+    - A success message indicating the movie was deleted.
+    """
 
     oauth2.admin_authentication(
         token=token,
@@ -531,7 +534,8 @@ def get_movies_by_category(
     category_name: str,
     movies: List[MovieBase],
 ):
-    category_id = get_category_with_name(db=db, category_name=category_name)
+    category_id = get_category_with_name(db=db, category_name=category_name,)
+    
     filtered_movies = []
     for movie in movies:
         for movie_category in movie.categories:
@@ -540,7 +544,7 @@ def get_movies_by_category(
     if filtered_movies == []:
         raise HTTPException(
             status_code=404,
-            detail=f"No movies in {category_name}",
+            detail=f"No movies in category with ID: {category_id}",
         )
     return filtered_movies
 
