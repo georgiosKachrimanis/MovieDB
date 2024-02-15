@@ -110,5 +110,6 @@ class ReviewDisplayAll(BaseModel):
 
 
 class ReviewUpdate(BaseModel):
+    movie_id: Optional[int] = None
     review_content: Optional[str] = None
     user_rating: Optional[float] = None
