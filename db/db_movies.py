@@ -15,7 +15,7 @@ from db.models import (
 )
 from routes.directors import get_director_by_id
 from services.movie_service import get_movie_extra_data
-from schemas.mov_dir_actors_schemas import (
+from schemas.movies_schemas import (
     MovieBase,
     MoviePatchUpdate,
     MovieUpdate,

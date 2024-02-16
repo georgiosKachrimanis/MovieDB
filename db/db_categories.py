@@ -1,7 +1,6 @@
 from sqlalchemy.orm import Session
-
 from db.models import DbCategory
-from schemas.mov_dir_actors_schemas import CategoryName
+from schemas.categories_schemas import CategoryBase
 
 
 # Create Category
@@ -33,14 +32,19 @@ def get_category_with_name(
     db: Session,
     category_name: str,
 ):
-    return db.query(DbCategory).filter(DbCategory.category_name == category_name).first().id
+    return (
+        db.query(DbCategory)
+        .filter(DbCategory.category_name == category_name)
+        .first()
+        .id
+    )
 
 
 # Update Category
 def update_category(
     db: Session,
     category_id: int,
-    request: CategoryName,
+    request: CategoryBase,
 ):
     category = get_category_with_id(db, category_id)
     if category:

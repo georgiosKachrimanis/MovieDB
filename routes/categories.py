@@ -1,17 +1,12 @@
 from typing import List
-from fastapi import (
-    APIRouter,
-    Depends,
-    HTTPException,
-)
+
+from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
+
 from auth import oauth2
 from db import db_categories
 from db.database import get_db
-from schemas.mov_dir_actors_schemas import (
-    Category,
-    CategoryName,
-)
+from schemas.categories_schemas import Category, CategoryBase
 
 router = APIRouter(
     prefix="/categories",
@@ -89,7 +84,7 @@ def get_category_by_id(
     - db (Session): Database session for executing database operations.
 
     Raises:
-    - HTTPException: 404 Not Found if the category with the specified ID 
+    - HTTPException: 404 Not Found if the category with the specified ID
         does not exist.
 
     Returns:
@@ -114,7 +109,7 @@ def get_category_by_id(
 )
 def update_category(
     category_id: int,
-    request: CategoryName,
+    request: CategoryBase,
     token: str = Depends(oauth2.oauth2_schema),
     db: Session = Depends(get_db),
 ):
@@ -128,7 +123,7 @@ def update_category(
     - db (Session): Database session for executing database operations.
 
     Raises:
-    - HTTPException: 404 Not Found if the category with the specified ID 
+    - HTTPException: 404 Not Found if the category with the specified ID
         does not exist.
 
     Returns:

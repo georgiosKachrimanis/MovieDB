@@ -15,37 +15,21 @@ from sqlalchemy.orm import Session
 from auth import oauth2
 from db import db_movies
 from db.database import get_db
-from routes.actors import (
-    get_actor_by_id,
-    patch_actor,
-)
 from db.db_categories import get_category_with_name
-from routes.reviews import (
-    all_reviews_for_movie,
-    create_review,
-    delete_review,
-    get_review,
-    update_review,
-)
-from schemas.mov_dir_actors_schemas import (
-    ActorDisplay,
-    ActorPatch,
-    Director,
-    DirectorDisplay,
-    DirectorUpdate,
+from routes.reviews import all_reviews_for_movie
+from schemas.actors_schemas import ActorDisplay
+from schemas.directors_schemas import DirectorDisplay
+from schemas.categories_schemas import CategoryMenu
+from schemas.users_reviews_schemas import ReviewDisplayOne
+from schemas.movies_schemas import (
     MovieBase,
     MovieDisplayAll,
     MovieDisplayOne,
     MovieExtraData,
     MoviePatchUpdate,
     MovieUpdate,
-    TestCategory,
 )
-from schemas.users_reviews_schemas import (
-    CreateReview,
-    ReviewDisplayOne,
-    ReviewUpdate,
-)
+
 
 router = APIRouter(
     prefix="/movies",
@@ -63,7 +47,7 @@ def get_movies(
     db: Session = Depends(get_db),
     actor_id: int = None,
     director_id: int = None,
-    category: TestCategory = None,
+    category: CategoryMenu = None,
     top_movies: int = None,
 ):
     """
@@ -128,7 +112,7 @@ def get_movie_by_id(
     movie_id: int,
     db: Session = Depends(get_db),
     token: Optional[str] = Depends(oauth2.oauth2_schema),
-):  
+):
     """
     Retrieves a movie by its ID. Requires a valid token to retrieve
     user-specific information if provided.
@@ -266,7 +250,7 @@ async def get_movie_extra(
     movie: MovieBase = Depends(get_movie_by_id),
 ):
     """
-    Retrieves extra data for a movie by its IMDb ID. 
+    Retrieves extra data for a movie by its IMDb ID.
     This is an asynchronous function.
 
     Parameters:
@@ -274,7 +258,7 @@ async def get_movie_extra(
 
     Returns:
     - MovieExtraData: Extra data about the movie.
-    """  
+    """
 
     return await db_movies.get_movie_extra(movie=movie)
 
@@ -330,7 +314,7 @@ async def upload_file(
     upload_file: UploadFile = File(...),
     db: Session = Depends(get_db),
     token: str = Depends(oauth2.oauth2_schema),
-):  
+):
     """
     Uploads a poster image file for a movie. Validates file type and
     updates the movie's poster URL in the database.
@@ -371,7 +355,7 @@ async def upload_file(
     )
 
 
-@router.post("/auto_add_movies")
+@router.post("/auto_add_movies", status_code=status.HTTP_201_CREATED)
 def auto_add_movies(db: Session = Depends(get_db)):
     """
     THIS IS ONLY TO BE USED FOR TESTING PURPOSES
@@ -481,7 +465,6 @@ def patch_movie(
     return updated_movie
 
 
-
 # ================================= DELETE Endpoints ========================
 @router.delete(
     "/{movie_id}",
@@ -534,8 +517,11 @@ def get_movies_by_category(
     category_name: str,
     movies: List[MovieBase],
 ):
-    category_id = get_category_with_name(db=db, category_name=category_name,)
-    
+    category_id = get_category_with_name(
+        db=db,
+        category_name=category_name,
+    )
+
     filtered_movies = []
     for movie in movies:
         for movie_category in movie.categories:

@@ -1,5 +1,5 @@
 from sqlalchemy.orm import Session
-from schemas.mov_dir_actors_schemas import (
+from schemas.actors_schemas import (
     Actor,
     ActorFullUpdate,
     ActorPatch,

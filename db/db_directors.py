@@ -1,7 +1,7 @@
 from fastapi import HTTPException, status
 from sqlalchemy.orm import Session
 from db.models import DbDirector
-from schemas.mov_dir_actors_schemas import (
+from schemas.directors_schemas import (
     Director,
     DirectorUpdate,
 )

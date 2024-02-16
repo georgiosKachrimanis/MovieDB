@@ -1,12 +1,10 @@
 from typing import List
-
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
-
 from auth import oauth2
 from db import db_actors
 from db.database import get_db
-from schemas.mov_dir_actors_schemas import (
+from schemas.actors_schemas import (
     Actor,
     ActorDisplay,
     ActorFullUpdate,
