@@ -2,9 +2,36 @@ from datetime import datetime
 from typing import List, Optional
 from pydantic import BaseModel
 from schemas.users_schemas import Review
-from schemas.categories_schemas import Category
+from schemas import categories_schemas
 from schemas.actors_schemas import Actor
-from schemas.directors_schemas import Director
+
+
+# =========================== Directors Schemas ===============================
+class Director(BaseModel):
+    director_name: str
+
+
+class DirectorUpdate(Director):
+    movies: List[int] = []
+
+
+class MovieBasicDisplay(BaseModel):
+    id: int
+    title: str
+
+    class Config:
+        from_attributes = True
+
+
+class DirectorDisplay(Director):
+    id: int
+    movies: List[MovieBasicDisplay] = []
+
+    class Config:
+        from_attributes = True
+
+
+# =================================== Actors ==================================
 
 
 # =========================== Movies Schemas ==================================
@@ -27,7 +54,7 @@ class MovieDisplayAll(BaseModel):
     plot: str
     released_date: datetime
     imdb_id: Optional[str]
-    categories: List[Category]
+    categories: List[categories_schemas.Category]
     poster_url: Optional[str] = None
     reviews_count: Optional[int] = None
     average_movie_rate: Optional[float] = None
@@ -93,3 +120,12 @@ class MovieTotalRequests(BaseModel):
     movie_id: int
     total_requests: Optional[int] = None
     last_request: Optional[datetime] = None
+
+
+# Used in Actors and Directors
+class MovieBasicDisplay(BaseModel):
+    id: int
+    title: str
+
+    class Config:
+        from_attributes = True

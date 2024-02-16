@@ -12,7 +12,7 @@ from sqlalchemy.orm import Session
 from auth import oauth2
 from db import db_reviews
 from db.database import get_db
-from schemas.users_reviews_schemas import (
+from schemas.reviews_schemas import (
     CreateReview,
     ReviewDisplayOne,
     ReviewUpdate,

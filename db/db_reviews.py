@@ -1,7 +1,7 @@
 from sqlalchemy.orm.session import Session
 from fastapi import HTTPException
 from db.models import DbReview
-from schemas.users_reviews_schemas import (
+from schemas.reviews_schemas import (
     CreateReview,
     ReviewUpdate,
 )

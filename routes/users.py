@@ -11,7 +11,7 @@ from auth import oauth2
 from db import db_users
 from db.database import get_db
 from routes.reviews import get_all_reviews
-from schemas.users_reviews_schemas import (
+from schemas.users_schemas import (
     UserBase,
     UserDisplay,
     UserTypeDisplay,

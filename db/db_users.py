@@ -4,7 +4,7 @@ from sqlalchemy.orm.session import Session
 
 from db.hash import Hash
 from db.models import DbReview, DbUser
-from schemas.users_reviews_schemas import UserBase, UserTypeUpdate, UserUpdate
+from schemas.users_schemas import UserBase, UserTypeUpdate, UserUpdate
 
 
 # TODO: check if i am passing user/reviews objects and not just ids

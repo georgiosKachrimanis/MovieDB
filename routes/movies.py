@@ -20,7 +20,7 @@ from routes.reviews import all_reviews_for_movie
 from schemas.actors_schemas import ActorDisplay
 from schemas.directors_schemas import DirectorDisplay
 from schemas.categories_schemas import CategoryMenu
-from schemas.users_reviews_schemas import ReviewDisplayOne
+from schemas.reviews_schemas import ReviewDisplayOne
 from schemas.movies_schemas import (
     MovieBase,
     MovieDisplayAll,
