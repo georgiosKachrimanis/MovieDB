@@ -18,7 +18,7 @@ from schemas.reviews_schemas import (
     ReviewUpdate,
 )
 
-router = APIRouter(prefix="/reviews", tags=["Review Endpoints"])
+router = APIRouter(prefix="/reviews", tags=["Reviews Endpoints"])
 
 
 # Returns all Reviews from a movie
@@ -44,7 +44,7 @@ def all_reviews_for_movie(
     reviews = get_all_reviews(db=db)
     movie_reviews = []
     for review in reviews:
-        if review.movie_id == movie_id:
+        if review.movie_id == int(movie_id):
             movie_reviews.append(review)
 
     if movie_reviews == []:
@@ -164,11 +164,12 @@ def get_all_reviews(
         for review in reviews:
             if review.movie_id == int(movie_id):
                 movie_reviews.append(review)
-            if movie_reviews == []:
-                raise HTTPException(
-                    status_code=status.HTTP_404_NOT_FOUND,
-                    detail=f"No reviews for movie with ID: {movie_id}!",
-                )
+        
+        if movie_reviews == []:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail=f"No reviews for movie with ID: {movie_id}!",
+            )
         else:
             reviews = movie_reviews
     return reviews
@@ -269,7 +270,10 @@ def delete_review(
     """
 
     user_payload = oauth2.decode_access_token(token=token)
-    review = get_review_from_db(review_id=review_id, db=db)
+    review = get_review_from_db(
+        review_id=review_id,
+        db=db,
+    )
 
     if (
         review.user_id == user_payload.get("user_id")

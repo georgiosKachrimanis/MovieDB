@@ -7,7 +7,6 @@ from schemas.reviews_schemas import (
 )
 
 
-# TODO: check if i am passing user/reviews objects and not just ids
 def get_review(review_id: int, db: Session):
     return db.query(DbReview).filter(DbReview.id == review_id).first()
 

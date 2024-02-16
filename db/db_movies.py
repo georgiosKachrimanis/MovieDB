@@ -62,7 +62,7 @@ def get_all_movies(
     skip: int = 0,
     limit: int = 100,
 ):
-    movies = db.query(DbMovie).all()
+    movies = db.query(DbMovie).filter(DbMovie.movie_active).all()
     for movie in movies:
         movie.average_movie_rate = calculate_average(
             db=db,

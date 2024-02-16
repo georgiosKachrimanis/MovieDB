@@ -11,6 +11,7 @@ from sqlalchemy.sql.sqltypes import (
     DateTime,
     Float,
     String,
+    Boolean,
 )
 from db.database import Base
 
@@ -21,6 +22,7 @@ class DbUser(Base):
         Integer,
         primary_key=True,
         index=True,
+        unique=True,
     )
     username = Column(String)
     email = Column(
@@ -34,10 +36,16 @@ class DbUser(Base):
         default=datetime.utcnow,
     )
     password = Column(String)
+    # Users need to be activated.
+    user_active = Column(
+        Boolean,
+        default=False,
+    )
     # One <--> Many relationship
     reviews = relationship(
         "DbReview",
         back_populates="user",
+        cascade="all, delete-orphan",
     )
     requests = relationship(
         "DbMovieRequest",
@@ -49,6 +57,7 @@ class DbMovie(Base):
     __tablename__ = "movies"
     id = Column(
         Integer,
+        unique=True,
         primary_key=True,
         index=True,
     )
@@ -62,6 +71,7 @@ class DbMovie(Base):
     reviews = relationship(
         "DbReview",
         back_populates="movie",
+        cascade="all, delete-orphan",
     )
     director_id = Column(
         Integer,
@@ -90,13 +100,18 @@ class DbMovie(Base):
     requests = relationship(
         "DbMovieRequest",
         back_populates="movies",
-    )  # One-to-many relationship
+    )
+    movie_active = Column(
+        Boolean,
+        default=True,
+    )
 
 
 class DbActor(Base):
     __tablename__ = "actors"
     id = Column(
         Integer,
+        unique=True,
         primary_key=True,
         index=True,
     )
@@ -110,6 +125,10 @@ class DbActor(Base):
         secondary="movie_actors",
         back_populates="actors",
     )
+    actor_active = Column(
+        Boolean,
+        default=True,
+    )
 
 
 class DbReview(Base):
@@ -118,6 +137,7 @@ class DbReview(Base):
         Integer,
         primary_key=True,
         index=True,
+        unique=True,
     )
     review_content = Column(Text)
     created_at = Column(
@@ -127,7 +147,10 @@ class DbReview(Base):
     # Foreign key to establish the one<-->many relationship
     user_id = Column(
         Integer,
-        ForeignKey("users.id"),
+        ForeignKey(
+            "users.id",
+            ondelete="CASCADE",
+        ),
     )
     user_rating = Column(Float)
     # One<-->many relationship
@@ -138,12 +161,19 @@ class DbReview(Base):
     # Foreign key to establish the one-to-many relationship
     movie_id = Column(
         Integer,
-        ForeignKey("movies.id"),
+        ForeignKey(
+            "movies.id",
+            ondelete="CASCADE",
+        ),
     )
     # # One<-->many relationship
     movie = relationship(
         "DbMovie",
         back_populates="reviews",
+    )
+    review_active = Column(
+        Boolean,
+        default=True,
     )
 
 
@@ -153,6 +183,7 @@ class DbDirector(Base):
         Integer,
         primary_key=True,
         index=True,
+        unique=True,
     )
     director_name = Column(
         String,
@@ -163,18 +194,28 @@ class DbDirector(Base):
         "DbMovie",
         back_populates="director",
     )
+    director_active = Column(
+        Boolean,
+        default=True,
+    )
 
 
 class DbMovieActor(Base):
     __tablename__ = "movie_actors"
     movie_id = Column(
         Integer,
-        ForeignKey("movies.id"),
+        ForeignKey(
+            "movies.id",
+            ondelete="CASCADE",
+        ),
         primary_key=True,
     )
     actor_id = Column(
         Integer,
-        ForeignKey("actors.id"),
+        ForeignKey(
+            "actors.id",
+            ondelete="CASCADE",
+        ),
         primary_key=True,
     )
 
@@ -185,6 +226,7 @@ class DbCategory(Base):
         Integer,
         primary_key=True,
         index=True,
+        unique=True,
     )
     category_name = Column(
         String,
@@ -194,7 +236,11 @@ class DbCategory(Base):
         "DbMovie",
         secondary="movie_categories",
         back_populates="categories",
-    )  # Many-to-many relationship
+    )
+    category_active = Column(
+        Boolean,
+        default=True,
+    )
 
 
 class DbMovieRequest(Base):

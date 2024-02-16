@@ -16,7 +16,6 @@ class MovieBasicDisplay(BaseModel):
 
 # Movie inside ActorDisplay
 class Actor(BaseModel):
-    id: int
     actor_name: str
 
 

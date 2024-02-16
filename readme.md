@@ -77,6 +77,10 @@ This will start the FastAPI application on <http://localhost:8000>.
 
 This API uses OAuth2 with JWT tokens for securing endpoints that require user authentication and authorization.
 
+## Known Issues
+
+Despite the database documentation asserting that ID incrementation is automatic and guarantees uniqueness, there's an observed behavior that contradicts this claim. Specifically, when the last item in a table is deleted and a new item is subsequently created within the same table, the new item is assigned the ID of the previously deleted item. This behavior suggests that under certain conditions, the database's auto-increment mechanism might reuse IDs, which deviates from the expected norm of always generating a new, unique ID for each insertion.
+
 ## Contributing
 
 Contributions are welcome! Please feel free to submit a pull request.
