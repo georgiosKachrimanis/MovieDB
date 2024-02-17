@@ -31,17 +31,16 @@ class DbUser(Base):
         index=True,
     )
     user_type = Column(String)
-    created_at = Column(
-        DateTime,
-        default=datetime.utcnow,
-    )
     password = Column(String)
     # Users need to be activated.
     user_active = Column(
         Boolean,
         default=False,
     )
-    # One <--> Many relationship
+    created_at = Column(
+        DateTime,
+        default=datetime.utcnow,
+    )
     reviews = relationship(
         "DbReview",
         back_populates="user",
@@ -101,9 +100,9 @@ class DbMovie(Base):
         "DbMovieRequest",
         back_populates="movies",
     )
-    movie_active = Column(
-        Boolean,
-        default=True,
+    created_date = Column(
+        DateTime,
+        default=datetime.utcnow,
     )
 
 
@@ -125,9 +124,9 @@ class DbActor(Base):
         secondary="movie_actors",
         back_populates="actors",
     )
-    actor_active = Column(
-        Boolean,
-        default=True,
+    created_date = Column(
+        DateTime,
+        default=datetime.utcnow,
     )
 
 
@@ -140,10 +139,6 @@ class DbReview(Base):
         unique=True,
     )
     review_content = Column(Text)
-    created_at = Column(
-        DateTime,
-        default=datetime.utcnow,
-    )
     # Foreign key to establish the one<-->many relationship
     user_id = Column(
         Integer,
@@ -153,12 +148,10 @@ class DbReview(Base):
         ),
     )
     user_rating = Column(Float)
-    # One<-->many relationship
     user = relationship(
         "DbUser",
         back_populates="reviews",
     )
-    # Foreign key to establish the one-to-many relationship
     movie_id = Column(
         Integer,
         ForeignKey(
@@ -166,14 +159,13 @@ class DbReview(Base):
             ondelete="CASCADE",
         ),
     )
-    # # One<-->many relationship
     movie = relationship(
         "DbMovie",
         back_populates="reviews",
     )
-    review_active = Column(
-        Boolean,
-        default=True,
+    created_at = Column(
+        DateTime,
+        default=datetime.utcnow,
     )
 
 
@@ -197,6 +189,10 @@ class DbDirector(Base):
     director_active = Column(
         Boolean,
         default=True,
+    )
+    created_date = Column(
+        DateTime,
+        default=datetime.utcnow,
     )
 
 
@@ -240,6 +236,10 @@ class DbCategory(Base):
     category_active = Column(
         Boolean,
         default=True,
+    )
+    created_date = Column(
+        DateTime,
+        default=datetime.utcnow,
     )
 
 
