@@ -11,8 +11,6 @@ router = APIRouter(prefix="/categories", tags=["Category Endpoints"])
 
 
 # CRUD Operations for Category
-
-
 # Create Category
 @router.post("/", response_model=categories_schemas.CategoryDisplay)
 def create_category(
@@ -188,7 +186,7 @@ def delete_category(
     db: Session = Depends(get_db),
     token: str = Depends(oauth2.oauth2_schema),
 ):
-     """
+    """
     Deletes a category from the database.
     
     Requires admin authentication. This endpoint allows for the deletion of a category by its ID.

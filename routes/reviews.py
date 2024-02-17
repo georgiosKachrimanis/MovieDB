@@ -6,6 +6,7 @@ from db import db_reviews, db_movies
 from auth import oauth2
 from typing import List, Optional
 from db.models import Movie
+from auth import oauth2
 
 
 router = APIRouter(prefix="/reviews", tags=["Review Endpoints"])
@@ -133,48 +134,49 @@ def get_review_by_id(
     return db_reviews.get_review_from_db(review_id=review_id, db=db)
 
 
-# Patch (Update Partially) Review
-@router.patch("/{review_id}",response_model=reviews_schemas.ReviewDisplayOne)
-def patch_review(
-    review_id: int,
-    request: reviews_schemas.ReviewUpdate,
-    db: Session = Depends(get_db),
-    token: str = Depends(oauth2.oauth2_schema),
-):
-    """
-    Partially updates a review.
+# # Patch (Update Partially) Review
+# @router.patch("/{review_id}",response_model=reviews_schemas.ReviewDisplayOne)
+# def patch_review(
+#     review_id: int,
+#     request: reviews_schemas.ReviewUpdate,
+#     db: Session = Depends(get_db),
+#     token: str = Depends(oauth2.oauth2_schema),
+# ):
+#     """
+#     Partially updates a review.
     
-    Requires authentication. This endpoint allows users to partially update their own reviews or for admins to update any review.
+#     Requires authentication. This endpoint allows users to partially update their own reviews or for admins to update any review.
     
-    Parameters:
-    - review_id: int - The ID of the review to update.
-    - request: reviews_schemas.ReviewUpdate - The partial update data.
-    - db: Session - Dependency injection of the database session.
-    - token: str - The OAuth2 token for user authentication.
+#     Parameters:
+#     - review_id: int - The ID of the review to update.
+#     - request: reviews_schemas.ReviewUpdate - The partial update data.
+#     - db: Session - Dependency injection of the database session.
+#     - token: str - The OAuth2 token for user authentication.
     
-    Returns:
-    - The updated review's details as defined by the ReviewDisplayOne schema.
+#     Returns:
+#     - The updated review's details as defined by the ReviewDisplayOne schema.
     
-    Raises:
-    - HTTPException: If the review is not found, not owned by the user, or the user is not an admin.
-    """
-    payload = oauth2.decode_access_token(token=token)
-    review = db_reviews.get_review_from_db(review_id=review_id, db=db)
+#     Raises:
+#     - HTTPException: If the review is not found, not owned by the user, or the user is not an admin.
+#     """
 
-    if (
-        review.user_id == payload.get("user_id")
-        or payload.get("user_type") == "admin"
-    ):
-        if review is not None:
-            return db_reviews.patch_review(
-                db=db, review_id=review_id, review_data=request
-            )
-        return review
-    else:
-        raise HTTPException(
-            status_code=status.HTTP_418_IM_A_TEAPOT,
-            detail="Not your review, you can not change it!",
-        )
+#     review = db_reviews.get_review_from_db(review_id=review_id, db=db)
+#     if oauth2.admin_authentication(token=token):
+#         payload = oauth2.decode_access_token(token=token)
+#         if (
+#             review.user_id == payload.get("user_id")
+#             or payload.get("user_type") == "admin"
+#         ):
+#             if review is not None:
+#                 return db_reviews.patch_review(
+#                     db=db, review_id=review_id, review_data=request
+#                 )
+#             return review
+#         else:
+#             raise HTTPException(
+#                 status_code=status.HTTP_418_IM_A_TEAPOT,
+#                 detail="Not your review, you can not change it!",
+#             )
 
 # Update Review
 @router.put(
@@ -203,23 +205,29 @@ def update_review(
     Raises:
     - HTTPException: If the review is not found, not owned by the user, or the user is not an admin.
     """
-    payload = oauth2.decode_access_token(token=token)
+    
     review = db_reviews.get_review_from_db(review_id=review_id, db=db)
+    user_id = review.user_id
+    if oauth2.admin_authentication(token=token, user_id=user_id):
+        payload = oauth2.decode_access_token(token=token)
 
-    if (
-        review.user_id == payload.get("user_id")
-        or payload.get("user_type") == "admin"
-    ):
         if review is not None:
-            return db_reviews.update_review(
+            if (
+                review.user_id == payload.get("user_id")
+                or payload.get("user_type") == "admin"
+                ):
+                return db_reviews.update_review(
                 db=db, review_id=review_id, review_data=request
             )
-        return review
-    else:
-        raise HTTPException(
-            status_code=status.HTTP_418_IM_A_TEAPOT,
-            detail="Not your review, you can not change it!",
-        )
+            else:
+                raise HTTPException(
+                status_code=403,
+                detail="Not your review, you can not change it!",
+                )
+        else:
+            raise HTTPException(status_code=404, detail="Review not found")
+
+    
 
 
 # Delete Review

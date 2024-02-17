@@ -266,6 +266,11 @@ def delete_user(
             detail="You need to log in to update !",
         ) from e
     else:
+        if payload.get("user_id") == user_id:
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="You can not delete your own account!",
+            )
         user = check_user(db=db, user_id=user_id)
         if payload.get("user_type") == "admin" and user:
             db_users.delete_user(db=db, id=user_id)
