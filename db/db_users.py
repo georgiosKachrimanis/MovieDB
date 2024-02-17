@@ -1,16 +1,17 @@
 from sqlalchemy import func
-from sqlalchemy.orm.session import Session
 from sqlalchemy.orm import joinedload
-from schemas.users_reviews_schemas import (
-    UserBase,
-    UserUpdate,
-    UserTypeUpdate,
-)
-from db.models import DbUser, DbReview
+from sqlalchemy.orm.session import Session
+
 from db.hash import Hash
+from db.models import DbReview, DbUser
+from schemas.users_schemas import UserBase, UserTypeUpdate, UserUpdate
 
 
-def create_user(db: Session, request: UserBase):
+# TODO: check if i am passing user/reviews objects and not just ids
+def create_user(
+    db: Session,
+    request: UserBase,
+):
     new_user = DbUser(
         username=request.username,
         email=request.email,
@@ -34,7 +35,11 @@ def get_all_users(db: Session):
     return users
 
 
-def get_user(db: Session, id: int = None, email: str = None):
+def get_user(
+    db: Session,
+    id: int = None,
+    email: str = None,
+):
     if id is not None:
         return db.query(DbUser).filter(DbUser.id == id).first()
     elif email is not None:
@@ -43,8 +48,12 @@ def get_user(db: Session, id: int = None, email: str = None):
         return None
 
 
-def update_user(db: Session, id: int, request: UserUpdate):
-    user = db.query(DbUser).filter(DbUser.id == id).first()
+def update_user(
+    db: Session,
+    user: DbUser,
+    request: UserUpdate,
+):
+
     if user is None:
         return None
     else:
@@ -55,18 +64,20 @@ def update_user(db: Session, id: int, request: UserUpdate):
         return user
 
 
-def update_user_type(db: Session, id: int, request: UserTypeUpdate):
-    user = db.query(DbUser).filter(DbUser.id == id).first()
-    if user is None:
-        return None
-    else:
-        user.user_type = request.user_type  # request.user_type
-        db.commit()
-        return user
+def update_user_type(
+    db: Session,
+    user: DbUser,
+    request: UserTypeUpdate,
+):
+    if user:
+        user.user_type = request.user_type
+
+    db.commit()
+    db.refresh(user)
+    return user
 
 
-def delete_user(db: Session, id: int):
-    user = db.query(DbUser).filter(DbUser.id == id).first()
+def delete_user(db: Session, user: DbUser):
     db.delete(user)
     db.commit()
     return user

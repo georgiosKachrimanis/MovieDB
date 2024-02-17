@@ -1,12 +1,10 @@
 from typing import List
-
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
-
 from auth import oauth2
 from db import db_directors
 from db.database import get_db
-from schemas.mov_dir_actors_schemas import Director, DirectorDisplay, DirectorUpdate
+from schemas.directors_schemas import Director, DirectorDisplay, DirectorUpdate
 
 router = APIRouter(
     prefix="/directors",
@@ -28,9 +26,20 @@ def create_director(
     db: Session = Depends(get_db),
     token: str = Depends(oauth2.oauth2_schema),
 ):
+    """
+    Creates a new director in the database. Requires admin authentication.
+
+    Parameters:
+    - request (Director): The director data to create.
+    - db (Session): Database session for executing database operations.
+    - token (str): OAuth2 token to authenticate the request.
+
+    Returns:
+    - Director: The created director object.
+    """
     oauth2.admin_authentication(
         token=token,
-        exception_text=AUTHENTICATION_TEXT,
+        detail=AUTHENTICATION_TEXT,
     )
 
     return db_directors.create_director(
@@ -48,6 +57,20 @@ def get_director_by_id(
     director_id: int,
     db: Session = Depends(get_db),
 ):
+    """
+    Retrieves a director by their ID.
+
+    Parameters:
+    - director_id (int): The ID of the director to retrieve.
+    - db (Session): Database session for executing database operations.
+
+    Raises:
+    - HTTPException: 404 Not Found if the director with the specified ID does
+    not exist.
+
+    Returns:
+    - DirectorDisplay: The requested director's information.
+    """
     director = db_directors.get_director(
         db=db,
         director_id=director_id,
@@ -67,6 +90,15 @@ def get_director_by_id(
     response_model=List[DirectorDisplay],
 )
 def get_all_directors(db: Session = Depends(get_db)):
+    """
+    Retrieves all directors from the database.
+
+    Parameters:
+    - db (Session): Database session for executing database operations.
+
+    Returns:
+    - List[DirectorDisplay]: A list of all director objects.
+    """
     return db_directors.get_all_directors(db)
 
 
@@ -81,9 +113,23 @@ def update_director(
     db: Session = Depends(get_db),
     token: str = Depends(oauth2.oauth2_schema),
 ):
+    """
+    Updates an existing director in the database. Requires admin
+    authentication.
+
+    Parameters:
+    - request (DirectorUpdate): The updated data for the director.
+    - director (Director): The current director object from the database,
+    obtained via dependency.
+    - db (Session): Database session for executing database operations.
+    - token (str): OAuth2 token to authenticate the request.
+
+    Returns:
+    - DirectorDisplay: The updated director's information.
+    """
     oauth2.admin_authentication(
         token=token,
-        exception_text=AUTHENTICATION_TEXT,
+        detail=AUTHENTICATION_TEXT,
     )
 
     return db_directors.update_director(
@@ -103,9 +149,26 @@ def delete_director(
     db: Session = Depends(get_db),
     token: str = Depends(oauth2.oauth2_schema),
 ):
+    """
+    Deletes a director from the database. Requires admin authentication.
+    The director cannot be deleted if they are associated with any movies.
+
+    Parameters:
+    - director (Director): The director object to delete, obtained via
+        dependency.
+    - db (Session): Database session for executing database operations.
+    - token (str): OAuth2 token to authenticate the request.
+
+    Raises:
+    - HTTPException: 409 Conflict if the director is associated with any
+        movies.
+
+    Returns:
+    - A status code of 204 No Content on successful deletion.
+    """
     oauth2.admin_authentication(
         token=token,
-        exception_text=AUTHENTICATION_TEXT,
+        detail=AUTHENTICATION_TEXT,
     )
 
     movies = db_directors.check_director_in_movie(db, director.id)

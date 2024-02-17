@@ -1,10 +1,13 @@
-from db.models import DbCategory
 from sqlalchemy.orm import Session
-from schemas.mov_dir_actors_schemas import CategoryName
+from db.models import DbCategory
+from schemas.categories_schemas import CategoryBase
 
 
 # Create Category
-def add_category(db: Session, category_name: str):
+def add_category(
+    db: Session,
+    category_name: str,
+):
     category = DbCategory(category_name=category_name)
     db.add(category)
     db.commit()
@@ -18,13 +21,32 @@ def get_all_categories(db: Session):
 
 
 # Get Category By Id
-def get_category(db: Session, category_id: int):
+def get_category_with_id(
+    db: Session,
+    category_id: int,
+):
     return db.query(DbCategory).filter(DbCategory.id == category_id).first()
 
 
+def get_category_with_name(
+    db: Session,
+    category_name: str,
+):
+    return (
+        db.query(DbCategory)
+        .filter(DbCategory.category_name == category_name)
+        .first()
+        .id
+    )
+
+
 # Update Category
-def update_category(db: Session, category_id: int, request: CategoryName):
-    category = get_category(db, category_id)
+def update_category(
+    db: Session,
+    category_id: int,
+    request: CategoryBase,
+):
+    category = get_category_with_id(db, category_id)
     if category:
         category.category_name = request.category_name
         db.commit()
@@ -33,8 +55,11 @@ def update_category(db: Session, category_id: int, request: CategoryName):
 
 
 # Delete Category
-def delete_category(db: Session, category_id: int):
-    category = get_category(db, category_id)
+def delete_category(
+    db: Session,
+    category_id: int,
+):
+    category = get_category_with_id(db, category_id)
     if category:
         db.delete(category)
         db.commit()

@@ -1,4 +1,9 @@
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import (
+    APIRouter,
+    Depends,
+    HTTPException,
+    status,
+)
 from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy.orm.session import Session
 from db.database import get_db
@@ -10,7 +15,7 @@ from auth import oauth2
 router = APIRouter(tags=["Authentication Endpoints"])
 
 
-# name needs to be the same as the  --> oauth2_schema = OAuth2PasswordBearer(tokenUrl="token")
+# name like this --> oauth2_schema = OAuth2PasswordBearer(tokenUrl="token")
 @router.post("/token")
 def get_token(
     request: OAuth2PasswordRequestForm = Depends(),
@@ -41,7 +46,7 @@ def get_token(
     The returned token should be included in the 'Authorization' header of
     subsequent requests as 'Bearer {token}'.
     """
-    
+
     user = (
         db.query(models.DbUser)
         .filter(models.DbUser.username == request.username)
@@ -52,9 +57,10 @@ def get_token(
         plain_password=request.password,
     ):
         raise HTTPException(
-            status_code=status.HTTP_418_IM_A_TEAPOT, detail="Wrong credentials"
+            status_code=status.HTTP_418_IM_A_TEAPOT,
+            detail="Wrong credentials",
         )
-        
+
     access_token = oauth2.create_access_token(
         data={
             "sub": user.username,
