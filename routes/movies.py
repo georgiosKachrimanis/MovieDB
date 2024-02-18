@@ -18,18 +18,17 @@ from db.database import get_db
 from db.db_categories import get_category_with_name
 from routes.reviews import all_reviews_for_movie
 from schemas.actors_schemas import ActorDisplay
-from schemas.directors_schemas import DirectorDisplay
 from schemas.categories_schemas import CategoryMenu
-from schemas.reviews_schemas import ReviewDisplayOne
+from schemas.directors_schemas import DirectorDisplay
 from schemas.movies_schemas import (
     MovieBase,
-    MovieDisplayAll,
     MovieDisplayOne,
     MovieExtraData,
     MoviePatchUpdate,
     MovieUpdate,
 )
-
+from schemas.reviews_schemas import ReviewDisplayOne
+from services.movie_service import get_movie_extra_data
 
 router = APIRouter(
     prefix="/movies",
@@ -41,7 +40,7 @@ AUTHENTICATION_TEXT = "You are not authorized to add, edit or delete a movie!"
 
 @router.get(
     "/",
-    response_model=Optional[List[MovieDisplayAll]],
+    response_model=Optional[List[MovieDisplayOne]],
 )
 def get_movies(
     db: Session = Depends(get_db),
@@ -51,7 +50,9 @@ def get_movies(
     top_movies: int = None,
 ):
     """
-    Retrieves a list of movies from the database. Can filter movies by actor ID, director ID, category, and limit the result to top N movies based on average movie rate.
+    Retrieves a list of movies from the database. Can filter movies by actor ID
+    director ID, category, and limit the result to top N movies based on
+    average movie rate.
 
     Parameters:
     - db (Session): Database session for executing database operations.
@@ -177,6 +178,8 @@ def get_movie_reviews(
     - Optional[List[ReviewDisplayOne]]: List of reviews for the movie or a
     specific review if review_id is provided.
     """
+
+    # This will return only one review if it is for the movie.
     if review_id:
         reviews = get_movie_review(
             movie=movie,
@@ -218,7 +221,7 @@ def get_movie_actors(
             return [movie_actor]
         raise HTTPException(
             status_code=404,
-            detail=f"Actor with ID: {actor_id}, doesn't belong to Movie.",
+            detail=f"Actor with ID: {actor_id}, is not in {movie.title}.",
         )
 
     return [ActorDisplay.model_validate(actor) for actor in movie.actors]
@@ -259,8 +262,10 @@ async def get_movie_extra(
     Returns:
     - MovieExtraData: Extra data about the movie.
     """
-
-    return await db_movies.get_movie_extra(movie=movie)
+    if movie.imdb_id is None:
+        return "No imdb_id stored in the DB for this movie."
+    else:
+        return await get_movie_extra_data(movie.imdb_id)
 
 
 # ========================== Post Endpoints =====================
@@ -296,11 +301,6 @@ def create_movie(
         detail=AUTHENTICATION_TEXT,
     )
 
-    if db_movies.get_movie(db=db, movie_title=movie.title):
-        raise HTTPException(
-            status_code=409,
-            detail=f"A movie with the title {movie.title} already exists.",
-        )
     return db_movies.create_movie(db, movie)
 
 
@@ -403,16 +403,11 @@ def update_movie_data(
         detail=AUTHENTICATION_TEXT,
     )
 
-    if movie is None:
-        raise HTTPException(
-            status_code=404, detail="Movie with Id :{movie_id} not found"
-        )
-    else:
-        updated_movie = db_movies.update_movie(
-            db=db,
-            movie=movie,
-            request=movie_updates,
-        )
+    updated_movie = db_movies.update_movie(
+        db=db,
+        movie=movie,
+        request=movie_updates,
+    )
 
     return updated_movie
 
@@ -423,8 +418,8 @@ def update_movie_data(
     response_model=Optional[MovieDisplayOne],
 )
 def patch_movie(
-    movie_id: int,
     movie_updates: Optional[MoviePatchUpdate],
+    movie: MovieBase = Depends(get_movie_by_id),
     db: Session = Depends(get_db),
     token: str = Depends(oauth2.oauth2_schema),
 ):
@@ -448,8 +443,6 @@ def patch_movie(
         token=token,
         detail=AUTHENTICATION_TEXT,
     )
-
-    movie = db_movies.get_movie(db, movie_id)
 
     if movie is None:
         raise HTTPException(
@@ -551,7 +544,7 @@ def get_movie_review(
 
 
 def get_movies_by_director(
-    movies: List[MovieDisplayAll],
+    movies: List[MovieDisplayOne],
     director_id: int,
 ):
     filtered_movies = []
@@ -568,7 +561,7 @@ def get_movies_by_director(
 
 
 def get_movies_by_actor(
-    movies: List[MovieDisplayAll],
+    movies: List[MovieDisplayOne],
     actor_id: int,
 ):
 

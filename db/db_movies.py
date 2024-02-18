@@ -6,30 +6,19 @@ from sqlalchemy.orm import (
 )
 from sqlalchemy.sql.functions import coalesce
 from db.models import (
+    DbActor,
     DbCategory,
     DbDirector,
     DbMovie,
-    DbReview,
-    DbActor,
     DbMovieRequest,
+    DbReview,
 )
 from routes.directors import get_director_by_id
-from services.movie_service import get_movie_extra_data
 from schemas.movies_schemas import (
     MovieBase,
     MoviePatchUpdate,
     MovieUpdate,
 )
-
-
-def check_director(
-    director_id: int,
-    db: Session,
-):
-    return get_director_by_id(
-        director_id=director_id,
-        db=db,
-    ).id
 
 
 def create_movie(
@@ -39,7 +28,7 @@ def create_movie(
 
     new_movie = DbMovie(
         title=request.title,
-        released_date=request.released_date,
+        released_date=request.release_year,
         categories=get_movie_categories(db=db, request=request),
         plot=request.plot,
         poster_url=request.poster_url,
@@ -62,7 +51,7 @@ def get_all_movies(
     skip: int = 0,
     limit: int = 100,
 ):
-    movies = db.query(DbMovie).filter(DbMovie.movie_active).all()
+    movies = db.query(DbMovie).all()
     for movie in movies:
         movie.average_movie_rate = calculate_average(
             db=db,
@@ -276,10 +265,11 @@ def create_request_log(
     return True
 
 
-def get_movie_extra(
-    movie: DbMovie,
+def check_director(
+    director_id: int,
+    db: Session,
 ):
-    if movie.imdb_id is None:
-        return "No imdb_id stored in the DB for this movie."
-    else:
-        return get_movie_extra_data(movie.imdb_id)
+    return get_director_by_id(
+        director_id=director_id,
+        db=db,
+    ).id

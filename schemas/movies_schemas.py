@@ -1,6 +1,6 @@
 from datetime import datetime
 from typing import List, Optional
-from pydantic import BaseModel
+from pydantic import BaseModel, validator
 from schemas.users_schemas import Review
 from schemas.categories_schemas import Category
 from schemas.actors_schemas import Actor
@@ -10,33 +10,33 @@ from schemas.directors_schemas import Director
 # =========================== Movies Schemas ==================================
 class MovieBase(BaseModel):
     title: str
-    released_date: Optional[datetime]
-    categories: List[int] = []
     director_id: Optional[int] = None
     actors: Optional[List[int]] = []
     plot: str
+    categories: List[int] = []
+    release_year: Optional[int]
     poster_url: Optional[str]
     imdb_id: Optional[str]
 
+    # @validator("release_year")
+    # def check_valid_year(cls, input_year):
+    #     if input < 1900 or input_year > 2030:
+    #         raise ValueError("Release year must be between 1900 and 2030.")
+    #     return input_year
 
-class MovieDisplayAll(BaseModel):
+
+class MovieDisplayOne(BaseModel):
     id: int
     title: str
     director: Optional[Director]
     actors: Optional[List[Actor]]
     plot: str
-    released_date: datetime
+    release_year: Optional[int]
     imdb_id: Optional[str]
     categories: List[Category]
     poster_url: Optional[str] = None
     reviews_count: Optional[int] = None
     average_movie_rate: Optional[float] = None
-
-    class Config:
-        from_attributes = True
-
-
-class MovieDisplayOne(MovieDisplayAll):
     reviews: List[Review] = []
 
     class Config:
@@ -46,7 +46,7 @@ class MovieDisplayOne(MovieDisplayAll):
 # to be used with the patch(update) function
 class MoviePatchUpdate(BaseModel):
     title: Optional[str] = None
-    released_date: Optional[datetime] = None
+    release_year: Optional[int] = None
     categories: Optional[List[int]] = None
     plot: Optional[str] = None
     poster_url: Optional[str] = None
@@ -58,7 +58,7 @@ class MoviePatchUpdate(BaseModel):
 # To be used with the put(update) function
 class MovieUpdate(BaseModel):
     title: str
-    released_date: datetime
+    release_year: Optional[int]
     categories: List[int]
     plot: str
     poster_url: str

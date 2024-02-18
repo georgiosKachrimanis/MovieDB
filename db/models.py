@@ -61,7 +61,7 @@ class DbMovie(Base):
         index=True,
     )
     title = Column(String)
-    released_date = Column(DateTime)
+    release_year = Column(Integer)
     categories = relationship(
         "DbCategory",
         secondary="movie_categories",
@@ -186,10 +186,6 @@ class DbDirector(Base):
         "DbMovie",
         back_populates="director",
     )
-    director_active = Column(
-        Boolean,
-        default=True,
-    )
     created_date = Column(
         DateTime,
         default=datetime.utcnow,
@@ -232,10 +228,6 @@ class DbCategory(Base):
         "DbMovie",
         secondary="movie_categories",
         back_populates="categories",
-    )
-    category_active = Column(
-        Boolean,
-        default=True,
     )
     created_date = Column(
         DateTime,

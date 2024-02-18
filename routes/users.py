@@ -26,6 +26,7 @@ router = APIRouter(
 
 
 AUTHENTICATION_TEXT = "You are not authorized to interact with the user(s)!"
+DELETE_TEXT = "You are not allowed to delete your self!"
 
 
 def check_user(
@@ -40,7 +41,8 @@ def check_user(
     - user_id (int): The ID of the user to check.
 
     Raises:
-    - HTTPException: 404 Not Found if the user with the specified ID does not exist.
+    - HTTPException: 404 Not Found if the user with the specified ID does not 
+    exist.
 
     Returns:
     - The user object if found.
@@ -327,13 +329,20 @@ def delete_user(
     """
 
     payload = oauth2.decode_access_token(token=token)
+
     user = check_user(
         db=db,
         user_id=user_id,
     )
-    if payload.get("user_type") == "admin" and user:
+    if payload.get("user_type") == "admin" and user.id != payload.get("user_id"):
+    
         db_users.delete_user(
             db=db,
             user=user,
         )
         return {"message": f"User with id:{user_id} was deleted successfully"}
+    else:
+        raise HTTPException(
+            status_code=status.HTTP_405_METHOD_NOT_ALLOWED,
+            detail=DELETE_TEXT,
+        )
